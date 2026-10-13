@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+# safegit — 本仓库唯一允许使用的 git 入口。
+#
+# 在调用真实 git 之前做策略检查，并把每一次调用（无论放行还是拒绝）
+# 写入带哈希链的审计日志 .git/safegit/audit.log。
+#
+# 用法：
+#   scripts/safegit <git 子命令> [参数...]
+#   scripts/safegit setup [--name 名字 --email 邮箱]   初始化本地配置
+#   scripts/safegit audit log [N]                      查看最近 N 条审计记录
+#   scripts/safegit audit verify                       校验审计日志哈希链
+#   scripts/safegit audit scan                         扫描仓库的历史、分支与配置
+set -uo pipefail
+
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/safegit-policy.sh
+source "$SELF_DIR/lib/safegit-policy.sh"
+
+# 不信任调用方的 PATH 与 GIT_* 环境变量
+REAL_GIT="$(PATH=/usr/local/bin:/usr/bin:/bin command -v git)"
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_EXEC_PATH \
+      GIT_CONFIG GIT_CONFIG_GLOBAL GIT_CONFIG_SYSTEM GIT_CONFIG_NOSYSTEM \
+      GIT_CONFIG_PARAMETERS GIT_CONFIG_COUNT \
+      GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_AUTHOR_DATE \
+      GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL GIT_COMMITTER_DATE \
+      GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_EDITOR
+
+REPO_ROOT="$("$REAL_GIT" -C "$SELF_DIR/.." rev-parse --show-toplevel 2>/dev/null)" || {
+  echo "safegit: 找不到仓库根目录" >&2; exit 2; }
+GIT_COMMON_DIR="$("$REAL_GIT" -C "$REPO_ROOT" rev-parse --path-format=absolute --git-common-dir)"
+AUDIT_DIR="$GIT_COMMON_DIR/safegit"
+AUDIT_LOG="$AUDIT_DIR/audit.log"
+HOOKS_DIR="$REPO_ROOT/.githooks"
+
+# 真实 git 调用：强制使用仓库内的 hooks 目录，禁止调用方覆盖
+rgit() { "$REAL_GIT" -C "$REPO_ROOT" -c core.hooksPath="$HOOKS_DIR" "$@"; }
+
+ORIG_ARGS=("$@")
+
+actor() {
+  if [[ -n "${CLAUDECODE:-}" || -n "${CLAUDE_CODE_ENTRYPOINT:-}" ]]; then
+    echo "claude-code"
+  else
+    echo "${SAFEGIT_ACTOR:-${USER:-$(id -un 2>/dev/null || echo unknown)}}"
+  fi
+}
+
+# 追加一条审计记录：audit_write <decision> <reason> <exit> [argv...]
+audit_write() {
+  local decision="$1" reason="$2" code="$3"; shift 3
+  mkdir -p "$AUDIT_DIR" && chmod 700 "$AUDIT_DIR"
+  (
+    flock -x 9
+    local prev entry hash
+    prev="$(tail -n1 "$AUDIT_LOG" 2>/dev/null | jq -r '.hash // empty' 2>/dev/null)"
+    [[ -z "$prev" ]] && prev="GENESIS"
+    entry="$(jq -cn \
+      --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      --arg actor "$(actor)" \
+      --arg pid "$$" --arg ppid "$PPID" \
+      --arg cwd "$PWD" \
+      --arg branch "$("$REAL_GIT" -C "$REPO_ROOT" branch --show-current 2>/dev/null)" \
+      --arg decision "$decision" --arg reason "$reason" \
+      --arg exit "$code" --arg prev "$prev" \
+      '{ts:$ts, actor:$actor, pid:($pid|tonumber), ppid:($ppid|tonumber), cwd:$cwd,
+        branch:$branch, argv:$ARGS.positional, decision:$decision, reason:$reason,
+        exit:($exit|tonumber), prev:$prev}' --args -- "$@")"
+    hash="$(printf '%s' "$entry" | sha256sum | cut -d' ' -f1)"
+    printf '%s\n' "$(jq -c --arg h "$hash" '. + {hash:$h}' <<<"$entry")" >>"$AUDIT_LOG"
+  ) 9>>"$AUDIT_DIR/.lock"
+  chmod 600 "$AUDIT_LOG" 2>/dev/null || true
+}
+
+deny() {
+  echo "safegit: 已拒绝 —— $1" >&2
+  audit_write deny "$1" 1 "${ORIG_ARGS[@]}"
+  exit 1
+}
+
+run_git() {
+  rgit "$@"
+  local code=$?
+  audit_write allow "" "$code" "${ORIG_ARGS[@]}"
+  exit "$code"
+}
+
+current_branch() { "$REAL_GIT" -C "$REPO_ROOT" branch --show-current 2>/dev/null; }
+
+check_identity() {
+  local ident
+  for var in GIT_AUTHOR_IDENT GIT_COMMITTER_IDENT; do
+    ident="$(rgit var "$var" 2>/dev/null | sed -E 's/ [0-9]+ [+-][0-9]{4}$//')"
+    if [[ -z "$ident" ]] || safegit_ident_forbidden "$ident"; then
+      deny "提交身份不合规（$var=$ident），请先运行 scripts/safegit setup --name ... --email ..."
+    fi
+  done
+}
+
+check_signing() {
+  local key prog
+  key="$(rgit config --get user.signingkey 2>/dev/null)"
+  prog="$(rgit config --get gpg.ssh.program 2>/dev/null)"
+  if printf '%s %s' "$key" "$prog" | grep -Eiq -- "$SAFEGIT_FORBIDDEN_SIGNING_RE"; then
+    deny "签名配置指向容器内置的 Claude 密钥（$key / $prog），拒绝用它签名"
+  fi
+}
+
+check_args_refs() {
+  local a
+  for a in "$@"; do
+    safegit_ref_forbidden "$a" && deny "禁止使用 claude/ 前缀的分支或引用：$a"
+  done
+}
+
+check_branch_not_forbidden() {
+  local b; b="$(current_branch)"
+  [[ -n "$b" ]] && safegit_ref_forbidden "$b" && deny "当前分支 $b 带有 claude/ 前缀，禁止在其上提交或推送"
+}
+
+has_arg() { local pat="$1"; shift; local a; for a in "$@"; do [[ "$a" =~ $pat ]] && return 0; done; return 1; }
+
+# ---------- 子命令：setup ----------
+cmd_setup() {
+  local name="" email=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --name) name="${2:-}"; shift 2 ;;
+      --email) email="${2:-}"; shift 2 ;;
+      *) deny "setup 不支持的参数：$1" ;;
+    esac
+  done
+  if [[ -n "$name" || -n "$email" ]]; then
+    { safegit_ident_forbidden "$name" || safegit_ident_forbidden "$email"; } && deny "setup 身份不合规：$name <$email>"
+    [[ -n "$name" ]] && "$REAL_GIT" -C "$REPO_ROOT" config --local user.name "$name"
+    [[ -n "$email" ]] && "$REAL_GIT" -C "$REPO_ROOT" config --local user.email "$email"
+  fi
+  "$REAL_GIT" -C "$REPO_ROOT" config --local core.hooksPath .githooks
+  # 默认不签名：避免继承容器全局的 commit.gpgsign=true（Claude 密钥）
+  "$REAL_GIT" -C "$REPO_ROOT" config --local commit.gpgsign false
+  "$REAL_GIT" -C "$REPO_ROOT" config --local tag.gpgsign false
+  chmod +x "$HOOKS_DIR"/* "$SELF_DIR/safegit" 2>/dev/null || true
+  audit_write allow "setup" 0 "${ORIG_ARGS[@]}"
+  echo "safegit: 本地配置已就绪（hooksPath=.githooks，commit.gpgsign=false）"
+  echo "         身份：$("$REAL_GIT" -C "$REPO_ROOT" config user.name) <$("$REAL_GIT" -C "$REPO_ROOT" config user.email)>"
+}
+
+# ---------- 子命令：audit ----------
+audit_verify() {
+  [[ -f "$AUDIT_LOG" ]] || { echo "审计日志为空"; return 0; }
+  python3 -I - "$AUDIT_LOG" <<'PY'
+import hashlib, json, sys
+prev, ok, n = "GENESIS", True, 0
+for n, line in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
+    try:
+        e = json.loads(line)
+    except ValueError:
+        print(f"第 {n} 行：不是合法 JSON"); ok = False; break
+    h = e.pop("hash", None)
+    if e.get("prev") != prev:
+        print(f"第 {n} 行：prev 不匹配，链条断裂"); ok = False; break
+    # 与 jq -c 的输出保持一致的序列化
+    body = json.dumps(e, ensure_ascii=False, separators=(",", ":"))
+    if hashlib.sha256(body.encode()).hexdigest() != h:
+        print(f"第 {n} 行：哈希不匹配，记录被修改"); ok = False; break
+    prev = h
+print(f"共 {n} 条记录，哈希链{'完整' if ok else '已损坏'}")
+sys.exit(0 if ok else 1)
+PY
+}
+
+audit_scan() {
+  local issues=0 b sha line
+  echo "== 分支与引用 =="
+  while read -r b; do
+    if safegit_ref_forbidden "$b"; then echo "  [违规] $b"; issues=$((issues+1)); fi
+  done < <(rgit for-each-ref --format='%(refname)')
+  echo "== 提交历史（所有引用）=="
+  while IFS=$'\x1f' read -r sha line; do
+    [[ -z "$sha" ]] && continue
+    if safegit_ident_forbidden "$line"; then echo "  [违规身份] ${sha:0:10} $line"; issues=$((issues+1)); fi
+  done < <(rgit log --all --format='%H%x1f%an <%ae> / %cn <%ce>' 2>/dev/null)
+  local tmp; tmp="$(mktemp)"
+  while read -r sha; do
+    rgit log -1 --format=%B "$sha" >"$tmp"
+    local hit; hit="$(safegit_msg_forbidden "$tmp")"
+    [[ -n "$hit" ]] && { echo "  [违规消息] ${sha:0:10} 含「$hit」"; issues=$((issues+1)); }
+  done < <(rgit rev-list --all 2>/dev/null)
+  rm -f "$tmp"
+  echo "== 本地配置 =="
+  local hp gs key prog
+  hp="$(rgit config --local --get core.hooksPath)"; gs="$(rgit config --get commit.gpgsign)"
+  key="$(rgit config --get user.signingkey)"; prog="$(rgit config --get gpg.ssh.program)"
+  [[ "$hp" == ".githooks" ]] || { echo "  [风险] core.hooksPath=$hp（应为 .githooks，运行 safegit setup）"; issues=$((issues+1)); }
+  if [[ "$gs" == "true" ]] && printf '%s %s' "$key" "$prog" | grep -Eiq -- "$SAFEGIT_FORBIDDEN_SIGNING_RE"; then
+    echo "  [风险] commit.gpgsign=true 且签名密钥为 Claude 内置密钥"; issues=$((issues+1))
+  fi
+  local ident; ident="$(rgit config user.name) <$(rgit config user.email)>"
+  safegit_ident_forbidden "$ident" && { echo "  [风险] 当前身份 $ident"; issues=$((issues+1)); }
+  echo "  身份：$ident    hooksPath：${hp:-未设置}    gpgsign：${gs:-未设置}"
+  echo "== 审计日志 =="
+  audit_verify | sed 's/^/  /' || issues=$((issues+1))
+  echo
+  if [[ $issues -eq 0 ]]; then echo "结论：未发现问题"; else echo "结论：发现 $issues 个问题"; fi
+  [[ $issues -eq 0 ]]
+}
+
+cmd_audit() {
+  case "${1:-log}" in
+    log)
+      [[ -f "$AUDIT_LOG" ]] || { echo "审计日志为空"; return 0; }
+      tail -n "${2:-20}" "$AUDIT_LOG" | jq -r \
+        '"\(.ts)  \(.decision|ascii_upcase)  \(.actor)  [\(.branch)]  git \(.argv|join(" "))" + (if .exit != 0 then "  (exit \(.exit))" else "" end) + (if .reason != "" then "\n      └─ \(.reason)" else "" end)' ;;
+    verify) audit_verify ;;
+    scan) audit_scan ;;
+    *) echo "用法：safegit audit [log [N]|verify|scan]" >&2; return 2 ;;
+  esac
+}
+
+# ---------- 入口 ----------
+[[ $# -eq 0 ]] && { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+
+# 唯一允许的全局选项：-c user.signingkey=<GPG 指纹>[!]
+SIGNING_OVERRIDE=()
+while [[ "${1:-}" == -* ]]; do
+  if [[ "$1" == "-c" && "${2:-}" =~ ^user\.signingkey=[0-9A-Fa-f]{8,40}!?$ ]]; then
+    SIGNING_OVERRIDE=(-c "$2" -c gpg.format=openpgp); shift 2
+  else
+    deny "不允许的全局选项：$1（safegit 只接受 -c user.signingkey=<GPG 指纹>）"
+  fi
+done
+
+SUB="${1:-}"; shift || true
+
+case "$SUB" in
+  setup) cmd_setup "$@"; exit $? ;;
+  audit) cmd_audit "$@"; exit $? ;;
+  __log)  # 供 Claude Code hook 记录被拦截的原始 git 调用
+    reason="${1:-}"; shift || true; ORIG_ARGS=("$@")
+    audit_write deny "$reason" 1 "$@"; exit 0 ;;
+esac
+
+# 所有子命令都禁止 --no-verify 与 claude/ 引用
+has_arg '^(--no-verify|-n)$' "$@" && [[ "$SUB" == commit || "$SUB" == push || "$SUB" == merge ]] \
+  && deny "禁止使用 --no-verify 跳过 hooks"
+check_args_refs "$@"
+
+case "$SUB" in
+  # —— 只读命令 ——
+  status|diff|log|show|ls-files|rev-parse|blame|shortlog|describe|grep|var|cat-file|ls-tree|reflog|for-each-ref|show-ref|merge-base|rev-list)
+    [[ "$SUB" == reflog ]] && has_arg '^(expire|delete)$' "$@" && deny "禁止改写 reflog"
+    run_git "$SUB" "$@" ;;
+
+  fetch)
+    has_arg '^(--prune|-p|--prune-tags)$' "$@" && deny "fetch 禁止 --prune"
+    run_git fetch "$@" ;;
+
+  remote)
+    [[ $# -eq 0 ]] || has_arg '^(-v|--verbose|show|get-url)$' "$1" || deny "remote 仅允许只读操作（-v / show / get-url）"
+    run_git remote "$@" ;;
+
+  config)
+    has_arg '^(--get|--get-all|--get-regexp|-l|--list)$' "$@" || deny "config 仅允许读取；修改配置请用 safegit setup"
+    run_git config "$@" ;;
+
+  branch)
+    has_arg '^(-D|-d|--delete|-m|-M|--move|-c|-C|--copy|-f|--force|-u|--set-upstream-to|--unset-upstream|--edit-description)$' "$@" \
+      && deny "branch 仅允许列出与新建，禁止删除/重命名/强制"
+    run_git branch "$@" ;;
+
+  switch)
+    has_arg '^(-C|--force-create|-f|--force|--discard-changes)$' "$@" && deny "switch 禁止强制选项"
+    run_git switch "$@" ;;
+
+  checkout)
+    has_arg '^(-B|-f|--force|--|\.|-p|--patch|--ours|--theirs)$' "$@" \
+      && deny "checkout 禁止强制或丢弃工作区修改（请用 switch / restore --staged）"
+    run_git checkout "$@" ;;
+
+  add|mv)
+    has_arg '^(-f|--force)$' "$@" && deny "$SUB 禁止 --force"
+    run_git "$SUB" "$@" ;;
+
+  rm)
+    has_arg '^(--cached)$' "$@" || deny "rm 仅允许 --cached（从索引移除，不删除文件）"
+    run_git rm "$@" ;;
+
+  restore)
+    has_arg '^(--staged|-S)$' "$@" && ! has_arg '^(--worktree|-W)$' "$@" \
+      || deny "restore 仅允许 --staged（取消暂存），禁止丢弃工作区修改"
+    run_git restore "$@" ;;
+
+  stash)
+    has_arg '^(drop|clear)$' "$@" && deny "stash 禁止 drop/clear"
+    run_git stash "$@" ;;
+
+  commit)
+    check_branch_not_forbidden
+    has_arg '^(--amend|--fixup.*|--squash.*|-C|-c|--reuse-message.*|--reedit-message.*|--author.*|--date.*|--reset-author)$' "$@" \
+      && deny "commit 禁止 --amend / 复用消息 / 伪造作者与日期"
+    check_identity
+    if has_arg '^(-S.*|--gpg-sign.*)$' "$@"; then
+      [[ ${#SIGNING_OVERRIDE[@]} -gt 0 ]] || check_signing
+    fi
+    rgit "${SIGNING_OVERRIDE[@]}" commit "$@"
+    code=$?; audit_write allow "" "$code" "${ORIG_ARGS[@]}"; exit "$code" ;;
+
+  push)
+    check_branch_not_forbidden
+    has_arg '^(-f|--force|--force-with-lease.*|--force-if-includes|--mirror|--all|-d|--delete|--prune)$' "$@" \
+      && deny "push 禁止强制推送、镜像、删除远程分支"
+    has_arg '^\+' "$@" && deny "push 禁止 +refspec（强制更新）"
+    has_arg '^:' "$@" && deny "push 禁止 :refspec（删除远程分支）"
+    run_git push "$@" ;;
+
+  pull)
+    has_arg '^(--rebase.*|-r|--force|-f)$' "$@" && deny "pull 禁止 rebase / force"
+    check_identity
+    run_git pull --no-rebase "$@" ;;
+
+  merge)
+    check_branch_not_forbidden
+    check_identity
+    run_git merge "$@" ;;
+
+  tag)
+    has_arg '^(-d|--delete|-f|--force)$' "$@" && deny "tag 禁止删除/强制"
+    run_git tag "$@" ;;
+
+  "")
+    deny "缺少子命令" ;;
+  *)
+    deny "子命令 '$SUB' 不在白名单中（如 reset/rebase/clean/filter-branch/update-ref/config 写入等均被禁止）" ;;
+esac

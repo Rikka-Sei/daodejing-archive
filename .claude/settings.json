@@ -1,0 +1,56 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(scripts/safegit status*)",
+      "Bash(scripts/safegit diff*)",
+      "Bash(scripts/safegit log*)",
+      "Bash(scripts/safegit show*)",
+      "Bash(scripts/safegit audit*)"
+    ],
+    "ask": [
+      "Bash(scripts/safegit push*)",
+      "Bash(./scripts/safegit push*)",
+      "Bash(scripts/safegit setup*)",
+      "Edit(scripts/safegit)",
+      "Edit(scripts/lib/**)",
+      "Edit(.githooks/**)",
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/hooks/**)",
+      "mcp__github__create_pull_request"
+    ],
+    "deny": [
+      "Bash(git)",
+      "Bash(git *)",
+      "Bash(/usr/bin/git *)",
+      "Bash(/usr/local/bin/git *)",
+      "Edit(.git/**)",
+      "mcp__github__push_files",
+      "mcp__github__create_or_update_file",
+      "mcp__github__delete_file",
+      "mcp__github__create_branch",
+      "mcp__github__merge_pull_request",
+      "mcp__github__update_pull_request_branch"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-git.sh",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

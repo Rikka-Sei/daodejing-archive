@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# 拒绝含 AI 署名标记的提交消息，以及违规的提交身份
+set -uo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+# shellcheck source=../scripts/lib/safegit-policy.sh
+source "$ROOT/scripts/lib/safegit-policy.sh"
+
+hit="$(safegit_msg_forbidden "$1")"
+if [[ -n "$hit" ]]; then
+  echo "commit-msg: 提交消息含禁止的 AI 标识「$hit」，已拒绝" >&2
+  exit 1
+fi
+for var in GIT_AUTHOR_IDENT GIT_COMMITTER_IDENT; do
+  ident="$(git var "$var")"
+  if safegit_ident_forbidden "${ident% * *}"; then
+    echo "commit-msg: 提交身份不合规（$ident），已拒绝" >&2
+    exit 1
+  fi
+done

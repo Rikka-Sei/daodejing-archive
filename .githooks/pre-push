@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# 推送前最后一道检查：远程引用名、待推送提交的身份与消息
+set -uo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+# shellcheck source=../scripts/lib/safegit-policy.sh
+source "$ROOT/scripts/lib/safegit-policy.sh"
+
+ZERO=0000000000000000000000000000000000000000
+fail=0
+tmp="$(mktemp)"; trap 'rm -f "$tmp"' EXIT
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if safegit_ref_forbidden "$local_ref" || safegit_ref_forbidden "$remote_ref"; then
+    echo "pre-push: 禁止推送 claude/ 前缀的引用（$local_ref -> $remote_ref）" >&2; fail=1; continue
+  fi
+  if [[ "$local_sha" == "$ZERO" ]]; then
+    echo "pre-push: 禁止删除远程引用 $remote_ref" >&2; fail=1; continue
+  fi
+  if [[ "$remote_sha" == "$ZERO" ]]; then range="$local_sha"; else range="$remote_sha..$local_sha"; fi
+  while read -r sha; do
+    ident="$(git log -1 --format='%an <%ae> / %cn <%ce>' "$sha")"
+    if safegit_ident_forbidden "$ident"; then
+      echo "pre-push: 提交 ${sha:0:10} 身份不合规：$ident" >&2; fail=1
+    fi
+    git log -1 --format=%B "$sha" >"$tmp"
+    hit="$(safegit_msg_forbidden "$tmp")"
+    if [[ -n "$hit" ]]; then
+      echo "pre-push: 提交 ${sha:0:10} 消息含 AI 标识「$hit」" >&2; fail=1
+    fi
+  done < <(git rev-list "$range")
+done
+exit "$fail"
