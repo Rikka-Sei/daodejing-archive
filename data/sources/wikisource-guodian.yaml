@@ -1,0 +1,17 @@
+id: wikisource-guodian
+kind: website
+title: 维基文库《郭店楚墓竹簡》
+editors: null
+publisher: 维基文库
+year: null
+url: https://zh.wikisource.org/wiki/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%B0%A1
+witnesses: [guodian-jia, guodian-yi, guodian-bing]
+license:
+  status: unknown
+  name: null
+  evidence: 站点页脚声明文字按 CC BY-SA 4.0 提供，但页面未注明释文出自哪位整理者，现代释文的权利状态不明
+retrieval:
+  status: pending
+  date: null
+  files: []
+notes: 页面含《老子（甲乙丙）》一节释文。2026-10-14 抓取的原始页面存档于项目文件夹（sha256 d1208a8cbf8234daea6ae2eacf7e95040759f7dff7c40f365646cac3b497a259），授权未明，不进仓库。
