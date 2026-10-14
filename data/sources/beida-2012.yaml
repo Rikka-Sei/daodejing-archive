@@ -1,0 +1,17 @@
+id: beida-2012
+kind: print
+title: 北京大学藏西汉竹书〔贰〕
+editors: null          # 通常著录为北京大学出土文献研究所编，存档页面未直接写明
+publisher: 上海古籍出版社
+year: 2012
+url: null
+witnesses: [beida]
+license:
+  status: all-rights-reserved
+  name: null
+  evidence: 正式出版物，未见开放授权声明，按著作权法默认保留权利（推断，未见具体条款）
+retrieval:
+  status: pending
+  date: null
+  files: []
+notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。只登记元数据，不入库释文。

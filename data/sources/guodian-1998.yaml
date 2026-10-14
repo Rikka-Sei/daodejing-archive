@@ -1,0 +1,17 @@
+id: guodian-1998
+kind: print
+title: 郭店楚墓竹简
+editors: null          # 通常著录为荆门市博物馆编，尚未在存档页面中核实
+publisher: 文物出版社
+year: 1998
+url: null
+witnesses: [guodian-jia, guodian-yi, guodian-bing]
+license:
+  status: all-rights-reserved
+  name: null
+  evidence: 正式出版物，未见开放授权声明，按著作权法默认保留权利（推断，未见具体条款）
+retrieval:
+  status: pending
+  date: null
+  files: []
+notes: 出版年月 1998 年 5 月，含图版、释文和注释，据《郭店简开辟出土文献新纪元》（中国社会科学网，2023-09-25）。只登记元数据，不入库释文。

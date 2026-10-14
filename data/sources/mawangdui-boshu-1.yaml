@@ -1,0 +1,17 @@
+id: mawangdui-boshu-1
+kind: print
+title: 马王堆汉墓帛书〔壹〕
+editors: [国家文物局古文献研究室]
+publisher: 文物出版社
+year: null             # 丛书 1980.3–1985.3 陆续出版，第壹册的具体年份未核实
+url: https://ci.nii.ac.jp/ncid/BN03781651
+witnesses: [mawangdui-jia, mawangdui-yi]
+license:
+  status: all-rights-reserved
+  name: null
+  evidence: 正式出版物，未见开放授权声明，按著作权法默认保留权利（推断，未见具体条款）
+retrieval:
+  status: pending
+  date: null
+  files: []
+notes: 书目据 CiNii（存档 sha256 8328b9c6e5d4113b60cd494b494c84c3679651c556e638144ad2b832ad19c841），著者另著录为"马王堆汉墓帛书整理小组"。第壹册收录《老子》甲乙本是通行说法，未在存档页面中核实。只登记元数据，不入库释文。

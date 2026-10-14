@@ -1,62 +1,90 @@
 # 版本登记表：本仓库收录的六个出土本。
-# 每条事实带 evidence：写明依据；"search-summary" 表示只来自网络搜索摘要，尚未对照一手资料核实。
+# 每条事实带 evidence：写明依据。值为下方 evidence_sources 中的键，指向一份已存档的网页；
+# "search-summary" 表示只来自网络搜索摘要，尚未对照一手资料核实。
 # 拿不准的字段写 null，核实后再填。
+
+# 依据网页。2026-10-14 抓取，原样存档于项目文件夹 archive/evidence/2026-10-14/（含版权内容，不进仓库），
+# sha256 为存档文件的哈希。
+evidence_sources:
+  cssn-2023-guodian:
+    title: 《郭店简开辟出土文献新纪元》，中国社会科学网（2023-09-25）
+    url: https://www.cssn.cn/skgz/202309/t20230925_5687577.shtml
+    sha256: 4eef4421d3f502d83c863b45710443a25fb3cea54dd4bfef206664adb441d2cd
+  pangpu-aisixiang:
+    title: 庞朴《存世最早的道德经》，爱思想
+    url: https://www.aisixiang.com/data/32871.html
+    sha256: 95bf0f1d02fb8f5fc709c90a04d3fcb6de4e432b170355d9a4cde00f86dc09ed
+  osaka-cks-2003:
+    title: 浅野裕一等《郭店楚簡各篇解題》，《中国研究集刊》33（2003），页6-45
+    url: https://ir.library.osaka-u.ac.jp/repo/ouka/all/60799/cks_033_006.pdf
+    sha256: 0d1e9881a4d3a34f17ec5cb7873c2ebd81f84f49b1338b68c28eb570d5d3f50e
+  sinoss-2013-beida:
+    title: 韩巍、孙晖《〈北京大学藏西汉竹书〉（〈老子〉卷）首发式在上海举行》，中国高校人文社会科学信息网（2013-02-26）
+    url: https://www.sinoss.net/c/2013-02-26/562554.shtml
+    sha256: aea6b6b329aba2ebe5d4c8e6b94e4cd5396de9b70b6d04fe6c17d550132bb427
+  rmrb-2024-mawangdui:
+    title: 刘钊《马王堆汉墓简帛研究取得最新成果》，《人民日报》2024-09-19 第20版
+    url: https://paper.people.com.cn/rmrb/html/2024-09/19/nw.D110000renmrb_20240919_1-20.htm
+    sha256: 77f8955bf1be2da1f08a21c72d9efd4b2de71af6d18e8a9a46f20ee1e2fe062c
 
 witnesses:
   - id: guodian-jia
     name: 郭店楚简《老子》甲组
     medium: 竹简
-    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
     date_estimate: { text: 约公元前300年之前, note: 墓葬断代有"战国中期偏晚"与"战国末期"两说, evidence: search-summary }
-    slips: null          # 甲组简数待核实
+    slips: { count: 39, note: 现存简数；庞朴文记甲本 1090 字, evidence: pangpu-aisixiang }
     scope: 节选本；郭店三组合计约为通行本字数的三分之一
+    published: { year: 1998, month: 5, title: 郭店楚墓竹简, publisher: 文物出版社, evidence: cssn-2023-guodian }
     holder: null
 
   - id: guodian-yi
     name: 郭店楚简《老子》乙组
     medium: 竹简
-    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
     date_estimate: { text: 约公元前300年之前, note: 同甲组, evidence: search-summary }
-    slips: null
+    slips: { count: 18, note: 现存简数；庞朴文记乙本 389 字, evidence: pangpu-aisixiang }
     scope: 节选本
+    published: { year: 1998, month: 5, title: 郭店楚墓竹简, publisher: 文物出版社, evidence: cssn-2023-guodian }
     holder: null
 
   - id: guodian-bing
     name: 郭店楚简《老子》丙组
     medium: 竹简
-    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
     date_estimate: { text: 约公元前300年之前, note: 同甲组, evidence: search-summary }
-    slips: null
+    slips: { count: 14, note: 现存简数；庞朴文记丙本 270 字；浅野裕一等文亦记 14 枚, evidence: pangpu-aisixiang }
     scope: 节选本
+    published: { year: 1998, month: 5, title: 郭店楚墓竹简, publisher: 文物出版社, evidence: cssn-2023-guodian }
     holder: null
 
   - id: mawangdui-jia
     name: 马王堆帛书《老子》甲本
     medium: 帛
     script: 篆书
-    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: search-summary }
+    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: pangpu-aisixiang }
     date_estimate: { text: 抄写早于乙本；墓葬下葬于公元前168年, note: 甲本据避讳判断较早, evidence: search-summary }
-    chapter_order: null  # 《德经》《道经》先后待核实
-    holder: null
+    chapter_order: { text: 德篇在前、道篇在后, note: 庞朴文对帛书甲乙本合述，未分别说明, evidence: pangpu-aisixiang }
+    holder: { name: 湖南博物院, note: 文中称湖南博物院"系统清理馆藏马王堆汉墓文物", evidence: rmrb-2024-mawangdui }
 
   - id: mawangdui-yi
     name: 马王堆帛书《老子》乙本
     medium: 帛
     script: 隶书
-    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: search-summary }
+    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: pangpu-aisixiang }
     date_estimate: { text: 晚于甲本；墓葬下葬于公元前168年, note: null, evidence: search-summary }
-    chapter_order: null
-    holder: null
+    chapter_order: { text: 德篇在前、道篇在后, note: 同甲本, evidence: pangpu-aisixiang }
+    holder: { name: 湖南博物院, note: 同甲本, evidence: rmrb-2024-mawangdui }
 
   - id: beida
     name: 北京大学藏西汉竹书《老子》
     medium: 竹简
-    excavated: { year: null, place: 购藏入馆，非考古出土, evidence: search-summary }
+    excavated: { year: null, place: 2009年初北京大学接受捐赠，从海外回归，非考古出土, evidence: sinoss-2013-beida }
     date_estimate:
       text: 争议：整理者认为在武帝后期，另有汉初和西汉晚期两说
       note: 抄写年代未定论
       evidence: search-summary
-    slips: { count: 221, evidence: search-summary }
-    titles: { on_back: [老子上经, 老子下经], note: 简帛文献中首次发现《老子》书名, evidence: search-summary }
-    published: { year: 2012, volume: 北京大学藏西汉竹书（贰）, publisher: null, evidence: search-summary }
-    holder: 北京大学
+    slips: { count: 221, note: 现存简数，5300余字，分77章, evidence: sinoss-2013-beida }
+    titles: { on_back: [老子上经, 老子下经], note: 简帛文献中首次发现《老子》书名, evidence: sinoss-2013-beida }
+    published: { year: 2012, month: 12, title: 北京大学藏西汉竹书〔贰〕, editor: 韩巍（本卷整理者）, publisher: 上海古籍出版社, evidence: sinoss-2013-beida }
+    holder: { name: 北京大学, evidence: sinoss-2013-beida }
