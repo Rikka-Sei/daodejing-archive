@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 data/ 下的全部数据：结构、编号、残缺区间、来源追溯与原始文件哈希。
+"""校验 data/ 下的全部数据：结构、编号、残缺区间、来源追溯、原始文件哈希，以及影像与文本单位的关联。
 
 用法：python3 scripts/validate_data.py [--root 仓库根目录]
 有任何问题时退出码为 1。
@@ -123,9 +123,55 @@ def main() -> int:
             elif raw not in {f["path"] for f in src["retrieval"].get("files", [])}:
                 problems.append(f"{where}: raw_file {raw} 没有在来源 {ref['source']} 中登记哈希")
 
+    # 影像
+    plate_validator = load_schema(root, "plate.schema.json")
+    unit_ids: set[str] = set()
+    for p in (data / "witnesses").glob("*.jsonl"):
+        for line in p.read_text(encoding="utf-8").splitlines():
+            try:
+                unit_ids.add(json.loads(line)["id"])
+            except (ValueError, KeyError, TypeError):
+                pass  # 上面已报告
+    plates = 0
+    seen_files: set[str] = set()
+    for p in sorted((data / "plates").glob("*.jsonl")):
+        wid = p.stem
+        if wid not in witnesses:
+            problems.append(f"{p.name}: 文件名不是已登记的版本 id")
+        for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            where = f"plates/{p.name}:{ln}"
+            try:
+                rec = json.loads(line)
+            except ValueError as e:
+                problems.append(f"{where}: 不是合法 JSON（{e}）")
+                continue
+            errs = list(schema_errors(plate_validator, rec, where))
+            problems += errs
+            if errs:
+                continue
+            plates += 1
+            if rec["witness"] != wid:
+                problems.append(f"{where}: witness 字段 {rec['witness']} 与文件名不一致")
+            if rec["file"] in seen_files:
+                problems.append(f"{where}: 图片重复登记 {rec['file']}")
+            seen_files.add(rec["file"])
+            src = sources.get(rec["source"])
+            if src is None:
+                problems.append(f"{where}: 来源 {rec['source']} 未登记")
+            elif rec["file"] not in {f["path"] for f in src["retrieval"].get("files", [])}:
+                problems.append(f"{where}: 图片 {rec['file']} 没有在来源 {rec['source']} 中登记哈希")
+            for uid in rec["units"]:
+                if uid not in unit_ids:
+                    problems.append(f"{where}: 关联的文本单位 {uid} 不存在")
+                elif not uid.startswith(wid + "."):
+                    problems.append(f"{where}: 文本单位 {uid} 不属于版本 {wid}")
+
     for pr in problems:
         print("✗", pr, file=sys.stderr)
-    print(f"检查了 {len(sources)} 个来源、{total} 条文本单位：{'发现 %d 个问题' % len(problems) if problems else '全部通过'}")
+    print(f"检查了 {len(sources)} 个来源、{total} 条文本单位、{plates} 张影像："
+          f"{'发现 %d 个问题' % len(problems) if problems else '全部通过'}")
     return 1 if problems else 0
 
 

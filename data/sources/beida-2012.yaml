@@ -1,17 +1,343 @@
 id: beida-2012
 kind: print
 title: 北京大学藏西汉竹书〔贰〕
-editors: null          # 通常著录为北京大学出土文献研究所编，存档页面未直接写明
+editors: [北京大学出土文献研究所]
 publisher: 上海古籍出版社
 year: 2012
-url: null
+url: https://archive.org/details/peking-university-bamboo-slips
 witnesses: [beida]
 license:
   status: public-domain
   name: null
-  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理。出版物本身未标明授权条款
+  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究，影像同样适用；来源未标明授权条款的，按可收录处理。出版物与 archive.org 条目均未标明授权条款
 retrieval:
-  status: pending
-  date: null
-  files: []
-notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。尚无电子本，暂未抓取。
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/images/beida-2012/beida-p016.jpg
+      sha256: c0c765f453b35118f0d3ae509eb3397e13f9ceb8d264a085fd5f2aa99beda285
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p017.jpg
+      sha256: aeaae3d592cfbad5037f2014ec203d319675e39994742a1348b9ef0dac26c1d9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p018.jpg
+      sha256: 24fa086107f962dc41e2bea2589a45e813521fdcaf4f7dc7b02fe7a21f46e3db
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p019.jpg
+      sha256: 24b1b2d6d82db2d8f1ece045444f9ff280e3931da1a712e6154ac174e81c6f21
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p020.jpg
+      sha256: 0b4603f4dbd16151d9be58a87ffb3db3c34adf3e2a34697281854b3274391575
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p021.jpg
+      sha256: c201ce716713f8b3f80968aae4a98257f165a587b371a52c75fcd3a21f8ea145
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p022.jpg
+      sha256: 9056d3727b54d8f109b674cf595629902aee3ac7259fe89a8d8be900affa3c91
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p023.jpg
+      sha256: 92959d330fee91eee42086a7afafe4169f860c6eded19cd0620d35183100cb18
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p024.jpg
+      sha256: e597b954815410bdebaf85949a3e76ac2ca7e1ff79fcbda3e5b40a19dc49bd15
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p025.jpg
+      sha256: 4f13e1b22770e1ff9c4e74a545d4bb9f9979d6593d7ba85988c4acdb832416d5
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p026.jpg
+      sha256: 307eb0ff8fe208eddb0a4633616d90782f2665c12088880357bfd7c94184c003
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p027.jpg
+      sha256: 215a938c3683f75850d8c943273f897e32220cf143105a615a468e55b6ac38ce
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p028.jpg
+      sha256: 57f56db989e0b81e6a22125e5b29f3c06f3a0fafbd64895cd3389299ba68adb4
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p029.jpg
+      sha256: 47c71d240a62d10632f50ea38bf9818af338799fd74d0983166208777cad2cca
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p030.jpg
+      sha256: 65b87b1347d06a9b382110df4647d8286592d35f3eea9f9d5a17b4c1b776686c
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p031.jpg
+      sha256: ce4e54931b4c4dfe5335335259f9692b781d83e64315d62fcd0e660524325ac9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p032.jpg
+      sha256: a0d724f1f7ef92b962b5762c677c072b0d17167e908f02642ab4ff954e090b1f
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p033.jpg
+      sha256: ba027aadd2b4fe0371ef28abe2eb512f7ebe73fd4a68c1028b8f3213aac3df06
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p034.jpg
+      sha256: 4ce040511c96c3e33799ff9aac3b2ea6a44607b25fe042ce42fc246a42f6cfeb
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p035.jpg
+      sha256: 90d21c6f2f8e905295b5a8cb84e7291c8f14628e9e119281e75ba56db551f8b6
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p036.jpg
+      sha256: c4987f54683847ab2a98430341f5c7cfe02cffb8935e617e613b070654d35df9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p037.jpg
+      sha256: 9f3fc471ee5f60228df10d706d87fbd5a479332f99f73ecc9678a0ff87ec4d76
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p038.jpg
+      sha256: 11d6ffa59b911bba16f130ea09ade539f2cb7abe63516e4022631b2226a24626
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p039.jpg
+      sha256: 7227f8d2e4c84b9d0f786f99178db37702325ca9ccda46d6f426eba7693565f3
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p040.jpg
+      sha256: 8df514dad8c6cf8737f26db2573d96f0075641ab5daa0fb84b2e95cd1a388c2c
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p041.jpg
+      sha256: f1d63df1e34723f52e9c29a326d3aa12c21a675f7821aac4b4d7f0333e7e74c6
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p042.jpg
+      sha256: 67820b0b8072c8d4df4fb4cc9527a1bf5ccedfc18531945418782adb54a93828
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p043.jpg
+      sha256: 8825daeeb910d151b8007409d6c251b4d7273ebc969d3c526d823d398caf62f9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p044.jpg
+      sha256: b6a96c67083af4a51f9889db6d2e507075985da530c4e9dbe449cef4f950247c
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p045.jpg
+      sha256: 1e772dbae690513d8a8e15fcc637e72e8aaf481738e6ef29e4e857e397684a47
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p046.jpg
+      sha256: 76fccf4624d068f817fed6d0c87cf36d026f6d4b513863c1c5db73016045489d
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p047.jpg
+      sha256: f10991579bc38ba65df267caac6836912f439ecf3fa53ab9a1b795934a71634a
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p048.jpg
+      sha256: 131aaf6f1ef376f2a279fd102c93161a18dbd7d7d9c5307e4d140eae48c70b9d
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p049.jpg
+      sha256: 3d131d9ce1a48ce4c4a67dc487dc7ef92b257fe39f33960d2bf53fdf85565b48
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p050.jpg
+      sha256: 7a0ae595394d242912fce25be75fdbaf36608b12d5c1ed28d19a253f98f0d28b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p051.jpg
+      sha256: d6f456bef35ea85c1a83235404f802658a8633677387314e617f54b5f2f35ba8
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p052.jpg
+      sha256: ea57c6dd2778b3990b6259fd4871460b6393cbd69e31a69c515f19e140f1c91b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p053.jpg
+      sha256: 0e0a879076605374689a9fdfc3f1b95799212defba6345e7cb83c5b6d358f613
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p054.jpg
+      sha256: 9cc03ce61043818c58c34800a235c3914e83c261fafcd9e96eb8a36ffa4d33f7
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p055.jpg
+      sha256: 4a9de44f281fd3376c65a1944f5e6913bffabb8a4dcb778c5486355b4a2093f3
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p056.jpg
+      sha256: adf1768b925a0fb2a5352d5376b2f271b1f60317bee977ae6c38fde56eda1b68
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p057.jpg
+      sha256: 3c39e2d81c57fe40d4145b17f2e436310d15dea6398f495b0e8dde7cd2ff5979
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p058.jpg
+      sha256: bc947212dbe83a3442887ef04a29945ec425bd3db48053392b4ba1cb3b6dceea
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p059.jpg
+      sha256: fd67a2da687ab0f641709ed48e0433a2e8e4ac77ff6b5a0d46a3b732b57393ca
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p060.jpg
+      sha256: b0a59948ab3a5c17e5cda595f1c3b82f2be710a7c00a3cbbbbc85b3cf7386ec2
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p061.jpg
+      sha256: 7d5a7bd3c3c44c2396dc36b6fab07c630f3736aa659cc987b162d0361d4c4bda
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p062.jpg
+      sha256: db573af1b22604ae3f486c30dfac7f4b3b906815c8487c8e717ed4a3767dd00b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p063.jpg
+      sha256: bf8fb130c40f7a4b64bb3636beb06d1ef4f35db60887f5fbb5d83adcee9f92df
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p064.jpg
+      sha256: 10f0a3bb1afc0c7857303c95168d7898b7062c6f1e5bc33e73a7cd8c36525366
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p065.jpg
+      sha256: 85d66ca0ff2c5bb8fcf356a9bffeada7063e735270f52382f3560a61e67fdca7
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p066.jpg
+      sha256: bb8bdceab936684dcaa99f25988d455e39aa8bd0ffc54d8cb764f34491600d98
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p067.jpg
+      sha256: 8e80bbed51150ed9def2724a1961dc0d05f59598be26ef14ab05b9cbc061c7c0
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p068.jpg
+      sha256: f4042d16b259d93305b5f8c6e4b4dcf2f157778b0f67d9b43db2c95af5f25e9e
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p069.jpg
+      sha256: f97d6ba4e96cab402a71bd97f05046514cea84e47823f219e927c7558b89b28e
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p070.jpg
+      sha256: 6dadad042d053d8ad1ce8567c5692606cb892fa5a8890f118eb6bbc75fc80e04
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p071.jpg
+      sha256: 6ffc6285f9fef9275a11d79cd9c5fda6849a2ec137cf2e9ebcbebd84b5775459
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p072.jpg
+      sha256: c6dd27ba583857d59297eb8b0b5eb080ea9d04452617047b482fbca84ddcbd83
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p073.jpg
+      sha256: 023f3c4f0e8458ecf2af0a49d1583422b7f5acfddefb8694d3b88a70b594ebad
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p074.jpg
+      sha256: d43cd9cdd13f32de55dfeb0b3f67a6dcb26e86d4446c185bb3ad2cde3e9faf92
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p075.jpg
+      sha256: 5e70981145f07078da3cb9d31824312f29441477fe67c0a6631502b1e28adfc7
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p076.jpg
+      sha256: 17059976b42e075e555bd74367057c0f7f1e04e89b64c0932ebb1750c78680fa
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p077.jpg
+      sha256: b04abe202c48690d2a8d30cc8effc89d29f06e6039bb6b8a7e610859be6bd38e
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p078.jpg
+      sha256: 4d96f31f52ce47da821bbb84a06cff4dcae722ab1275399679021c0188b418be
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p079.jpg
+      sha256: c8e02d94ff58918d759b152f8aeceaf10dec6e7d4a18760346a9ff832dc76c5a
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p080.jpg
+      sha256: e725ef5fb879056f276d62afcef1a45f24ec580a2ceca3bd0a72ed21639e64b9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p081.jpg
+      sha256: 6dbe1c1adbc85c65c797783d43cc039fb4383666deda0b8ea4ef239102911f01
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p082.jpg
+      sha256: 36a28606ba33cc545dadf061218baf35282b52df1452947848ed97405703963f
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p083.jpg
+      sha256: 8bf60ca5e279a65e0a971e6fcd6d2bc85c3114d941dc1f2ff75a1bbf74dca925
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p084.jpg
+      sha256: e1741748cbb4d2689180439ecc469d0b66b16a3f0a40bf3f5b44e2c5c0f4edc6
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p085.jpg
+      sha256: bbd58de480372aaad092cd59accb0fda1d4fbc6efea50f33d202794dc92b54ce
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p086.jpg
+      sha256: 87835ee889ae87b730ccded151f840e93d9d9116dab5a13be1845554a501725c
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p087.jpg
+      sha256: f6abdcbc7c1f2f198e3b10430520ea6d55c8bd18ec74d76aaddfcdb3e8b471ca
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p088.jpg
+      sha256: ffa949c00b685984bcbd61991ae75738dfc395feb363e98dea44692c1d27f750
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p089.jpg
+      sha256: ec753c06aac24df4da576469ec382b3205de43c7c3408b3b36fb420e4120a804
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p090.jpg
+      sha256: 3bfa2e2d8da6f9841b9dbc299dc514059ded06094a175c6dff34362321466f4d
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p091.jpg
+      sha256: 63a914e583b6f0a366fec8c395c0ee57089f57279458afc3609a0f2cf6ec3e95
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p092.jpg
+      sha256: 43554c00e21a167dae52a294c4de4b86313e310440e647ad277cd68638a99d0e
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p093.jpg
+      sha256: e0e699e73d95d4552c1eb97f4f9ee352036ec3fad18066e591a43f403ba6b832
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p094.jpg
+      sha256: 192b3505e98bd04addf4eb4b58de8ef4852713578937373325554165feff1777
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p095.jpg
+      sha256: f2c2c5a4a80f9d53f3d55774265ed0f645d7ade9eab278f3e9ea240b0d85c856
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p096.jpg
+      sha256: 250f9252ee07d6e87524de63543bcf6fe36c6ac68f950eba1423cfc723e74e8b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p097.jpg
+      sha256: 35bf35fd44feccc028067d5fe017477bd9a2637af24a52252b8c001ddaf44698
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p098.jpg
+      sha256: fdb384a044e635d5fd5e1affe77183d05282a2278c4587f29d54b09edf3341de
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p099.jpg
+      sha256: f9216d216e63343c0eb78b73e8d7a1b472d264d8838ea2b547164e3b79d3192a
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p100.jpg
+      sha256: d68e2df801e4dd8c98618354c5fab55004bbabfd2f6ac941fa50dfe1e69011fe
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p101.jpg
+      sha256: 4abed3805396187641355c23da98f1fce92da02870540cfce4b7641cee6cc5de
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p102.jpg
+      sha256: bb6344193130b7ec686bb0ab384e195ed1d87c2a533857464ab104525c2ec65c
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p103.jpg
+      sha256: 32d8165c9e1f5a3266bf9cdf9c35bfc2e708f8c0b180a99414549c8978e25388
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p104.jpg
+      sha256: c902788b22a1f0c857bc75dbab41b068ef31b13a9598d8dd1bdf7817f8fd4919
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p105.jpg
+      sha256: 0b5b5ed77bb0361de0c86c10c5f3d62ad4c3fe25f4a6d33397e8b568592d62e9
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p106.jpg
+      sha256: 85c5bc8e9d9781be1e5a84b2d869212f9b35534902f38aa1d7ab34514eb6ef4d
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p107.jpg
+      sha256: be8c304c06095c12a4a015088a7f453f35b0d2823860b12b61e488b4e1b3e915
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p108.jpg
+      sha256: a0a6d92a40c6bc22be56f87b2f04d4a8a8f2e45acf79e7ba91353f1a5d7c02af
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p109.jpg
+      sha256: 14cdcce3a3ac0e0e4402f57bc737e5b7d6f94d760f7a047ccf9ed1d9c936b9e0
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p110.jpg
+      sha256: ed7bdaaa2694ff0b4b6cff442e2c5051fcb0b1c84f2135578ca57dac7490e1dc
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p111.jpg
+      sha256: 4507570cf878321d6b579f3a329fe0a3073fd45a015fd6698715673f843385a4
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p112.jpg
+      sha256: e731bdc71e803b382313f28c98e492a0f07b4bfbd44230443618a362a7b60dd6
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p113.jpg
+      sha256: 8729cbfe785666cbf51de7389c1be19243d18974bccbe19239f5550d31c1ea39
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p114.jpg
+      sha256: e165be4a3ace55842ba63b2f147dbe57431b95e94b6f2c16d5809eabf5c4fc3e
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p115.jpg
+      sha256: 0093897001fb2f5f021711edaea6d23efba7705e9f5e645fafa927e2e0e6de2b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p116.jpg
+      sha256: fa74856a58e3040d4bd7fb556ba929402eb8f3df98d2528341e72177ff854edc
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p117.jpg
+      sha256: 570f17d49637b4109ac2a42ca1ba7e77c7ee4ab67c624424fe62cfc90faf57ca
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p118.jpg
+      sha256: 85d1622685b1df8bbc757a1e16b9948c6348d6851dcd542d5bb7ac5b8f494de1
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p119.jpg
+      sha256: 2c97d77049eb190c1c54000c675610593a81a8aa0e3410435b4c93a143668a0b
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p120.jpg
+      sha256: 0f8810684ba66a98138ac988ad6a5ddbaad2c0b4b79ce6f344c59be7e35eabfa
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p121.jpg
+      sha256: 8eac8e6396f8134f492f2a956b4889943784efd080484440ae1ae3616e487004
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p122.jpg
+      sha256: bfe0a65b6c11aa1ea58cfa4590b875d2aa8859faffcfae6a9f96115d3755aab1
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+    - path: data/images/beida-2012/beida-p123.jpg
+      sha256: fd923dc391e1426a852456d6982b89d5d27b163ce830d677eb8d2233ea93e3d4
+      url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
+notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。编者、ISBN 978-7-5325-6099-8 据扫描本版权页。
+  影像取自 archive.org 条目 peking-university-bamboo-slips 的扫描本（PDF SHA-256 9fb9c39253ced4a1b07bfbbb3e9476cc5d9ac1b5973301f849813b4e28d4bf17），
+  只抽第 16–123 页图版（原大、放大、简背），不收释文注释和简背划痕示意图；图版尚未逐简对应到文本单位。

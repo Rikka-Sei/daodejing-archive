@@ -1,0 +1,26 @@
+id: commons-laozi
+kind: website
+title: Wikimedia Commons 简帛《老子》照片
+editors: null
+publisher: Wikimedia Commons
+year: null
+url: https://commons.wikimedia.org/
+witnesses: [guodian-yi, mawangdui-jia]
+license:
+  status: cc
+  name: CC BY-SA 4.0；Public domain
+  evidence: >-
+    各文件页面的授权：File:郭店楚简《老子乙》01826.jpg 为 CC BY-SA 4.0（作者 Cangminzho，自摄，转载需署名并以相同协议共享）；
+    File:Mawangdui LaoTsu Ms2.JPG 标为 Public domain（翻拍自《马王堆汉墓帛书〔壹〕》，文物出版社 1980）。项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究，影像同样适用；来源未标明授权条款的，按可收录处理
+retrieval:
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/images/commons/Mawangdui_LaoTsu_Ms2.JPG
+      sha256: c434ee2d236a16671f1239066c98389a686a1e128042d213a053512a32065189
+      url: https://upload.wikimedia.org/wikipedia/commons/e/ed/Mawangdui_LaoTsu_Ms2.JPG
+    - path: data/images/commons/郭店楚简《老子乙》01826.jpg
+      sha256: 763d4bb356a07125178a0c98379ac558e0afc8778402a641c2a7a57c48af9e44
+      url: https://upload.wikimedia.org/wikipedia/commons/4/43/%E9%83%AD%E5%BA%97%E6%A5%9A%E7%AE%80%E3%80%8A%E8%80%81%E5%AD%90%E4%B9%99%E3%80%8B01826.jpg
+notes: >-
+  原图下载，SHA-1 与 Commons 记录一致。郭店甲组、丙组两张照片和 File:Guodian-laozi.kopi.png 因 Commons 限速暂未下载。

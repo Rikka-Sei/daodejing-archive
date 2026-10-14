@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plate.schema.json",
+  "title": "影像记录（一张图版或照片）",
+  "description": "plates/*.jsonl 中每行一条。图片文件放在 data/images/<来源>/，必须在对应来源记录里登记哈希。",
+  "type": "object",
+  "required": ["file", "witness", "source", "kind", "locator", "units"],
+  "additionalProperties": false,
+  "properties": {
+    "file": { "type": "string", "pattern": "^data/images/", "description": "仓库内的图片路径" },
+    "witness": { "type": "string", "description": "对应 data/witnesses.yaml 中的版本 id" },
+    "source": { "type": "string", "description": "对应 data/sources/*.yaml 中的来源 id" },
+    "kind": {
+      "enum": ["slip-plate", "page", "photo"],
+      "description": "slip-plate：一枚简的图版；page：图版书的一整页，未逐简对应；photo：文物照片"
+    },
+    "locator": { "type": "string", "description": "在来源中的位置，如扫描本页码" },
+    "units": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "图中出现的文本单位 id；尚未对应时为空"
+    },
+    "note": { "type": ["string", "null"] }
+  }
+}

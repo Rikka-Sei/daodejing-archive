@@ -1,0 +1,235 @@
+id: jianbo-shufa-guodian-2002
+kind: print
+title: 郭店楚墓竹简·老子（甲本；乙、丙本）（简帛书法选）
+editors: [《简帛书法选》编辑组]
+publisher: 文物出版社
+year: 2002
+url: https://archive.org/details/guodian
+witnesses: [guodian-jia, guodian-yi, guodian-bing]
+license:
+  status: public-domain
+  name: null
+  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究，影像同样适用；来源未标明授权条款的，按可收录处理。出版物与 archive.org 条目均未标明授权条款
+retrieval:
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/images/jianbo-shufa-guodian-2002/bing-001.jpg
+      sha256: f517df7324515b6c0950c766d59b8349ea4b4063d7cb03faa58fe29b966ac8c2
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-002.jpg
+      sha256: f3ac28dbf1866c1fb80d65d293e08de39d19a66261c40d270aa95584fde843a7
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-003.jpg
+      sha256: 9145dc40dff9a6ef2bb36fdbe7c206b0f1e84d6dde04244117a4242accbf3924
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-004.jpg
+      sha256: d516952a98c5ad1bf78600dea93952602e647bd3427224ee2155da13bc3dc712
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-005.jpg
+      sha256: 341336da3e6744d9c24468cc7f000cb75bbb8f0ce3379b72ea8724d0ce689c14
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-006.jpg
+      sha256: e1026e4eee3479a0aa9795251f5b93ec0181ea2956ffeec0860f9de192efd131
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-007.jpg
+      sha256: 8e4c11a90a9a58928057ffb3b63c6d33edb806b2a6c86d8b278d05a7fc9d5a95
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-008.jpg
+      sha256: c4855ae6330f3ebda8a89ca5c4930fb2854640f4947d6e81ac36227a8deca9a2
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-009.jpg
+      sha256: 14bf1648003e1040126c4756c0146b35d237234768336d37578fd5a0f74fea56
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-010.jpg
+      sha256: 8e7757bf8d6457a167bdde5df3d9aa56ac5daf7fbdc5adedb03ff03c11a529ee
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-011.jpg
+      sha256: b27ace6e368360fe4af19fe7f875ea04da1a0499c1067c47fed2592ecc0c8b66
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-012.jpg
+      sha256: e644669d6e71a779d47aa7f003b1ef176fa114ddede78133a4b9f5aefb8ef3e2
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-013.jpg
+      sha256: 56b54e032d546a1b4d5264b49947e1d657d05f326f3947a03ec1df296ea6919d
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/bing-014.jpg
+      sha256: 9cac473baec05b05571459d0bdb7733bf57e41b11bf96cb4be82c156896c3179
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-001.jpg
+      sha256: 5f0eee7fadaec3e2fb544d1764b3f95b8919f2465ae67f16dd5650bb1b1a6fec
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-002.jpg
+      sha256: 72f55927546edbaa4522909fff8cabb034ab0201e3171f2d38a964526ac2f838
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-003.jpg
+      sha256: 7667df0103ec11479132ecf444709f56245d608f72d9e9fb96508ebe9fd547b3
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-004.jpg
+      sha256: 528f3377fa0be7b63a9bbee9eb6431d30899f68aec2deb96dd9241189fcb75e9
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-005.jpg
+      sha256: 5cd9c0041bbe03122bb78b74befa93e37b5a1eaaf918c58639b265082976525f
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-006.jpg
+      sha256: ee59b70aef9bb6a5f92a4d6f534b94e89029a7d2ef4f7b55ab17b196d4a291df
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-007.jpg
+      sha256: a71493f408ef05f37b7a21319d93623dad11e8666914f5d3111793167a430646
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-008.jpg
+      sha256: c0802f3316f08873b21095c9fed5cb953c9840db5631c4a00ec9aed9766a8074
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-009.jpg
+      sha256: 85ccf6cc77b284dd69ce9bbc222ef78c29c083a57fe4e383f18a960692a9d5f2
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-010.jpg
+      sha256: c62e60538def7a3a1a19f4ca02e071eb518927aed15f2855cbb6848f24109a83
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-011.jpg
+      sha256: 26d5b15b54321de01e2f842cf6d93de237982acdab72a547fcd693c0b407e55a
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-012.jpg
+      sha256: ef562195db95ea73a6cb47a22b5966af69b1ed80c14e8af4d116bb9813b3c8c5
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-013.jpg
+      sha256: 14a34010746b53f975a6bfbda55278b9f220eecda7cdd9f8424d87cc01c5cd66
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-014.jpg
+      sha256: f7d87b1ce62a1fac1866f6622f357ac2bbd960e78614f639f604618a25f614f3
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-015.jpg
+      sha256: a4db86ea831dcf608adb6cf30b0e5edffe185c00228b9890bd2c37061d68b0dd
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-016.jpg
+      sha256: ad7deeaded69b3d74a9edaa7185f25b83496cd4249e0b0ecb65c7a2cb39f73f4
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-017.jpg
+      sha256: b3efb133bbabfd19a0e522a9e5365b429e4b16d1484f5fb065713244369c5ab8
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-018.jpg
+      sha256: a2bd5a92ffc29d49c5465ba861e75589168d800d5cd50c320fbe4b506d8dcedc
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-019.jpg
+      sha256: c6ddd579bb46d53cff2043b096ff5e542bd8f31dbd824b97941f37d4b330a582
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-020.jpg
+      sha256: 764a9573aadb5e2df8825fa886077cb87c44b9a04673439c38aa75f502b6de5a
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-021.jpg
+      sha256: 70759d67504a46be4a8936aa695ccf0243b0089774e2f7ef2713fdc6390f49e1
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-022.jpg
+      sha256: c20be17617e538a6f9806605cc2aaaaaadbd6ddeab4589b37bfe61b6ba9790ad
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-023.jpg
+      sha256: 20a5a54e41dd48bf699c1868a0714516af9760dc293e08560180fd8de7643516
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-024.jpg
+      sha256: 5f88f63d94a7e49e37c343d944a6a768c984ca3994a991cbb8d36d36e01c92cd
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-025.jpg
+      sha256: 97f8df12e882b906a591079a5be86c7cf6bb5d08daed43d91408bb26737f0acb
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-026.jpg
+      sha256: 9c9afe02099e1f7ace81816b5a1bc32a2369f291edf0865dee8a437cabaf102e
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-027.jpg
+      sha256: bd313094caa6dd501da2df6d61585ab02b0351a1f4d73654b19a0be5080c3b06
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-028.jpg
+      sha256: d3ea5959ae38b0db6b02f3bb2f95c2ffb5c055fed6ec913c0f60a14123c54b6d
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-029.jpg
+      sha256: dca3206602fd9e16ed0098846973fc7dcbeeb9634ddedff373d369448ec7464b
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-030.jpg
+      sha256: 7a377152e19881e90a1c01162af1b9518d55fcbb4753c9a1b6873945b98685ba
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-031.jpg
+      sha256: 1f5cae166c03f867aa1a1664cb1464279fd189400836010e5d42e153ad863013
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-032.jpg
+      sha256: d4674aa61a2893b86abf4a9c4f1cbe50eefb62558167b057252d4d4beb1f1389
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-033.jpg
+      sha256: d4e66eb84a1884b3d4c0c30d12c3a3b2b4961cc0639775baea9d62b82b266263
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-034.jpg
+      sha256: 2d340b20d85a9dbc73ee9ca49c0b6593258e5f1453f9a979900038175836e9db
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-035.jpg
+      sha256: 0a270fe5a3c01ca0b5beb4284052882f67f2c399482b3bb1f0b82bb0fbfe896a
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-036.jpg
+      sha256: 63f05784629643582de24d35a92df38c873f6c67e7c93c9c789475852faa55be
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-037.jpg
+      sha256: 170acc0a2ccdfff82314f6c10846f26860bc9b711086a478307658586a37b61a
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-038.jpg
+      sha256: c1996dcf297a800e0fdac6d9390b7f27e3b378634884e2b9319e2bbe14952f17
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/jia-039.jpg
+      sha256: 20086a70ff6e53924472a6b727577d01b4629762edc35cc32a0a5091a71048ee
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E7%94%B2.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-001.jpg
+      sha256: 1ea6b0c45f4ed361b932cf27052dcb3db1e1ff1650433ac370756f175a1ac20d
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-002.jpg
+      sha256: 97460289e7080c67f708d4c9f5abcc4f9ff45465b266f76673d1e906842a115d
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-003.jpg
+      sha256: 77c4f39f4412c6b44ddab35973f3b9957b12ef2461dbaeca26d933d39807f34e
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-004.jpg
+      sha256: 18a50c55fd8261682b8ff3848e587dd4d61a1db4940cc39d7b1de014573c39c0
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-005.jpg
+      sha256: 84d7d4d994f7d3bcf064151d2f448a6939f95839c1df0773cac12a49ad9224f7
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-006.jpg
+      sha256: 6607c58c70f4aa5d67c59ef9f2cf4a7402ca5478ef108720735551182ea1c693
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-007.jpg
+      sha256: c6c271826cc090362aff5ee9522563862bc974b7eaff09b9719db4ddfcef2b7a
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-008.jpg
+      sha256: 5052df6ae72d5af7712cf21e5b69231ccdefc2d1c7fe0d5db2f6d6e1ae02da09
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-009.jpg
+      sha256: c4b60d75cd391c6db46902ffad642cb618a299989e801aefa6b1be4521147444
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-010.jpg
+      sha256: c73125f4ef60865d5d094a0dbbc23c9f6dca104f492f6da126e5d2eb4c83d647
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-011.jpg
+      sha256: 08cf2deab00f93ed4701d5b00c6e6581bae21f770152b6ef84e67f3a43834613
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-012.jpg
+      sha256: c18a98af1682a5518f13361a2f9bcb4d281e3544eedfa1aec7a280cac402e5e1
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-013.jpg
+      sha256: 90cd7bb2a0c3f45c331e9a307498c4452510d85de689432b6dce06e2be0ae96f
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-014.jpg
+      sha256: 753771aa98249202440750e95e349d0c471ddeb27843d99b96b1f1ed0856af07
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-015.jpg
+      sha256: f305aa8696666d9a45c15b3105813560bc3c23fdefeacd76e32e396091bc2279
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-016.jpg
+      sha256: 228dbc26566c48e4c4bbe7757b0d3d03552512813fd60242407b578c239aba88
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-017.jpg
+      sha256: d0ced13f3aaeac24cb7d863c478e0de33ce184d4c349a6a32f002406745c6673
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+    - path: data/images/jianbo-shufa-guodian-2002/yi-018.jpg
+      sha256: d7192a00b20d7be1cd55839c6dd8864a705996dae3993c37bb4b85fa5a78654e
+      url: https://archive.org/download/guodian/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%AE%80%20%20%E8%80%81%E5%AD%90%E4%B9%99.%E4%B8%99.pdf
+notes: >-
+  两册：甲本 ISBN 7-5010-1366-7，乙、丙本 ISBN 7-5010-1367-5，均为 2002 年 10 月第一版（据扫描本版权页）。
+  扫描本取自 archive.org 条目 guodian（上传者未署名出处），PDF 的 SHA-256：
+  老子甲 44187c206dacddf9d85bd7a5549f798aa504e8c01347ccd07cacfa84c803e792，
+  老子乙.丙 08c350d13b31e5adeb639bae42f1ae98b269c7d124790ba8c57f9242733a492c。
+  图版一页一简，页上附整理者小字释文；用 scripts/extract_plates.py 原样抽出内嵌 JPEG，整本 PDF 不进仓库。

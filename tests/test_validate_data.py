@@ -100,6 +100,37 @@ class ValidateData(unittest.TestCase):
         code, err = self.run_validator()
         self.assertEqual(code, 0, err)
 
+    def write_plate(self, **over):
+        rec = {"file": "data/raw/fake/page.txt", "witness": "guodian-jia", "source": "fake",
+               "kind": "slip-plate", "locator": "第 1 页", "units": ["guodian-jia.001"]}
+        rec.update(over)
+        (self.tmp / "data" / "plates").mkdir(exist_ok=True)
+        (self.tmp / "data" / "plates" / "guodian-jia.jsonl").write_text(
+            json.dumps(rec, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    def test_valid_plate_passes(self):
+        self.write_plate(file="data/images/fake/1.jpg")
+        img = self.tmp / "data" / "images" / "fake" / "1.jpg"
+        img.parent.mkdir(parents=True)
+        img.write_bytes(b"\xff\xd8placeholder")
+        self.write_source(retrieval={"status": "fetched", "date": "2026-10-14", "files": [
+            {"path": "data/raw/fake/page.txt", "sha256": self.sha},
+            {"path": "data/images/fake/1.jpg", "sha256": hashlib.sha256(img.read_bytes()).hexdigest()}]})
+        code, err = self.run_validator()
+        self.assertEqual(code, 0, err)
+
+    def test_plate_with_unknown_unit_fails(self):
+        self.write_plate(file="data/images/fake/1.jpg", units=["guodian-jia.099"])
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("guodian-jia.099 不存在", err)
+
+    def test_plate_file_without_hash_fails(self):
+        self.write_plate(file="data/images/fake/unregistered.jpg")
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("没有在来源 fake 中登记哈希", err)
+
     def test_unknown_unit_type_fails(self):
         self.write_units([self.unit(1, "甲乙", unit_type="page")])
         code, err = self.run_validator()
