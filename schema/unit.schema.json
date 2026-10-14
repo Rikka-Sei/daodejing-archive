@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "unit.schema.json",
+  "title": "文本单位（一枚简 / 帛书的一行）",
+  "description": "witnesses/*.jsonl 中每行一条。text 字段沿用来源的写法，不做任何转换。",
+  "type": "object",
+  "required": ["id", "witness", "unit_type", "unit_no", "text", "source_ref", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+\\.[0-9]{3,4}$",
+      "description": "<witness>.<序号>，序号为本版本内的阅读顺序，从 001 起，一旦分配不再改动"
+    },
+    "witness": { "type": "string", "description": "对应 data/witnesses.yaml 中的版本 id" },
+    "unit_type": { "enum": ["slip", "silk-line"] },
+    "unit_no": {
+      "type": "string",
+      "description": "来源给出的简号或行号，原样记录，不规范化（如 '12'、'12背'）"
+    },
+    "text": { "type": "string", "minLength": 1, "description": "来源的释文，原样" },
+    "source_ref": {
+      "type": "object",
+      "required": ["source"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string", "description": "对应 data/sources/*.yaml 中的来源 id" },
+        "raw_file": { "type": "string", "description": "data/raw/ 下抓取到的原始文件路径" },
+        "locator": { "type": "string", "description": "原始文件内的位置，如页码、锚点、行号" }
+      }
+    },
+    "marks": {
+      "type": "array",
+      "description": "来源释文中出现的符号。符号同时也保留在 text 里，这里只是结构化标注",
+      "items": {
+        "type": "object",
+        "required": ["type", "as_source"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "enum": ["section-mark", "repeat", "ligature", "end-mark", "punctuation", "other"] },
+          "as_source": { "type": "string", "description": "来源中该符号的写法" },
+          "offset": { "type": "integer", "minimum": 0, "description": "在 text 中的字符偏移（按 Unicode 码点）" }
+        }
+      }
+    },
+    "damage": {
+      "type": "array",
+      "description": "残缺与补字。区间按 text 的码点偏移，左闭右开",
+      "items": {
+        "type": "object",
+        "required": ["kind", "start", "end"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "enum": ["missing", "illegible", "restored", "uncertain"] },
+          "start": { "type": "integer", "minimum": 0 },
+          "end": { "type": "integer", "minimum": 0 },
+          "restored_by": { "type": "string", "description": "补字者，如 '整理者' 或某校勘本" }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "description": "来源附带的注释，保留作者与出处，不改写",
+      "items": {
+        "type": "object",
+        "required": ["by", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "by": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "status": {
+      "enum": ["unverified", "double-checked"],
+      "description": "unverified：只与一个来源核对过；double-checked：与第二个独立来源逐字核对过"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+# 版本登记表：本仓库收录的六个出土本。
+# 每条事实带 evidence：写明依据；"search-summary" 表示只来自网络搜索摘要，尚未对照一手资料核实。
+# 拿不准的字段写 null，核实后再填。
+
+witnesses:
+  - id: guodian-jia
+    name: 郭店楚简《老子》甲组
+    medium: 竹简
+    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    date_estimate: { text: 约公元前300年之前, note: 墓葬断代有"战国中期偏晚"与"战国末期"两说, evidence: search-summary }
+    slips: null          # 甲组简数待核实
+    scope: 节选本；郭店三组合计约为通行本字数的三分之一
+    holder: null
+
+  - id: guodian-yi
+    name: 郭店楚简《老子》乙组
+    medium: 竹简
+    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    date_estimate: { text: 约公元前300年之前, note: 同甲组, evidence: search-summary }
+    slips: null
+    scope: 节选本
+    holder: null
+
+  - id: guodian-bing
+    name: 郭店楚简《老子》丙组
+    medium: 竹简
+    excavated: { year: 1993, place: 湖北荆门郭店一号楚墓, evidence: search-summary }
+    date_estimate: { text: 约公元前300年之前, note: 同甲组, evidence: search-summary }
+    slips: null
+    scope: 节选本
+    holder: null
+
+  - id: mawangdui-jia
+    name: 马王堆帛书《老子》甲本
+    medium: 帛
+    script: 篆书
+    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: search-summary }
+    date_estimate: { text: 抄写早于乙本；墓葬下葬于公元前168年, note: 甲本据避讳判断较早, evidence: search-summary }
+    chapter_order: null  # 《德经》《道经》先后待核实
+    holder: null
+
+  - id: mawangdui-yi
+    name: 马王堆帛书《老子》乙本
+    medium: 帛
+    script: 隶书
+    excavated: { year: 1973, place: 湖南长沙马王堆三号墓, evidence: search-summary }
+    date_estimate: { text: 晚于甲本；墓葬下葬于公元前168年, note: null, evidence: search-summary }
+    chapter_order: null
+    holder: null
+
+  - id: beida
+    name: 北京大学藏西汉竹书《老子》
+    medium: 竹简
+    excavated: { year: null, place: 购藏入馆，非考古出土, evidence: search-summary }
+    date_estimate:
+      text: 争议：整理者认为在武帝后期，另有汉初和西汉晚期两说
+      note: 抄写年代未定论
+      evidence: search-summary
+    slips: { count: 221, evidence: search-summary }
+    titles: { on_back: [老子上经, 老子下经], note: 简帛文献中首次发现《老子》书名, evidence: search-summary }
+    published: { year: 2012, volume: 北京大学藏西汉竹书（贰）, publisher: null, evidence: search-summary }
+    holder: 北京大学

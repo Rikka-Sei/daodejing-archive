@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source.schema.json",
+  "title": "来源记录",
+  "description": "data/sources/*.yaml：每个来源（出版物或网站）一份。字段拿不准就写 null，不要猜。",
+  "type": "object",
+  "required": ["id", "kind", "title", "witnesses", "license", "retrieval"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "kind": { "enum": ["print", "website", "database"] },
+    "title": { "type": "string" },
+    "editors": { "type": ["array", "null"], "items": { "type": "string" } },
+    "publisher": { "type": ["string", "null"] },
+    "year": { "type": ["integer", "null"] },
+    "url": { "type": ["string", "null"] },
+    "witnesses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "该来源提供了哪些版本的释文"
+    },
+    "license": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["unknown", "public-domain", "cc", "all-rights-reserved", "permission-granted"] },
+        "name": { "type": ["string", "null"], "description": "如 CC BY-SA 4.0" },
+        "evidence": { "type": ["string", "null"], "description": "授权依据的页面或条款位置" }
+      }
+    },
+    "retrieval": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["pending", "fetched"] },
+        "date": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256"],
+            "additionalProperties": false,
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "url": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "notes": { "type": ["string", "null"] }
+  }
+}
