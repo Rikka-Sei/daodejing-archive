@@ -7,11 +7,11 @@ year: 2012
 url: null
 witnesses: [beida]
 license:
-  status: all-rights-reserved
+  status: public-domain
   name: null
-  evidence: 正式出版物，未见开放授权声明，按著作权法默认保留权利（推断，未见具体条款）
+  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理。出版物本身未标明授权条款
 retrieval:
   status: pending
   date: null
   files: []
-notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。只登记元数据，不入库释文。
+notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。尚无电子本，暂未抓取。

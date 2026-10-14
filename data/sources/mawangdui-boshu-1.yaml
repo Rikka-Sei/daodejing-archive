@@ -7,11 +7,11 @@ year: null             # 丛书 1980.3–1985.3 陆续出版，第壹册的具�
 url: https://ci.nii.ac.jp/ncid/BN03781651
 witnesses: [mawangdui-jia, mawangdui-yi]
 license:
-  status: all-rights-reserved
+  status: public-domain
   name: null
-  evidence: 正式出版物，未见开放授权声明，按著作权法默认保留权利（推断，未见具体条款）
+  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理。出版物本身未标明授权条款
 retrieval:
   status: pending
   date: null
   files: []
-notes: 书目据 CiNii（存档 sha256 8328b9c6e5d4113b60cd494b494c84c3679651c556e638144ad2b832ad19c841），著者另著录为"马王堆汉墓帛书整理小组"。第壹册收录《老子》甲乙本是通行说法，未在存档页面中核实。只登记元数据，不入库释文。
+notes: 书目据 CiNii（存档 sha256 8328b9c6e5d4113b60cd494b494c84c3679651c556e638144ad2b832ad19c841），著者另著录为"马王堆汉墓帛书整理小组"。第壹册收录《老子》甲乙本是通行说法，未在存档页面中核实。尚无电子本，暂未抓取。

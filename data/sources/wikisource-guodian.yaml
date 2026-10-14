@@ -4,14 +4,20 @@ title: 维基文库《郭店楚墓竹簡》
 editors: null
 publisher: 维基文库
 year: null
-url: https://zh.wikisource.org/wiki/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%B0%A1
+url: https://zh.wikisource.org/w/index.php?title=%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%B0%A1&oldid=1705904
 witnesses: [guodian-jia, guodian-yi, guodian-bing]
 license:
-  status: unknown
-  name: null
-  evidence: 站点页脚声明文字按 CC BY-SA 4.0 提供，但页面未注明释文出自哪位整理者，现代释文的权利状态不明
+  status: cc
+  name: CC BY-SA 4.0
+  evidence: 页面页脚声明文字按 CC BY-SA 4.0 提供（转载需署名并以相同协议共享）。页面未注明释文出自哪位整理者。项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理
 retrieval:
-  status: pending
-  date: null
-  files: []
-notes: 页面含《老子（甲乙丙）》一节释文。2026-10-14 抓取的原始页面存档于项目文件夹（sha256 d1208a8cbf8234daea6ae2eacf7e95040759f7dff7c40f365646cac3b497a259），授权未明，不进仓库。
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/raw/wikisource-guodian/2026-10-14.html
+      sha256: d1208a8cbf8234daea6ae2eacf7e95040759f7dff7c40f365646cac3b497a259
+      url: https://zh.wikisource.org/wiki/%E9%83%AD%E5%BA%97%E6%A5%9A%E5%A2%93%E7%AB%B9%E7%B0%A1
+notes: >-
+  修订版本 oldid=1705904（2019-08-09）。《老子（甲乙丙）》一节每枚简的释文后紧跟简号，甲 39、乙 18、丙 14 枚，与 witnesses.yaml 一致。
+  释文为简体，"○"是页面上无法录入的字形占位符，后面括号里是整理者的读法，不是残缺。
+  由 scripts/import_wikisource.py 切分入库。

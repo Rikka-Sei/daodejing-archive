@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "unit.schema.json",
-  "title": "文本单位（一枚简 / 帛书的一行）",
+  "title": "文本单位（一枚简 / 帛书的一行 / 来源按章划分的一章）",
   "description": "witnesses/*.jsonl 中每行一条。text 字段沿用来源的写法，不做任何转换。",
   "type": "object",
   "required": ["id", "witness", "unit_type", "unit_no", "text", "source_ref", "status"],
@@ -13,10 +13,13 @@
       "description": "<witness>.<序号>，序号为本版本内的阅读顺序，从 001 起，一旦分配不再改动"
     },
     "witness": { "type": "string", "description": "对应 data/witnesses.yaml 中的版本 id" },
-    "unit_type": { "enum": ["slip", "silk-line"] },
+    "unit_type": {
+      "enum": ["slip", "silk-line", "chapter"],
+      "description": "slip：一枚简；silk-line：帛书一行；chapter：来源只按章给出释文、没有简号或行号时的一章"
+    },
     "unit_no": {
       "type": "string",
-      "description": "来源给出的简号或行号，原样记录，不规范化（如 '12'、'12背'）"
+      "description": "来源给出的简号、行号或章号，原样记录，不规范化（如 '12'、'12背'）"
     },
     "text": { "type": "string", "minLength": 1, "description": "来源的释文，原样" },
     "source_ref": {

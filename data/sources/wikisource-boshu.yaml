@@ -1,0 +1,24 @@
+id: wikisource-boshu
+kind: website
+title: 维基文库《老子 (帛書本)》
+editors: null
+publisher: 维基文库
+year: null
+url: https://zh.wikisource.org/w/index.php?title=%E8%80%81%E5%AD%90_(%E5%B8%9B%E6%9B%B8%E6%9C%AC)&oldid=2609630
+witnesses: [mawangdui-jia, mawangdui-yi]
+license:
+  status: public-domain
+  name: PD-old
+  evidence: 页面第三十七章后附公有领域模板："此先秦作品在全世界都属于公有领域"。页面未注明释文出自哪位整理者。项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理
+retrieval:
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/raw/wikisource-boshu/2026-10-14.html
+      sha256: e6da4855066e8f342ca37b9bf8af713ab6917d6f5d0d1a57023c08927f1400c0
+      url: https://zh.wikisource.org/wiki/%E8%80%81%E5%AD%90_(%E5%B8%9B%E6%9B%B8%E6%9C%AC)
+notes: >-
+  修订版本 oldid=2609630。页面按通行本 81 章编排，先德经（38–81）后道经（1–37），每章上段为甲本、下段为乙本，没有帛书行号，
+  所以按章入库（unit_type: chapter），unit_no 是页面给的通行本章号，不是帛书原有的分章。
+  "□"为缺字，"﹦"为重文号；"‧"、"∠"、"∟"的含义页面未说明，marks 中记为 other。
+  由 scripts/import_wikisource.py 切分入库。

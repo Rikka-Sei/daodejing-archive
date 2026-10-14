@@ -95,6 +95,17 @@ class ValidateData(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("缺少 raw_file", err)
 
+    def test_chapter_unit_type_passes(self):
+        self.write_units([self.unit(1, "甲乙", unit_type="chapter", unit_no="38")])
+        code, err = self.run_validator()
+        self.assertEqual(code, 0, err)
+
+    def test_unknown_unit_type_fails(self):
+        self.write_units([self.unit(1, "甲乙", unit_type="page")])
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("unit_type", err)
+
 
 if __name__ == "__main__":
     unittest.main()
