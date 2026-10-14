@@ -10,11 +10,12 @@
 
 | 层 | 文件 | 作用 |
 |---|---|---|
-| 1. Claude Code 权限 | `.claude/settings.json` | `deny` 掉 `Bash(git *)`、`.git/**` 写入，以及 GitHub MCP 的写文件、建分支、合并等工具；改动防护文件、`safegit push`、`safegit setup` 都要用户确认；关闭提交与 PR 的自动署名 |
+| 1. Claude Code 权限 | `.claude/settings.json` | `deny` 掉 `Bash(git *)`、`.git/**` 写入，以及 GitHub MCP 的写文件、建分支、合并等工具；改动防护文件、`safegit push`、`safegit setup` 都要用户确认；关闭提交与 PR 的自动署名；`deny` 掉 GitHub MCP 创建 PR、Issue、评论和评审的工具（服务端会自动追加 AI 页脚） |
 | 2. Claude Code hook | `.claude/hooks/guard-git.sh` | PreToolUse 拦截任何位置上的 git 调用，包括 `cd x && git`、`env git`、`xargs git`、`bash -c "git …"`、`$(git …)`、`/usr/bin/git`；禁止设置 `GIT_*` 环境变量；通过 shell 改写受保护文件时要求确认。被拦截的调用写入审计日志 |
+| 2b. GitHub 工具 hook | `.claude/hooks/guard-github.sh` | PreToolUse 拦截 GitHub MCP 的发帖类工具（与第 1 层的 deny 列表一致，作为第二道防线）；其余 GitHub 工具的参数中出现 AI 署名标记时拒绝，规则取自策略库 |
 | 3. safegit 包装器 | `scripts/safegit` | 子命令白名单加参数检查，清除调用方的 `GIT_*` 环境变量，并强制 `core.hooksPath=.githooks` |
 | 4. git hooks | `.githooks/commit-msg`、`.githooks/pre-push` | 无论从哪个入口提交或推送，都会检查消息、身份和引用名 |
-| 5. 策略库 | `scripts/lib/safegit-policy.sh` | 第 3、4 层共用的正则规则 |
+| 5. 策略库 | `scripts/lib/safegit-policy.sh` | 第 2b、3、4 层共用的正则规则 |
 
 ## safegit 拒绝的操作
 
