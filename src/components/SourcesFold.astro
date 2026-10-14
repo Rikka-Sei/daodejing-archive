@@ -1,0 +1,36 @@
+---
+// 这个本的来源与授权：折叠，收起时给出来源数和授权概要。
+import type { Corpus, Witness } from '../lib/corpus';
+import { licenseBrief } from '../lib/text';
+import Icon from './Icon.astro';
+import Source from './Source.astro';
+
+interface Props {
+  corpus: Corpus;
+  wit: Witness;
+}
+const { corpus, wit } = Astro.props;
+const sources = corpus.sourcesOf(wit);
+---
+
+{
+  sources.length > 0 && (
+    <details class="fold">
+      <summary>
+        <span class="t">来源与授权</span>
+        <span class="m">
+          {sources.length} 个来源 · {licenseBrief(sources)}
+        </span>
+        <Icon name="chev" class="chev" />
+      </summary>
+      <div class="body">
+        <ol class="src">
+          {sources.map((s) => (
+            <Source source={s} />
+          ))}
+        </ol>
+        <p class="lic">{corpus.licenseNote}</p>
+      </div>
+    </details>
+  )
+}

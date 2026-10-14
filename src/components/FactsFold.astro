@@ -1,0 +1,37 @@
+---
+// 版本信息：折叠，收起时给出前几项的概要。
+import type { Witness } from '../lib/corpus';
+import { facts } from '../lib/text';
+import Icon from './Icon.astro';
+
+interface Props {
+  wit: Witness;
+}
+const rows = facts(Astro.props.wit.meta);
+const brief = rows
+  .slice(0, 3)
+  .map(([, v]) => v)
+  .join(' · ');
+---
+
+{
+  rows.length > 0 && (
+    <details class="fold">
+      <summary>
+        <span class="t">版本信息</span>
+        <span class="m">{brief}</span>
+        <Icon name="chev" class="chev" />
+      </summary>
+      <div class="body">
+        <dl class="facts">
+          {rows.map(([k, v]) => (
+            <>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </>
+          ))}
+        </dl>
+      </div>
+    </details>
+  )
+}

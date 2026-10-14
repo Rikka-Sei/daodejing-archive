@@ -1,0 +1,31 @@
+---
+// 一行的“⋯”菜单内容，藏在该行里，点开时由脚本搬进浮层。stem 是下载文件名（不含扩展名）。
+import { url } from '../lib/url';
+import Icon from './Icon.astro';
+
+interface Props {
+  corpusId: string;
+  stem: string;
+  name: string;
+  /** 整个文献的合集（文件夹那一行）还是单个本 */
+  whole: boolean;
+}
+const { corpusId, stem, name, whole } = Astro.props;
+const all = whole ? '全部' : '';
+const shown = whole ? `${name} 全部` : name;
+const downloads = [
+  ['txt', '释文'],
+  ['jsonl', '数据'],
+];
+---
+
+<div class="menu-src" hidden>
+  {
+    downloads.map(([ext, what]) => (
+      <a role="menuitem" href={url(`${corpusId}/${stem}.${ext}`)} download={`${shown.replaceAll(' ', '-')}.${ext}`}>
+        <Icon name="download" />
+        <span>下载{all}{what}（.{ext}）</span>
+      </a>
+    ))
+  }
+</div>

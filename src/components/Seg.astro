@@ -1,0 +1,13 @@
+---
+// 顶栏的分段开关：按钮的 data-k / data-v 由 app.js 读取，选择记在 localStorage。
+interface Props {
+  k: string;
+  title: string;
+  options: [value: string, label: string][];
+}
+const { k, title, options } = Astro.props;
+---
+
+<div class="seg" role="group" aria-label={title} title={title}>
+  {options.map(([v, label]) => <button type="button" data-k={k} data-v={v}>{label}</button>)}
+</div>

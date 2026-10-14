@@ -1,0 +1,31 @@
+---
+// 一条释文：编号、正文（残缺处加样式）、来源附注，以及这枚简对应的单简图版缩略图。
+// 注意：不带属性的 <p> 只用于释文正文，make_fonts.py 靠它把释文用字和界面用字分开统计。
+import type { Witness } from '../lib/corpus';
+import { labelText, markDamage, unitLabel } from '../lib/text';
+import { fullUrl, thumbUrl } from '../lib/thumbs';
+import type { Unit } from '../lib/types';
+
+interface Props {
+  unit: Unit;
+  wit: Witness;
+  corpusId: string;
+}
+const { unit: u, wit, corpusId } = Astro.props;
+const [pre, no, suf] = unitLabel(u);
+const label = labelText(u);
+const plates = (wit.byUnit.get(u.id) ?? []).filter((p) => p.kind === 'slip-plate');
+---
+
+<div class="u" id={u.id}>
+  <a class="no" href={`#${u.id}`}>{pre}<span class="n">{no}</span>{suf}</a>
+  <p set:html={markDamage(u.text, u.damage)} />
+  {(u.notes ?? []).map((n) => <div class="note">{n.by}：{n.text}</div>)}
+  {
+    plates.map((p) => (
+      <a class="plate" href={fullUrl(p.file)} target="_blank" rel="noopener">
+        <img loading="lazy" src={thumbUrl(corpusId, p.file)} alt={`${label}图版`} />
+      </a>
+    ))
+  }
+</div>

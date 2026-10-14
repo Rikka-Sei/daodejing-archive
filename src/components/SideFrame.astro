@@ -1,0 +1,36 @@
+---
+// 侧栏骨架：收起键、书名、阅读版/数据版切换，插槽 search 放检索框，默认插槽放内容，最后是页脚。
+import { REPO_URL, url } from '../lib/url';
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  coverHref: string;
+  mode: 'read' | 'data';
+  readHref: string;
+  dataHref: string;
+  /** 数据版专用：阅读版开关的地址模板，{id} 为当前本 */
+  readTpl?: string;
+}
+const { title, coverHref, mode, readHref, dataHref, readTpl } = Astro.props;
+---
+
+<div class="sb-top">
+  <button type="button" class="ibtn" id="sbclose" aria-label="收起侧栏"><Icon name="panel" /></button>
+  <a class="brand" href={coverHref}>{title}</a>
+  <div class="mode" role="group" aria-label="阅读版与数据版">
+    <a id="to-read" class:list={[{ on: mode === 'read' }]} href={readHref} data-tpl={readTpl} title="阅读版" aria-label="阅读版"
+      ><Icon name="book" /></a
+    >
+    <a id="to-data" class:list={[{ on: mode === 'data' }]} href={dataHref} title="数据版" aria-label="数据版"
+      ><Icon name="table" /></a
+    >
+  </div>
+</div>
+<slot name="search" />
+<slot />
+<div class="sb-gap"></div>
+<div class="sb-foot">
+  <a href={REPO_URL} target="_blank" rel="noopener">数据仓库</a>
+  <a href={url('llms.txt')}>llms.txt</a>
+</div>

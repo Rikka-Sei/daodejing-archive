@@ -1,0 +1,71 @@
+---
+// 阅读版的一个本：版本信息、来源与授权、释文、整页图版、上下本。
+import FactsFold from '../components/FactsFold.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import ReadSide from '../components/ReadSide.astro';
+import SourcesFold from '../components/SourcesFold.astro';
+import Unit from '../components/Unit.astro';
+import Shell from '../layouts/Shell.astro';
+import type { Corpus, Witness } from '../lib/corpus';
+import { LEGEND } from '../lib/legend';
+import { UNIT_NOUN } from '../lib/text';
+import { coverUrl, dataUrl, witnessUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  wit: Witness;
+  corpora: Corpus[];
+}
+const { corpus: c, wit: w, corpora } = Astro.props;
+const i = c.witnesses.indexOf(w);
+const prev = i > 0 ? c.witnesses[i - 1] : null;
+const next = i + 1 < c.witnesses.length ? c.witnesses[i + 1] : null;
+const noun = UNIT_NOUN[w.units[0].unit_type];
+const cover = coverUrl(c);
+---
+
+<Shell title={`${w.meta.name} · ${c.title}`} desc={`${w.meta.name}的释文与影像`} wide>
+  <ReadSide slot="side" corpus={c} corpora={corpora} current={w.id} dataHref={`${dataUrl(c)}#${w.id}`} />
+  <Fragment slot="crumb">
+    <a href={cover}>{c.title}</a><span class="sep">›</span>{
+      w.label === '全本' ? (
+        <b>{w.group}</b>
+      ) : (
+        <>
+          <span>{w.group}</span><span class="sep">›</span><b>{w.label}</b>
+        </>
+      )
+    }
+  </Fragment>
+  <h1>{w.meta.name}</h1>
+  <FactsFold wit={w} />
+  <SourcesFold corpus={c} wit={w} />
+  <div class="legend">{LEGEND}</div>
+  <details class="fold jump" open={w.units.length <= 60}>
+    <summary>
+      <span class="t">跳转到{noun}</span>
+      <Icon name="chev" class="chev" />
+    </summary>
+    <div class="body chips">{w.units.map((u) => <a href={`#${u.id}`}>{u.unit_no}</a>)}</div>
+  </details>
+  <div class="units">{w.units.map((u) => <Unit unit={u} wit={w} corpusId={c.id} />)}</div>
+  <Gallery wit={w} corpusId={c.id} />
+  <nav class="pager">
+    {
+      prev && (
+        <a class="prev" href={witnessUrl(c, prev)}>
+          <small>上一本</small>
+          {prev.title}
+        </a>
+      )
+    }{
+      next && (
+        <a class="next" href={witnessUrl(c, next)}>
+          <small>下一本</small>
+          {next.title}
+        </a>
+      )
+    }
+  </nav>
+</Shell>

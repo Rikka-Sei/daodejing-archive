@@ -1,0 +1,13 @@
+---
+// 目录行右侧的“⋯”：点开下载菜单（菜单内容在该行的 .menu-src 里，由 app.js 搬进浮层）。
+import Icon from './Icon.astro';
+
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<button type="button" class="more" aria-haspopup="menu" aria-expanded="false" aria-label={`更多操作：${label}`} title="更多"
+  ><Icon name="more" /></button
+>

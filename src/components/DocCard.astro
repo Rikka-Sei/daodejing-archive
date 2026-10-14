@@ -1,0 +1,38 @@
+---
+// 封面上的一张文献卡片：实物影像、名称、概况；有几个本，就列几个。
+import type { Corpus, Group } from '../lib/corpus';
+import { COVER_WIDTH, thumbUrl } from '../lib/thumbs';
+import { witnessUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  group: Group;
+}
+const { corpus: c, group: g } = Astro.props;
+const plate = g.coverPlate();
+const units = g.witnesses.reduce((n, w) => n + w.units.length, 0);
+const meta = [...(g.single ? [] : [`${g.witnesses.length} 个版本`]), `${units} 条释文`, ...(g.plates ? [`${g.plates} 张影像`] : [])];
+---
+
+<article class="doc">
+  <a class="cov" href={witnessUrl(c, g.first)}
+    ><span class="pic"
+      >{
+        plate ? (
+          <img loading="lazy" src={thumbUrl(c.id, plate.file, COVER_WIDTH)} alt="" />
+        ) : (
+          <span class="ph">{Array.from(g.name)[0]}</span>
+        )
+      }</span
+    ><span class="tx"><span class="t">{g.name}</span><span class="m">{meta.join(' · ')}</span></span></a
+  >
+  {
+    !g.single && (
+      <div class="subs">
+        {g.witnesses.map((w) => (
+          <a href={witnessUrl(c, w)}>{w.label}</a>
+        ))}
+      </div>
+    )
+  }
+</article>

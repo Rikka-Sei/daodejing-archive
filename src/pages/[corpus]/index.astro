@@ -1,0 +1,12 @@
+---
+// 一部典籍的阅读版封面。
+import { allCorpora, corpusById } from '../../lib/site';
+import Cover from '../../views/Cover.astro';
+
+export function getStaticPaths() {
+  return allCorpora().map((c) => ({ params: { corpus: c.id } }));
+}
+const corpus = corpusById(Astro.params.corpus!);
+---
+
+<Cover corpus={corpus} corpora={allCorpora()} />

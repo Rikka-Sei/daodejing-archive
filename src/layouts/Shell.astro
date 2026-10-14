@@ -1,0 +1,52 @@
+---
+// 页面外壳：侧栏、顶栏（面包屑与开关）、正文栏。插槽 side / crumb 与默认插槽（正文）。
+import '../styles/site.css';
+import appUrl from '../scripts/app.js?url';
+import Icon from '../components/Icon.astro';
+import Tools from '../components/Tools.astro';
+import { facesCss, preloadHrefs } from '../lib/fonts';
+import { FAVICON } from '../lib/icons';
+
+interface Props {
+  title: string;
+  desc: string;
+  /** 页面里有释文，竖排时正文栏撑满整宽 */
+  wide?: boolean;
+  /** 顶栏只放外观开关 */
+  themeOnly?: boolean;
+  /** 面包屑需要被脚本改写时（数据版）：节点 id 与初始内容的 HTML */
+  crumbId?: string;
+  crumbBase?: string;
+}
+const { title, desc, wide = false, themeOnly = false, crumbId, crumbBase } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <link rel="icon" href={FAVICON} />
+    {preloadHrefs().map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
+    <style is:inline set:html={facesCss()}></style>
+  </head>
+  <body>
+    <div id="app">
+      <aside id="side"><slot name="side" /></aside>
+      <main>
+        <header class="top">
+          <button type="button" class="ibtn" id="menu" aria-label="菜单"><Icon name="menu" /></button>
+          <span class="tile"><Icon name="book" /></span>
+          <nav class="crumb" id={crumbId} data-base={crumbBase}><slot name="crumb" /></nav>
+          <div class="tools"><Tools themeOnly={themeOnly} /></div>
+        </header>
+        <div class:list={['content', { wide }]}><slot /></div>
+      </main>
+    </div>
+    <div id="pop" class="pop" role="menu" hidden></div>
+    <script is:inline src={appUrl}></script>
+  </body>
+</html>

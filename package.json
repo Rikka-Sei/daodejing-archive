@@ -1,0 +1,28 @@
+{
+  "name": "daodejing-archive",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "道德经文献工程的展示站：Astro 读取 data/ 生成阅读版、数据版、下载文件与 llms.txt。",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "astro": "^7.3.5",
+    "sharp": "^0.35.5",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.4"
+  }
+}

@@ -1,0 +1,35 @@
+---
+// 目录里的一个本。top：它自己就是一项文献（文献只有一个本），前面带文件图标。
+import type { Group, Witness } from '../lib/corpus';
+import { witnessUrl } from '../lib/url';
+import Icon from './Icon.astro';
+import MoreButton from './MoreButton.astro';
+import RowMenu from './RowMenu.astro';
+
+interface Props {
+  corpusId: string;
+  group: Group;
+  wit: Witness;
+  /** 当前本的 id */
+  current: string;
+  /** 数据版：链接是页内的 #<本 id> */
+  data: boolean;
+  top: boolean;
+}
+const { corpusId, group: g, wit: w, current, data, top } = Astro.props;
+const href = data ? `#${w.id}` : witnessUrl({ id: corpusId }, w);
+const on = w.id === current;
+---
+
+<div class:list={['item', 'leaf', { on }]}>
+  <a
+    class="lk"
+    href={href}
+    data-w={data ? w.id : undefined}
+    data-name={data ? w.meta.name : undefined}
+    aria-current={on && !data ? 'page' : undefined}
+    >{top && <Icon name="file" />}<span class="t">{top ? g.name : w.label}</span>{data && <span class="cnt" />}</a
+  >
+  <MoreButton label={w.title} />
+  <RowMenu corpusId={corpusId} stem={w.id} name={w.title} whole={false} />
+</div>

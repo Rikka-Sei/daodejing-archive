@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# Astro 站点
+node_modules/
+dist/
+.astro/

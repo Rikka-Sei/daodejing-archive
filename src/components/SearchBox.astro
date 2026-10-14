@@ -1,0 +1,22 @@
+---
+// go 非空时，回车跳转到该页（数据版）并带上检索词；否则就地过滤本页。
+import Icon from './Icon.astro';
+
+interface Props {
+  placeholder: string;
+  go?: string;
+}
+const { placeholder, go } = Astro.props;
+---
+
+<label class="sb-search"
+  ><Icon name="search" /><input
+    id="q"
+    type="search"
+    placeholder={placeholder}
+    aria-label={placeholder}
+    autocomplete="off"
+    data-go={go || undefined}
+  /></label
+>
+<div class="hint" id="hits"></div>

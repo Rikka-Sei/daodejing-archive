@@ -1,0 +1,41 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+/** BASE 在模块加载时定下，换 base 要重新加载模块。 */
+async function load(env: { BASE_URL?: string; SITE?: string }) {
+  vi.resetModules();
+  if (env.BASE_URL !== undefined) vi.stubEnv('BASE_URL', env.BASE_URL);
+  if (env.SITE !== undefined) vi.stubEnv('SITE', env.SITE);
+  return import('../../src/lib/url');
+}
+
+afterEach(() => vi.unstubAllEnvs());
+
+describe('站内地址', () => {
+  it('根部署：地址从 / 开始', async () => {
+    const u = await load({ BASE_URL: '/' });
+    expect(u.url('llms.txt')).toBe('/llms.txt');
+    expect(u.url()).toBe('/');
+    expect(u.coverUrl({ id: 'laozi' })).toBe('/laozi/');
+    expect(u.dataUrl({ id: 'laozi' })).toBe('/laozi/data/');
+    expect(u.witnessUrl({ id: 'laozi' }, { id: 'guodian-jia' })).toBe('/laozi/guodian-jia/');
+  });
+
+  it.each(['/daodejing-archive', '/daodejing-archive/'])('子路径部署（base=%s）：带不带结尾斜杠都一样', async (base) => {
+    const u = await load({ BASE_URL: base });
+    expect(u.url('laozi/guodian-jia.txt')).toBe('/daodejing-archive/laozi/guodian-jia.txt');
+    expect(u.url('/fonts/a.woff2')).toBe('/daodejing-archive/fonts/a.woff2');
+    expect(u.coverUrl({ id: 'laozi' })).toBe('/daodejing-archive/laozi/');
+  });
+});
+
+describe('llms.txt 里的站点地址', () => {
+  it('配了 site：站点加 base，没有多余的斜杠', async () => {
+    expect((await load({ BASE_URL: '/x/', SITE: 'https://example.test/' })).absoluteBase()).toBe('https://example.test/x');
+    expect((await load({ BASE_URL: '/', SITE: 'https://example.test' })).absoluteBase()).toBe('https://example.test');
+  });
+
+  it('没配 site 或环境里的 SITE 不是网址（如字符串 "undefined"）：留空，写相对链接', async () => {
+    expect((await load({ BASE_URL: '/', SITE: 'undefined' })).absoluteBase()).toBe('');
+    expect((await load({ BASE_URL: '/', SITE: '' })).absoluteBase()).toBe('');
+  });
+});

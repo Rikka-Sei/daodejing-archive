@@ -1,0 +1,19 @@
+---
+import Seg from './Seg.astro';
+
+interface Props {
+  /** 只放外观开关（封面没有释文，排版与影像开关用不上） */
+  themeOnly?: boolean;
+}
+const { themeOnly = false } = Astro.props;
+---
+
+{
+  !themeOnly && (
+    <>
+      <Seg k="layout" title="释文排版" options={[['h', '横排'], ['v', '竖排']]} />
+      <Seg k="plates" title="单简图版与整页图版" options={[['on', '影像'], ['off', '纯文']]} />
+    </>
+  )
+}
+<Seg k="theme" title="外观" options={[['auto', '自动'], ['light', '浅'], ['dark', '深']]} />

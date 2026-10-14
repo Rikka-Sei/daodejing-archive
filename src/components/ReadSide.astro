@@ -1,0 +1,33 @@
+---
+// 阅读版侧栏：封面、凡例，再是文献目录。current 是当前本的 id。
+import type { Corpus } from '../lib/corpus';
+import { coverUrl, dataUrl } from '../lib/url';
+import CorpusLinks from './CorpusLinks.astro';
+import SearchBox from './SearchBox.astro';
+import SideFrame from './SideFrame.astro';
+import SideItem from './SideItem.astro';
+import Tree from './Tree.astro';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+  current?: string;
+  onCover?: boolean;
+  /** “数据版”开关的去向；默认是数据版总目 */
+  dataHref?: string;
+}
+const { corpus: c, corpora, current = '', onCover = false, dataHref } = Astro.props;
+const cover = coverUrl(c);
+const data = dataUrl(c);
+---
+
+<SideFrame title={c.title} coverHref={cover} mode="read" readHref={cover} dataHref={dataHref ?? data}>
+  <SearchBox slot="search" placeholder={onCover ? '搜索全部版本' : '搜索本页释文'} go={onCover ? data : undefined} />
+  <nav class="sb-nav">
+    <SideItem href={cover} label="封面" icon="book" on={onCover} />
+    <SideItem href={`${onCover ? '' : cover}#preface`} label="凡例" icon="list" />
+  </nav>
+  <CorpusLinks corpus={c} corpora={corpora} />
+  <div class="sb-label">文献</div>
+  <Tree corpus={c} current={current} />
+</SideFrame>

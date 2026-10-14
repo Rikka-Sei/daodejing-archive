@@ -1,0 +1,13 @@
+---
+// 阅读版的一个本。
+import { allCorpora, corpusById } from '../../lib/site';
+import Volume from '../../views/Volume.astro';
+
+export function getStaticPaths() {
+  return allCorpora().flatMap((c) => c.witnesses.map((w) => ({ params: { corpus: c.id, id: w.id } })));
+}
+const corpus = corpusById(Astro.params.corpus!);
+const wit = corpus.witness(Astro.params.id!)!;
+---
+
+<Volume corpus={corpus} wit={wit} corpora={allCorpora()} />

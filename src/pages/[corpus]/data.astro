@@ -1,0 +1,12 @@
+---
+// 数据版：所有版本在一页。
+import { allCorpora, corpusById } from '../../lib/site';
+import DataView from '../../views/DataView.astro';
+
+export function getStaticPaths() {
+  return allCorpora().map((c) => ({ params: { corpus: c.id } }));
+}
+const corpus = corpusById(Astro.params.corpus!);
+---
+
+<DataView corpus={corpus} corpora={allCorpora()} />

@@ -1,0 +1,30 @@
+---
+// 数据版侧栏：总目与文献目录，目录项是页内的 #<本 id>。
+import type { Corpus } from '../lib/corpus';
+import { coverUrl, dataUrl, url } from '../lib/url';
+import CorpusLinks from './CorpusLinks.astro';
+import SearchBox from './SearchBox.astro';
+import SideFrame from './SideFrame.astro';
+import SideItem from './SideItem.astro';
+import Tree from './Tree.astro';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+}
+const { corpus: c, corpora } = Astro.props;
+const cover = coverUrl(c);
+const data = dataUrl(c);
+// 数据版里选中某个本时，“阅读版”开关改去该本的阅读页（app.js 把 {id} 换成本 id）
+const readTpl = `${url(`${c.id}/`)}{id}/`;
+---
+
+<SideFrame title={c.title} coverHref={cover} mode="data" readHref={cover} dataHref={data} readTpl={readTpl}>
+  <SearchBox slot="search" placeholder="搜索全部版本" />
+  <nav class="sb-nav">
+    <SideItem href="#" label="总目" icon="list" on={true} attrs={{ 'data-w': '' }} />
+  </nav>
+  <CorpusLinks corpus={c} corpora={corpora} />
+  <div class="sb-label">文献</div>
+  <Tree corpus={c} data={true} />
+</SideFrame>

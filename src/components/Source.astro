@@ -1,0 +1,63 @@
+---
+// 一个来源：题名、出版者与年份、授权与抓取情况；授权依据、备注、原始文件（含 SHA-256）收在下面的折叠里。
+import { quotePath } from '../lib/html';
+import { licenseLabel } from '../lib/text';
+import type { Meta } from '../lib/types';
+import { REPO_URL } from '../lib/url';
+
+interface Props {
+  source: Meta;
+}
+const s = Astro.props.source;
+const lic = s.license ?? {};
+const retr = s.retrieval ?? {};
+const fetched = retr.status === 'fetched';
+const pub = [s.publisher, s.year].filter(Boolean).map(String).join('，');
+const state = fetched ? (retr.date ? `；抓取于 ${retr.date}` : '') : '；仅登记，未抓取';
+const files: { path: string; sha256: string }[] = retr.files ?? [];
+const blobUrl = (rel: string) => `${REPO_URL}/blob/main/${quotePath(rel)}`;
+const why = {
+  evidence: lic.evidence as string | undefined,
+  notes: s.notes ? String(s.notes).trim() : '',
+};
+const hasWhy = !!(why.evidence || why.notes || files.length);
+---
+
+<li>
+  {s.url ? <a href={s.url} target="_blank" rel="noopener">{s.title}</a> : s.title}{pub && `　${pub}`}<small
+    >授权：{licenseLabel(lic)}{state}</small
+  >{
+    hasWhy && (
+      <details class="why">
+        <summary>依据与原始文件</summary>
+        <dl class="facts">
+          {why.evidence && (
+            <>
+              <dt>授权依据</dt>
+              <dd>{why.evidence}</dd>
+            </>
+          )}
+          {why.notes && (
+            <>
+              <dt>备注</dt>
+              <dd>{why.notes}</dd>
+            </>
+          )}
+          {files.length > 0 && (
+            <>
+              <dt>原始文件</dt>
+              <dd>
+                {files.map((f, i) => (
+                  <>
+                    {i > 0 && <br />}
+                    <a href={blobUrl(f.path)} target="_blank" rel="noopener">{f.path}</a>　SHA-256 <code>{f.sha256.slice(0, 12)}…</code>
+                  </>
+                ))}
+              </dd>
+            </>
+          )}
+        </dl>
+      </details>
+    )
+  }
+</li>

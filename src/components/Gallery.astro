@@ -1,0 +1,36 @@
+---
+// 整页图版与实物照片（单简图版已在各条释文旁）。
+import type { Witness } from '../lib/corpus';
+import { fullUrl, thumbUrl } from '../lib/thumbs';
+
+interface Props {
+  wit: Witness;
+  corpusId: string;
+}
+const { wit, corpusId } = Astro.props;
+const items = wit.plates
+  .filter((p) => p.kind !== 'slip-plate')
+  .map((p) => {
+    // 登记的位置形如“某书.pdf 第 6 页”，图注只留“6 页”
+    const i = p.locator.indexOf(' 第 ');
+    return { p, cap: i >= 0 ? p.locator.slice(i + 3) : p.locator };
+  });
+---
+
+{
+  items.length > 0 && (
+    <div class="plates">
+      <h3>整页图版</h3>
+      <div class="grid">
+        {items.map(({ p, cap }) => (
+          <figure>
+            <a href={fullUrl(p.file)} target="_blank" rel="noopener">
+              <img loading="lazy" src={thumbUrl(corpusId, p.file)} alt={cap} />
+            </a>
+            <figcaption>{cap}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  )
+}

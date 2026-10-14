@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
 """生成站点用的固定字体子集（WOFF2）：思源黑体、思源宋体，SIL OFL 1.1。
 
-先把站点生成一遍，统计页面上实际出现的字，再从固定来源的字体里裁出这些字，存到 scripts/pagegen/assets/fonts/。
+先构建站点（npm run build），统计 dist/ 里页面实际出现的字，再从固定来源的字体里裁出这些字，存到 public/fonts/。
 来源文件按 URL + SHA-256 固定，下载后先校验；子集的哈希和覆盖的字记在 fonts.json。
-新增典籍、页面出现新字后重新运行即可（站点生成时会提示哪些字不在子集里）。
+新增典籍、页面出现新字后重新运行即可（构建时会提示哪些字不在子集里），然后重新构建。
 
 依赖：pip install fonttools brotli
-用法：scripts/make_fonts.py [--corpus ID=目录 ...] [--cache 目录]
+用法：npm run build && scripts/make_fonts.py [--site dist] [--cache 目录]
 """
 import argparse
 import hashlib
+import html
 import json
 import os
+import re
 import sys
-import tempfile
 import urllib.request
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-import fontTools  # noqa: E402
-from fontTools import subset, ttLib  # noqa: E402
-from fontTools.varLib import instancer  # noqa: E402
-
-from pagegen import cli, fonts  # noqa: E402
-from pagegen.corpus import load_corpus  # noqa: E402
+REPO = Path(__file__).resolve().parent.parent
+FONT_DIR = REPO / "public" / "fonts"
+MANIFEST = FONT_DIR / "fonts.json"
 
 GF = "https://raw.githubusercontent.com/google/fonts/main/ofl"
 SOURCES = {
@@ -65,19 +61,50 @@ def fetch(url: str, sha256: str, cache: Path) -> Path:
     return dest
 
 
-def used_chars(corpora) -> dict:
+_BLOCKS = re.compile(r"<(style|script)\b[^>]*>(.*?)</\1>", re.S)
+_COMMENT = re.compile(r"/\*.*?\*/", re.S)
+_TAGS = re.compile(r"<[^>]+>")
+_UNIT_P = re.compile(r"<p>.*?</p>", re.S)                       # 释文正文（不带 class 的 <p>）：只用宋体 400
+_NOTES = re.compile(r'<div class="note">.*?</div>', re.S)       # 来源附带的注释：黑体 400
+_SHOWN_ATTRS = re.compile(r'\b(?:placeholder|alt)="([^"]*)"')   # 属性值里会画出来的文字：输入框提示、图片加载失败时的替代文字
+
+
+def visible_text(page: str, units: bool = True, notes: bool = True) -> str:
+    """页面上会画出来的文字：标签之间的正文，输入框提示和图片替代文字，以及样式、脚本里（去掉注释）的字符串，
+    脚本会往页面里写字（如“本页命中”），样式会给序号加“、”。units、notes 为 False 时分别不含释文正文、来源注释。
+    与 src/lib/verify.ts 的 visibleText 同一套规则，构建时的字体提示用的是那边。"""
+    if not units:
+        page = _UNIT_P.sub("", page)
+    if not notes:
+        page = _NOTES.sub("", page)
+    shown = [_COMMENT.sub("", m.group(2)) for m in _BLOCKS.finditer(page)]
+    shown += _SHOWN_ATTRS.findall(page)
+    return html.unescape(_TAGS.sub("", _BLOCKS.sub("", page)) + "".join(shown))
+
+
+def site_chars(site: Path, units: bool = True, notes: bool = True) -> set:
+    """已构建站点用到的字：全部页面的可见文字，加上外部样式与脚本（_astro/）里的字符串。"""
+    chars = set()
+    for page in site.rglob("*.html"):
+        chars.update(visible_text(page.read_text(encoding="utf-8"), units, notes))
+    for asset in list(site.rglob("*.css")) + list(site.rglob("*.js")):
+        chars.update(_COMMENT.sub("", asset.read_text(encoding="utf-8")))
+    return {c for c in chars if not c.isspace() and c.isprintable()}
+
+
+def used_chars(site: Path) -> dict:
     """页面用字，按用在哪里分三档（都加上常用标点）：
     all 全部；text 去掉释文正文（黑体 400：界面、识语、注释）；ui 再去掉注释（500 字重：标题与界面）。
     释文只用宋体 400，所以其余字体的子集小得多。"""
-    with tempfile.TemporaryDirectory() as d:
-        cli.build(corpora, Path(d), thumbnails=False, ship_fonts=False)      # 只为统计用字，不依赖现有字体文件
-        extra = set(EXTRA)
-        return {"all": fonts.site_chars(Path(d)) | extra,
-                "text": fonts.site_chars(Path(d), units=False) | extra,
-                "ui": fonts.site_chars(Path(d), units=False, notes=False) | extra}
+    extra = set(EXTRA)
+    return {"all": site_chars(site) | extra,
+            "text": site_chars(site, units=False) | extra,
+            "ui": site_chars(site, units=False, notes=False) | extra}
 
 
 def subset_options(flavor=None) -> "subset.Options":
+    from fontTools import subset      # fonttools 只有生成子集时才用到，统计用字不依赖它
+
     opts = subset.Options()
     opts.flavor = flavor
     opts.layout_features = ["*"]      # 竖排用的 vert/vrt2 等一并保留
@@ -90,6 +117,9 @@ def subset_options(flavor=None) -> "subset.Options":
 
 def make_subset(src: Path, weight: int, chars: str, out: Path) -> None:
     """先在变体字体上裁出用到的字（实例化才快），再取指定字重，存成 WOFF2。"""
+    from fontTools import subset, ttLib
+    from fontTools.varLib import instancer
+
     font = ttLib.TTFont(src)
     sub = subset.Subsetter(subset_options())
     sub.populate(text=chars)
@@ -101,18 +131,23 @@ def make_subset(src: Path, weight: int, chars: str, out: Path) -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--corpus", action="append", metavar="ID=目录", help="收录一部典籍，可重复；默认同 build_page.py")
+    ap.add_argument("--site", default=str(REPO / "dist"), help="已构建的站点目录，默认 dist（先运行 npm run build）")
     ap.add_argument("--cache", default=os.path.expanduser("~/.cache/daodejing-archive/fonts"), help="来源字体的缓存目录")
     args = ap.parse_args(argv)
 
-    corpora = [load_corpus(cid, path, meta) for cid, path, meta in cli.parse_specs(args.corpus)]
-    pools = used_chars(corpora)
+    site = Path(args.site)
+    if not any(site.rglob("*.html")):
+        sys.exit(f"{site} 里没有页面，先运行 npm run build")
+    import fontTools
+    from fontTools import ttLib
+
+    pools = used_chars(site)
     wanted = pools["all"]
-    fonts.DIR.mkdir(parents=True, exist_ok=True)
+    FONT_DIR.mkdir(parents=True, exist_ok=True)
     files, sources, covered = [], [], None
     for family, s in SOURCES.items():
         src = fetch(s["url"], s["sha256"], Path(args.cache))
-        (fonts.DIR / s["license_file"]).write_bytes(fetch(s["license_url"], s["license_sha256"], Path(args.cache)).read_bytes())
+        (FONT_DIR / s["license_file"]).write_bytes(fetch(s["license_url"], s["license_sha256"], Path(args.cache)).read_bytes())
         cmap = ttLib.TTFont(src, lazy=True).getBestCmap()
         have = {c for c in wanted if ord(c) in cmap}
         covered = have if covered is None else covered & have      # 黑体、宋体共有的字
@@ -120,8 +155,8 @@ def main(argv=None) -> int:
             scope, key = SCOPE[(family, weight)]
             pool = have & pools[key]
             name = f"{s['slug']}-{weight}.woff2"
-            make_subset(src, weight, "".join(sorted(pool)), fonts.DIR / name)
-            data = (fonts.DIR / name).read_bytes()
+            make_subset(src, weight, "".join(sorted(pool)), FONT_DIR / name)
+            data = (FONT_DIR / name).read_bytes()
             files.append({"file": name, "family": family, "weight": weight, "scope": scope, "chars": len(pool),
                           "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
         sources.append({"family": family, "name": s["name"], "url": s["url"].replace("%5B", "[").replace("%5D", "]"),
@@ -137,7 +172,7 @@ def main(argv=None) -> int:
         "licenses": [s["license_file"] for s in SOURCES.values()],
         "sources": sources,
     }
-    (fonts.MANIFEST).write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     total = sum(f["bytes"] for f in files)
     for f in files:
         print(f"{f['file']:26s} {f['bytes'] / 1024:7.0f} KB")

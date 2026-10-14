@@ -1,0 +1,23 @@
+---
+// 多部典籍时，侧栏里的切换组；只有一部时不显示。
+import type { Corpus } from '../lib/corpus';
+import { coverUrl } from '../lib/url';
+import SideItem from './SideItem.astro';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+}
+const { corpus, corpora } = Astro.props;
+---
+
+{
+  corpora.length > 1 && (
+    <>
+      <div class="sb-label">典籍</div>
+      {corpora.map((x) => (
+        <SideItem href={coverUrl(x)} label={x.title} icon="books" on={x.id === corpus.id} />
+      ))}
+    </>
+  )
+}
