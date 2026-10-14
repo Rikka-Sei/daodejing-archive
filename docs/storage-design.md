@@ -30,8 +30,9 @@ data/
   witnesses/<版本>.jsonl 文本单位，每行一枚简或帛书一行（来源只按章给出时每行一章），按阅读顺序
 schema/                 上述各类数据的 JSON Schema
 scripts/validate_data.py 校验脚本
-scripts/import_wikisource.py 把维基文库原始页面切分成文本单位
-scripts/extract_plates.py 从扫描本 PDF 抽出图版页
+scripts/import_wikisource.py 把维基文库原始页面切分成文本单位（郭店、马王堆）
+scripts/import_tt24h.py  把 tt24h/daodejing（CC0）的北大汉简实录按简切分
+scripts/extract_plates.py 从扫描本 PDF 抽出图版页，并按页上印的简号、行号挂到文本单位
 tests/                  校验脚本的测试（用占位字符，不含任何真实释文）
 ```
 

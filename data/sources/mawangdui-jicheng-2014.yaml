@@ -1,17 +1,72 @@
 id: mawangdui-jicheng-2014
 kind: print
 title: 长沙马王堆汉墓简帛集成
-editors: [裘锡圭]
+editors: [湖南省博物馆, 复旦大学出土文献与古文字研究中心, 裘锡圭]
 publisher: 中华书局
 year: 2014
-url: null
+url: https://archive.org/details/mawangdui
 witnesses: [mawangdui-jia, mawangdui-yi]
 license:
   status: public-domain
   name: null
-  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究；来源未标明授权条款的，按可收录处理。出版物本身未标明授权条款
+  evidence: 项目所有者决定（2026-10-14）：《道德经》为公版作品，本仓库用于学术研究，影像同样适用；来源未标明授权条款的，按可收录处理。出版物本身未标明授权条款
 retrieval:
-  status: pending
-  date: null
-  files: []
-notes: 湖南博物院、复旦大学出土文献与古文字研究中心与中华书局合作整理，2014 年中华书局出版；2024 年 8 月出修订本，《老子》甲乙本由裘锡圭、刘娇修订增补。据刘钊文（《人民日报》2024-09-19）。"裘锡圭主编"一说来自搜索摘要，存档页面未直接写明。尚无电子本，暂未抓取。
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/images/mawangdui-jicheng-2014/jia-p115.jpg
+      sha256: 5aa72db1494b94f8ffca7c9064dee299a30383111a3bf432e42e36be424c9f9d
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p116.jpg
+      sha256: 7fa3ef25723bbe7c8b41a246fbf4108eb05e7512c9a8803fc7e01c44d656832f
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p117.jpg
+      sha256: 8c1029fbc90150f2c86f105629742989cbc63b192d341dff157132093db71118
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p118.jpg
+      sha256: 734f28e0d160d669aba45d15650e7e3384d05ec3bc7de16e4406010eec1e3efd
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p119.jpg
+      sha256: 58b5987058e5e970d4061160d639b6987d426123fb0faad43b6dd78a084cbca0
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p120.jpg
+      sha256: 23e502fcc2eb442cea4a06ea3c5548dd9ddd9a0daf32111ebb719d6031a2f364
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p121.jpg
+      sha256: cb9a5ce71f5bae35d84923a73db922642c55707c8a4478abfa2ec28f0275442d
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/jia-p122.jpg
+      sha256: 41c85b3267f7289a16a8385ca69ae55215047fbe56a46a95c1559357f0793e47
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p162.jpg
+      sha256: 66ffca0920d355af98f23ea96e8fb0e91c20d5f029c60b71973b2bd3ea89d034
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p163.jpg
+      sha256: d45a20911a33690339a57a882e7bbacc74d909170b2e1b1625c0ad0a744a8bce
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p164.jpg
+      sha256: 5f4278afd7f6a867923af417eef402cd636c2ff2022cfd5fd0473406d00ea163
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p165.jpg
+      sha256: 6fb17114cd053353c4e23672bf212704c210de33d1706ab4f93661cc8f01ebdd
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p166.jpg
+      sha256: f1b277366140182e4b991a667730d0b423d991f21a8d5f2014e9c041b58274d8
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p167.jpg
+      sha256: 2cb5a0d2707e6237b43f9190cd8db48c0b6ad16264510196bd47bd40a1683c4b
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p168.jpg
+      sha256: 1ad0ec1507088ab66db719d13949fe3ea78e4ee7858fa09b24de86bf11ff798a
+      url: null
+    - path: data/images/mawangdui-jicheng-2014/yi-p169.jpg
+      sha256: 7a93abfd8b0fa74ac92c0c74bf47601ea34eb25984b5f1e686e62a829015f83c
+      url: null
+notes: >-
+  全 7 册，2014 年 6 月中华书局出版，ISBN 978-7-101-10168-3；湖南省博物馆、复旦大学出土文献与古文字研究中心编纂，裘锡圭主编
+  （据册 1 扫描本的 CIP 数据页和编纂委员会页）。2024 年 8 月出修订本，《老子》甲乙本由裘锡圭、刘娇修订增补（据刘钊文，《人民日报》2024-09-19）。
+  影像取自 archive.org 条目 mawangdui 的册 1 扫描本"长沙马王堆汉墓简帛集成  1_13896076.pdf"
+  （SHA-1 b60d38a83761478d2008d657706a31b44e4c50e5，与 archive.org 元数据一致；SHA-256 1e4e6686084b8367fda760ebfea64e04e125c2dc2f062aefe94d8974c5dce010），
+  只抽整理图版中老子甲本（PDF 第 115–122 页）和老子乙本（PDF 第 162–169 页）共 16 页，JPEG 原样抽出。
+  图版下方印有帛书行号，每页对应哪几章由 scripts/extract_plates.py 按行号和 tt24h 排版数据推出；第 122 页左端另有《五行》开头几行。
+  同一条目里还有 1980 年文物出版社《马王堆汉墓帛书〔壹〕》扫描本，图版与本书重复，没有收。

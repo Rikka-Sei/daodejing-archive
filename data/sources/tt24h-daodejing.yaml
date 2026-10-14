@@ -1,0 +1,45 @@
+id: tt24h-daodejing
+kind: website
+title: 《老子道德经：四种原文表》源码 v0.1.3（tt24h/daodejing）
+editors: null
+publisher: null
+year: 2026
+url: https://archive.org/details/laozi-daodejing
+witnesses: [beida, mawangdui-jia, mawangdui-yi]
+license:
+  status: cc
+  name: CC0 1.0
+  evidence: >-
+    archive.org 条目 licenseurl 为 https://creativecommons.org/publicdomain/zero/1.0/；
+    源码 README.md "使用协议"一节：除 .ttf 字体及 .svg 图片外，项目内文件及内容采用 CC0 1.0；
+    每份实录文件头部也写明"本文件内容使用协议：CC0"
+retrieval:
+  status: fetched
+  date: "2026-10-14"
+  files:
+    - path: data/raw/tt24h-daodejing/v0.1.3/README.md
+      sha256: 85fcc737a0a917b76aa1b6c43d9a1eba5f48e73cba7cdb38d6b06c945f80e8bd
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+    - path: data/raw/tt24h-daodejing/v0.1.3/实录-北大汉简.txt
+      sha256: 83acabd5fa09dd628fd4723cf257ea5b2a1b99fe4e7d8324f440e492d3154473
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+    - path: data/raw/tt24h-daodejing/v0.1.3/实录-帛书甲本.txt
+      sha256: 51875309350c3aa41c89174d4c6a9555c13735fa92a31c1c501faee47f600d9b
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+    - path: data/raw/tt24h-daodejing/v0.1.3/实录-帛书乙本.txt
+      sha256: 54e86bf9751763356dc3ab19367c292ee871525878e3647d3330fcb05aed80ce
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+    - path: data/raw/tt24h-daodejing/v0.1.3/帛书甲本.typ
+      sha256: fad6914833b24ab2eb1d1db13ebeab70a9bbb7dc03bf613a7c880cd98cb7a92f
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+    - path: data/raw/tt24h-daodejing/v0.1.3/帛书乙本.typ
+      sha256: 749da846bc8fb99976ca23ff2225150ef9496e642b85248051cec2f0b43de923
+      url: https://archive.org/download/laozi-daodejing/github仓库源码-daodejing--v0.1.3.zip
+notes: >-
+  原仓库 https://github.com/tt24h/daodejing ，本地代理访问 GitHub 返回 403，改从 archive.org 镜像取得：
+  github仓库源码-daodejing--v0.1.3.zip（SHA-1 48669b210da5ff1adbac4c8842101faa17944d19，与 archive.org 元数据一致；
+  SHA-256 f7ec8361d28949685716e761e69d59a6fa150a50c9c74b235407845dd6c31891），只取出 README、"工具/实录-*.txt"三份释文和"编译用代码/数据/"下帛书甲乙本两份排版数据（.typ，用来查帛书每行属于哪一章）。
+  北大汉简实录的底本是《北京大學藏西漢竹書》册2（2012），每行一简，行末〚L…〛为简号，"2背""124背"是"老子上經""老子下經"篇题；
+  帛书甲乙本实录的底本是《長沙馬王堆漢墓簡帛集成》修订本（2024），带帛书行号（乙本分上下半行）。
+  记号："＝"重文号，"◍"分章圆点（marks 记为 section-mark），"□"缺字，〚F字〛残字，〚⿰…〛造字序列，"〼"文件未说明，记为 other。
+  目前只有北大本由 scripts/import_tt24h.py 切分入库；帛书两本已按章从维基文库入库，这里的逐行释文先只存原始文件；.typ 数据用于把《简帛集成》图版页按行号挂到章（scripts/extract_plates.py）。

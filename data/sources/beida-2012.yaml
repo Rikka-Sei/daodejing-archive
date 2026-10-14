@@ -340,4 +340,4 @@ retrieval:
       url: https://archive.org/download/peking-university-bamboo-slips/%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E8%97%8F%E8%A5%BF%E6%B1%89%E7%AB%B9%E4%B9%A6%202_13350360.pdf
 notes: 2012 年 12 月出版，《老子》卷整理者韩巍，含前言、凡例、图版、释文与注释、附录。据中国高校人文社会科学信息网 2013-02-26 报道。编者、ISBN 978-7-5325-6099-8 据扫描本版权页。
   影像取自 archive.org 条目 peking-university-bamboo-slips 的扫描本（PDF SHA-256 9fb9c39253ced4a1b07bfbbb3e9476cc5d9ac1b5973301f849813b4e28d4bf17），
-  只抽第 16–123 页图版（原大、放大、简背），不收释文注释和简背划痕示意图；图版尚未逐简对应到文本单位。
+  只抽第 16–123 页图版（原大、放大、简背），不收释文注释和简背划痕示意图；每页图版收哪几枚简按页底印的简号对应到 data/witnesses/beida.jsonl（见 scripts/extract_plates.py 的 BEIDA_SLIPS）。
