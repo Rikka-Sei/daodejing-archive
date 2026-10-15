@@ -1,4 +1,4 @@
-"""字库 font/：笔画库、SVG 读取、合并进字体、改名，以及登记的 6 个手绘字。
+"""字库 font/：笔画库、SVG 读取、合并进字体、改名、拟合工具，以及登记的 6 个手绘字。
 
 构建用一个很小的合成字体当“上游”，不下载思源宋体；真正的上游字体由 npm run fonts 生成时核对哈希。
 运行：python3 -m unittest tests.test_font（需要 fonttools、skia-pathops、pyyaml）
@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / 'font' / 'tools'))
 
 import build as fontbuild  # noqa: E402
 import draw  # noqa: E402
+import fit  # noqa: E402
 import glyphlib  # noqa: E402
 import parts  # noqa: E402
 import strokes  # noqa: E402
@@ -79,7 +80,8 @@ class StrokeTest(unittest.TestCase):
             strokes.pie(400, 100, 300, 500),
             strokes.na(500, 300, 900, 800),
             strokes.na_duan(300, 400, 480, 730),
-            strokes.shu_wan_gou_r(620, 45, 940, 965, 730),
+            strokes.shu_wan_gou(620, 45, 940, 965, 730),
+            strokes.plain_shu(170, 150, 735),
             strokes.ti(30, 770, 380, 660),
             strokes.xie_shu(405, 50, 300, 490),
             strokes.shu_tail(160, 320, 650),
@@ -108,6 +110,32 @@ class StrokeTest(unittest.TestCase):
         g = glyphlib.to_glyph(rects((0, 0, 100, 100)))  # SVG 里在字身框顶部
         g.recalcBounds(None)
         self.assertEqual((g.yMin, g.yMax), (780, 880))
+
+
+class FitTest(unittest.TestCase):
+    def test_overlap_is_area_of_intersection_over_union(self):
+        a, b = (glyphlib._path(d) for d in rects((0, 0, 100, 100), (50, 0, 150, 100)))
+        self.assertAlmostEqual(fit.iou(a, a), 1.0)
+        self.assertAlmostEqual(fit.iou(a, b), 1 / 3)
+        self.assertEqual(fit.iou(a, glyphlib._path(rects((200, 0, 300, 100))[0])), 0.0)
+
+    def test_reference_contours_are_flipped_like_the_svgs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            font = fit.reference_font(fake_upstream(Path(tmp) / 'up.ttf'))
+            (c,) = fit.contours(font, '国')
+        self.assertEqual(tuple(round(v) for v in c.bounds), (99, 880 - 821, 944, 880 + 78))
+
+    def test_climbing_recovers_a_shifted_stroke(self):
+        target = glyphlib._path(strokes.shu(300, 100, 800))
+        x, best = fit.climb(lambda v: strokes.shu(*v), [280, 130, 760], target, [1, 1, 1])
+        self.assertGreater(best, 0.99)
+        self.assertEqual([round(v) for v in x], [300, 100, 800])
+
+    def test_every_registered_stroke_draws(self):
+        for name, (ch, specs) in fit.SPECS.items():
+            for s in specs:
+                self.assertEqual(len(s.init), len(s.scale), f'{name}.{s.name}')
+                self.assertGreater(fit.drawn(s.model(s.init)).area, 0, f'{name}.{s.name}')
 
 
 class BuildTest(unittest.TestCase):
@@ -194,6 +222,7 @@ class RegisteredGlyphsTest(unittest.TestCase):
             self.assertEqual(ord(g['char']), g['cp'])
             self.assertEqual(g['svg'], f"glyphs/u{g['cp']:05X}.svg")
             self.assertTrue((ROOT / 'font' / g['svg']).exists(), g['svg'])
+            self.assertTrue(g['refs'].strip(), f"{g['char']} 没有登记参考字")
 
     def test_svgs_are_what_draw_py_produces(self):
         """SVG 与 draw.py 同步：只改了其中一边就会失败"""
@@ -216,7 +245,7 @@ class RegisteredGlyphsTest(unittest.TestCase):
     def test_parts_scale_positions_but_not_stroke_weight(self):
         """部件压扁挤窄，笔画仍和正文一样粗：横笔画的纵向厚度不变"""
         for yt, yb in ((50, 900), (50, 400)):
-            g = glyphlib.to_glyph([d for _, d in parts.wang(50, 450, yt, yb) if _ == 'wang-heng1'])
+            g = glyphlib.to_glyph([d for _, d in parts.wang_left(50, 450, yt, yb) if _ == 'wang-heng1'])
             g.recalcBounds(None)
             # 顶横上缘到下缘：顿角之外的横身厚 30，顿角最高 65 + 13
             self.assertLess(g.yMax - g.yMin, 110)

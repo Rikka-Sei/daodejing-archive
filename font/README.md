@@ -17,22 +17,31 @@ DaoSong 是思源宋体（Noto Serif SC）Regular 的**派生字体**。上游�
 
 ```
 font/
-  font.yaml          登记：字体名、版本、上游字体（URL 与 SHA-256）、手绘的字
-  glyphs/uXXXXX.svg  手绘的字形，每笔一条 <path>（1000×1000 字身框，基线在 y=880 的红线上）
+  font.yaml          登记：字体名、版本、上游字体（URL 与 SHA-256）、手绘的字（码位、结构、参考字）
+  glyphs/uXXXXX.svg  字形，每笔一条 <path>（1000×1000 字身框，基线在 y=880 的红线上）；由 tools/draw.py 生成，构建只读它们
   build.py           生成字体：上游字体取定字重 400，加入 SVG 里的字形，改名，存成 TTF
   glyphlib.py        SVG 读写、笔画合并、转成 TrueType 曲线
-  tools/strokes.py   笔画的画法：横、竖、撇、捺、竖弯钩……按思源宋体量得的尺寸现画
-  tools/parts.py     部件：木 王 屯 白 从 口框……按字框摆放笔画
-  tools/draw.py      6 个字的摆法；运行它重写 glyphs/*.svg
+  tools/strokes.py   笔画：横、竖、撇、捺、提、斜竖、横折钩、竖弯钩……尺寸常量在文件开头
+  tools/parts.py     部件，按部位命名：wang_left（左旁王）、tun_right（右旁屯）、mu_bottom（字底木）、
+                     bai_top（字头白）、cong_top（字头从）、yi（㠯）、kou_frame（口框）
+  tools/draw.py      6 个字的摆法，字形的唯一源头；运行它重写 glyphs/*.svg
+  tools/fit.py       在思源宋体的参考字上量出部件落点（measure 列轮廓范围，fit 逐笔拟合）
   OFL.txt            授权文本（上游的 SIL OFL 1.1 加上本项目的版权说明）
 ```
 
 ## 怎么画的
 
-- **笔画尺寸**：用思源宋体 Regular 的 白、木、王、屯、从 等字量得：横 30、竖 66，横的右端有三角形顿角，竖头有小钩，竖脚向左收圆，撇捺的曲线比例是在这些字上拟合出来的。`tools/strokes.py` 里每一笔都按这些尺寸现画，画出的白、木、王、屯、从与原字叠在一起几乎重合。
-- **按同部位的字定比例**：同一个部件在字头、字底、偏旁里写法不同（王作左旁末笔是提，木在字底是扁的，从在字头撇更斜）。每个部件都对照思源宋体里**同一部件在同一部位**的字逐笔拟合落点：𠂤 对照 追 師 官，𠕁 对照 冊，𠚕 的从对照 怂 的字头，𣐩 对照 臬，𤤀 对照 珅 的左旁和 纯 的右旁，𭇁 对照 吾。
+- **笔画尺寸**：横 30、竖 66，横的右端有三角形顿角，竖头有小钩，竖脚向左收圆，都量自思源宋体 Regular，写成 `tools/strokes.py` 开头的常量。每一笔都按这些尺寸现画，不取用思源宋体的轮廓。
+- **按同部位的字定比例**：同一个部件在字头、字底、偏旁里写法不同（王作左旁末笔是提，木在字底是扁的，从在字头撇更斜），所以部件按部位命名，各自对照思源宋体里**同一部件在同一部位**的参考字（登记在 `font.yaml` 的 `refs`）。
+- **拟合**：`tools/fit.py` 把每一笔对应到参考字的一个或几个轮廓，用笔画函数画出这一笔，求两者的重合度（交集面积 ÷ 并集面积），逐个参数爬坡到不再升高；`parts.py` 里的坐标就是它的输出。头宽、尖宽、轻重这类参数单凭重合度会被拟到失形，所以按目测取定、只拟合落点与曲线。重新核对：
+
+  ```bash
+  python3 font/tools/fit.py --upstream "NotoSerifSC[wght].ttf" fit        # 打印各部件每一笔的参数与重合度
+  python3 font/tools/fit.py --upstream "NotoSerifSC[wght].ttf" measure 冊  # 列出参考字各轮廓的范围
+  ```
+
 - **不是拼贴**：部件只按字框移动笔画的落点，横竖的粗细和收笔不随字框缩放；撇捺在缩小的部件里按缩小比例的平方根减轻，和思源宋体里小部件的笔画轻重一致，不会像把整个字缩放后那样细成线。
-- **改字形**：改 `tools/draw.py` 里的坐标，运行 `python3 font/tools/draw.py` 重写 SVG；也可以直接用矢量软件（Inkscape、Illustrator 等）改 SVG，只要保留 `<path>`，构建只认 SVG。`tests/test_font.py` 会核对 SVG 与 `draw.py` 的输出一致：直接改了 SVG 的话，要么把改动画回 `draw.py`，要么删掉那条对应字的核对。
+- **改字形**：改 `tools/draw.py`（或 `parts.py`、`strokes.py`）里的坐标，运行 `python3 font/tools/draw.py` 重写 SVG。`draw.py` 是唯一的源头，SVG 是它生成的产物，可以在矢量软件里打开查看，但不要手改：`tests/test_font.py` 核对 SVG 与 `draw.py` 的输出逐字相同。
 
 ## 生成
 
@@ -57,4 +66,7 @@ SIL OFL 1.1（见 `OFL.txt`）。按这份授权，派生字体必须改名（�
 
 ## 补新字的步骤
 
-在 `tools/draw.py` 里加一个函数摆笔画、登记到 `GLYPHS`，运行它生成 SVG，在 `font.yaml` 的 `glyphs` 里登记码位，再 `npm run build && npm run fonts`；然后跑 `python3 -m unittest tests.test_font` 与 `npm test`。
+1. 在思源宋体里找同一部件在同一部位的参考字，用 `fit.py measure` 看它的轮廓；需要新部件时在 `parts.py` 里按部位命名，在 `fit.py` 的 `SPECS` 里登记、拟合出落点。
+2. 在 `tools/draw.py` 里加一个函数摆笔画、登记到 `GLYPHS`，运行它生成 SVG。
+3. 在 `font.yaml` 的 `glyphs` 里登记码位、结构与参考字，再 `npm run build && npm run fonts`。
+4. 把字形和参考字放大并排看一遍、在正文字号下看一遍，再跑 `python3 -m unittest tests.test_font` 与 `npm test`。

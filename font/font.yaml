@@ -15,12 +15,12 @@ upstream:
   sha256: 050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9
   weight: 400
 
-# 手绘的字：码位、字、结构（IDS，仅作说明）、SVG 文件。字形依据 Unicode 字表（The Unicode Standard 18.0，
+# 手绘的字：码位、字、结构（IDS，仅作说明）、SVG 文件（由 tools/draw.py 生成）、参考字（对照比例的思源宋体字，见 tools/fit.py）。字形依据 Unicode 字表（The Unicode Standard 18.0，
 # CJK Unified Ideographs Extension B / F 字表）里的通用字形，笔画尺寸按思源宋体 Regular 量得，逐笔手绘，没有取用任何字体的现成轮廓。
 glyphs:
-  - { cp: 0x200A4, char: 𠂤, ids: ⿱丿㠯, svg: glyphs/u200A4.svg, note: 堆的本字：丿下一道左竖，右边上下两个分开的框，同 追 師 的右旁 }
-  - { cp: 0x20541, char: 𠕁, ids: ⿵冂卄, svg: glyphs/u20541.svg, note: 冂内套卄，近“冊” }
-  - { cp: 0x20695, char: 𠚕, ids: ⿶凵⿳从一从, svg: glyphs/u20695.svg, note: 凵内叠两个从，近“齿” }
-  - { cp: 0x23429, char: 𣐩, ids: ⿱白木, svg: glyphs/u23429.svg, note: 上白下木，近“杲” }
-  - { cp: 0x24900, char: 𤤀, ids: ⿰王屯, svg: glyphs/u24900.svg, note: 左王（末笔作提）右屯，同 珅 纯 的偏旁写法 }
-  - { cp: 0x2D1C1, char: 𭇁, ids: ⿱𫝀口, svg: glyphs/u2D1C1.svg, note: 上 𫝀（U+2B740，斜竖、一、横折、一）下口，即 吾 去掉首横 }
+  - { cp: 0x200A4, char: 𠂤, ids: ⿱丿㠯, svg: glyphs/u200A4.svg, refs: 追 師 官 自, note: 堆的本字：丿下一道左竖，右边上下两个分开的框，同 追 師 的右旁 }
+  - { cp: 0x20541, char: 𠕁, ids: ⿵冂卄, svg: glyphs/u20541.svg, refs: 冊, note: 冂内套卄，近“冊” }
+  - { cp: 0x20695, char: 𠚕, ids: ⿶凵⿳从一从, svg: glyphs/u20695.svg, refs: 怂 凶, note: 凵内叠两个从，近“齿” }
+  - { cp: 0x23429, char: 𣐩, ids: ⿱白木, svg: glyphs/u23429.svg, refs: 臬, note: 上白下木，近“杲” }
+  - { cp: 0x24900, char: 𤤀, ids: ⿰王屯, svg: glyphs/u24900.svg, refs: 珅 纯, note: 左王（末笔作提）右屯，同 珅 纯 的偏旁写法 }
+  - { cp: 0x2D1C1, char: 𭇁, ids: ⿱𫝀口, svg: glyphs/u2D1C1.svg, refs: 吾, note: 上 𫝀（U+2B740，斜竖、一、横折、一）下口，即 吾 去掉首横 }

@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 HERE = Path(__file__).resolve().parent

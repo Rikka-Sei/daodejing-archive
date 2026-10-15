@@ -1,7 +1,6 @@
 """宋体笔画的画法：每个函数画一笔，返回 SVG 路径（1000 单位的字身框，y 向下）。
 
-笔画粗细、顿角、收笔的尺寸，是对思源宋体 Regular（400）的白 木 王 屯 口 等字量得的：
-横 30，竖 66，横的右端有三角形的顿角，竖头有小钩，竖脚向左收圆。
+笔画的粗细、顿角、竖头、收笔，是对思源宋体 Regular（400）量得的（可用 tools/fit.py measure 核对），常量都在本文件开头。
 这里的每一笔都是按这些尺寸现画的，不是从思源宋体里抠下来的轮廓。
 """
 
@@ -9,6 +8,19 @@ from __future__ import annotations
 
 T_H = 30  # 横画粗
 W_V = 66  # 竖画粗
+
+# 横的右端顿角：从收笔端往回 DUN_START 处起坡，到往回 DUN_PEAK_X、高出横的上缘 DUN_PEAK_Y 处为顶，再圆转落回收笔端
+DUN_START = 148
+DUN_PEAK_X, DUN_PEAK_Y = 95, 65
+
+# 竖头向右的小钩（独立起笔的竖、短竖、斜竖、竖弯钩共用）：各点相对竖头左上角 (xl, y0)。
+# 先斜出到 (102, 12)，两段圆弧收回，落到竖的右缘、往下 HEAD_DROP 处
+HEAD_TIP = (102, 12)
+HEAD_CURVE = ((101, 22), (93.5, 29), (86, 36))
+HEAD_DROP = 39
+
+# 框的左竖起笔斜切：左上角向右下 (73, 35) 切到右缘
+QIE = (73, 35)
 
 
 def n(v: float) -> str:
@@ -24,6 +36,17 @@ def path(*segs: str) -> str:
     return ' '.join(segs) + ' Z'
 
 
+def _head(xl: float, y0: float, x_end: float) -> list[str]:
+    """竖头：从左上角 (xl, y0) 起笔，出小钩，落到 (x_end, y0 + HEAD_DROP)。x_end 通常是竖的右缘。"""
+    (c1, c2, c3) = HEAD_CURVE
+    return [
+        f'M{pt(xl, y0)}',
+        f'L{pt(xl + HEAD_TIP[0], y0 + HEAD_TIP[1])}',
+        f'Q{pt(xl + c1[0], y0 + c1[1])} {pt(xl + c2[0], y0 + c2[1])}',
+        f'Q{pt(xl + c3[0], y0 + c3[1])} {pt(x_end, y0 + HEAD_DROP)}',
+    ]
+
+
 def heng(x0: float, x1: float, yc: float, *, dun: bool = True) -> str:
     """横。x0 起笔，x1 收笔处顿角的最右端，yc 笔画中线。dun=False 是两头平齐的内横。"""
     top, bot = yc - T_H / 2, yc + T_H / 2
@@ -31,8 +54,8 @@ def heng(x0: float, x1: float, yc: float, *, dun: bool = True) -> str:
         return path(f'M{pt(x0, top)}', f'L{pt(x1, top)}', f'L{pt(x1, bot)}', f'L{pt(x0, bot)}')
     return path(
         f'M{pt(x0, top)}',
-        f'L{pt(x1 - 148, top)}',
-        f'L{pt(x1 - 95, top - 65)}',
+        f'L{pt(x1 - DUN_START, top)}',
+        f'L{pt(x1 - DUN_PEAK_X, top - DUN_PEAK_Y)}',
         f'C{pt(x1 - 70, top - 47)} {pt(x1 - 35, top - 18)} {pt(x1, top + 13)}',
         f'Q{pt(x1 - 3, bot)} {pt(x1 - 27, bot)}',
         f'L{pt(x0 + 8, bot)}',
@@ -53,17 +76,13 @@ def _foot(xr: float, y1: float, xl: float) -> list[str]:
 def shu(xl: float, y0: float, y1: float, *, w: float = W_V, head: bool = True) -> str:
     """竖：左缘 xl，从 y0（头尖）到 y1（脚底），竖头有向右的小钩（head=False 则头是平的，接在横下），竖脚收圆。"""
     xr = xl + w
-    top = (
-        [
-            f'M{pt(xl, y0)}',
-            f'L{pt(xl + 102, y0 + 12)}',
-            f'Q{pt(xl + 101, y0 + 22)} {pt(xl + 93.5, y0 + 29)}',
-            f'Q{pt(xl + 86, y0 + 36)} {pt(xr, y0 + 39)}',
-        ]
-        if head
-        else [f'M{pt(xl, y0)}', f'L{pt(xr, y0)}']
-    )
+    top = _head(xl, y0, xr) if head else [f'M{pt(xl, y0)}', f'L{pt(xr, y0)}']
     return path(*top, *_foot(xr, y1, xl))
+
+
+def plain_shu(xl: float, y0: float, y1: float, *, w: float = W_V + 3) -> str:
+    """两头平的竖：接在横上、横下的内竖（如 王 的竖）。"""
+    return path(f'M{pt(xl, y0)}', f'L{pt(xl + w, y0)}', f'L{pt(xl + w, y1)}', f'L{pt(xl, y1)}')
 
 
 def shu_qie(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
@@ -71,8 +90,8 @@ def shu_qie(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
     xr = xl + w
     return path(
         f'M{pt(xl, y0)}',
-        f'L{pt(xl + 73, y0 + 35)}',
-        f'L{pt(xr, y0 + 35)}',
+        f'L{pt(xl + QIE[0], y0 + QIE[1])}',
+        f'L{pt(xr, y0 + QIE[1])}',
         *_foot(xr, y1, xl),
     )
 
@@ -112,7 +131,7 @@ def _ctl(p0, p3, c: Ctl):
     return (p0[0] + dx * c[0], p0[1] + dy * c[1]), (p0[0] + dx * c[2], p0[1] + dy * c[3])
 
 
-# 曲线的比例，是在思源宋体的 木 从 白 的撇捺上拟合得到的
+# 撇捺两条边的默认曲线比例（独体 木 从 白 上拟合）；部件里的撇捺一般带着各自拟合的比例
 PIE_R: Ctl = (0.0, 0.38, 0.10, 0.64)
 PIE_L: Ctl = (0.0, 0.40, 0.10, 0.66)
 NA_U: Ctl = (0.16, 0.46, 0.46, 0.80)
@@ -128,8 +147,8 @@ def pie(
     head: float = 112,
     tip: float = 22,
     plain: bool = False,
-    right: Ctl | None = None,
-    left: Ctl | None = None,
+    right: Ctl = PIE_R,
+    left: Ctl = PIE_L,
     k: float = 1.0,
 ) -> str:
     """撇：(xa, ya) 是头部左上角，(xe, ye) 是收笔尖的中心。头部带斜切的顶，向下渐细，收笔平切。
@@ -140,8 +159,8 @@ def pie(
     r0 = b if plain else (xa + head * 0.67, ya + 47 * k)
     tr = (xe + tip / 2, ye)
     tl = (xe - tip / 2, ye)
-    rc1, rc2 = _ctl(r0, tr, right or PIE_R)
-    lc1, lc2 = _ctl(tl, a, left or PIE_L)
+    rc1, rc2 = _ctl(r0, tr, right)
+    lc1, lc2 = _ctl(tl, a, left)
     return path(
         f'M{pt(*a)}',
         f'L{pt(*b)}',
@@ -158,8 +177,8 @@ def na(
     xe: float,
     ye: float,
     *,
-    upper: Ctl | None = None,
-    lower: Ctl | None = None,
+    upper: Ctl = NA_U,
+    lower: Ctl = NA_L,
     foot: tuple[float, float] = (-70, 65),
     k: float = 1.0,
 ) -> str:
@@ -169,8 +188,8 @@ def na(
     tip = (xe, ye)
     tip2 = (xe - 3 * k, ye + 10 * k)
     ft = (xe + foot[0] * k, ye + foot[1] * k)
-    uc1, uc2 = _ctl(s1, tip, upper or NA_U)
-    lc1, lc2 = _ctl(ft, s2, lower or NA_L)
+    uc1, uc2 = _ctl(s1, tip, upper)
+    lc1, lc2 = _ctl(ft, s2, lower)
     return path(
         f'M{pt(*s1)}',
         f'C{pt(*uc1)} {pt(*uc2)} {pt(*tip)}',
@@ -192,7 +211,7 @@ def na_duan(
     w: float = 14,
     k: float = 1.0,
 ) -> str:
-    """短捺（从 的左人：捺画短，到底圆收）。(xs, ys) 细笔起，(xe, ye) 是圆头的中心。k 是笔画的轻重系数。"""
+    """短捺（从 的左人：捺缩成一点，到底圆收）。(xs, ys) 细笔起，(xe, ye) 是圆头的中心。k 是笔画的轻重系数。"""
     s1 = (xs, ys)
     s2 = (xs - w * k, ys + 7 * k)
     u = (xe + 16 * k, ye - 38 * k)
@@ -210,13 +229,10 @@ def na_duan(
 
 
 def shu_tail(xl: float, y0: float, y1: float) -> str:
-    """竖（头有小钩），脚向左下拖出一个小尖尾（屯 左边的短竖）。y1 是竖脚转折处，尖尾再向下 33。"""
+    """短竖，脚向左下拖出一个小尖尾（屯 左边的短竖）。y1 是竖脚转折处，尖尾再向下 33。"""
     xr = xl + W_V
     return path(
-        f'M{pt(xl, y0)}',
-        f'L{pt(xl + 100, y0 + 11)}',
-        f'Q{pt(xl + 99, y0 + 21)} {pt(xl + 91, y0 + 29)}',
-        f'Q{pt(xl + 83, y0 + 36)} {pt(xr, y0 + 38)}',
+        *_head(xl, y0, xr),
         f'L{pt(xr, y1)}',
         f'L{pt(xr + 8, y1)}',
         f'L{pt(xr - 16, y1 + 33)}',
@@ -228,13 +244,10 @@ def shu_tail(xl: float, y0: float, y1: float) -> str:
 
 
 def shu_duan(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
-    """竖（头有小钩），脚平收，右下角微圆（屯 里面的短竖）。"""
+    """短竖，脚平收，右下角微圆（屯 右边的短竖）。"""
     xr = xl + w
     return path(
-        f'M{pt(xl, y0)}',
-        f'L{pt(xl + 102, y0 + 12)}',
-        f'Q{pt(xl + 101, y0 + 22)} {pt(xl + 93.5, y0 + 29)}',
-        f'Q{pt(xl + 86, y0 + 36)} {pt(xr, y0 + 39)}',
+        *_head(xl, y0, xr),
         f'L{pt(xr, y1 - 22)}',
         f'Q{pt(xr, y1 - 18)} {pt(xr - 15, y1 - 7)}',
         f'Q{pt(xr - 40, y1)} {pt(xr - 53, y1)}',
@@ -243,7 +256,7 @@ def shu_duan(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
 
 
 def ti(xa: float, ya: float, xe: float, ye: float) -> str:
-    """提：(xa, ya) 是起笔顿头的左上角，向右上挑出，(xe, ye) 是笔尖的上缘。起笔粗、笔尖细，如 王 作偏旁时的末笔。"""
+    """提：(xa, ya) 是起笔顿头的左上角，向右上挑出，(xe, ye) 是笔尖的上缘。起笔粗、笔尖细，如 王 作左旁时的末笔。"""
     dx, dy = xe - xa, ye - ya
     return path(
         f'M{pt(xa, ya)}',
@@ -254,15 +267,12 @@ def ti(xa: float, ya: float, xe: float, ye: float) -> str:
     )
 
 
-def shu_wan_gou_r(xl: float, y0: float, ybot: float, xr: float, yhook: float) -> str:
-    """右旁的竖弯钩（沌 纯 的屯）：竖到底圆转成平的横，末端竖直向上出一个细钩。
-    xl 竖的左缘，y0 竖头尖，ybot 横的下缘，xr 钩脚最右处，yhook 钩尖的高度。"""
+def shu_wan_gou(xl: float, y0: float, ybot: float, xr: float, yhook: float) -> str:
+    """竖弯钩（右旁 屯 的写法，如 沌 纯）：竖到底圆转成平的横，末端竖直向上出一个细钩。
+    xl 竖的左缘，y0 竖头尖，ybot 横的下缘，xr 钩脚最右处，yhook 钩尖的高度。竖宽 65。"""
     xs = xl + 65
     return path(
-        f'M{pt(xl, y0)}',
-        f'L{pt(xl + 101, y0 + 12)}',
-        f'Q{pt(xl + 100, y0 + 22)} {pt(xl + 85, y0 + 30)}',
-        f'Q{pt(xl + 76, y0 + 37)} {pt(xs, y0 + 39)}',
+        *_head(xl, y0, xs),
         f'L{pt(xs, ybot - 95)}',
         f'Q{pt(xs, ybot - 61)} {pt(xs + 48, ybot - 61)}',
         f'L{pt(xr - 184, ybot - 61)}',
@@ -281,12 +291,9 @@ def shu_wan_gou_r(xl: float, y0: float, ybot: float, xr: float, yhook: float) ->
 def xie_shu(xt: float, yt: float, xb: float, yb: float, *, w: float = 70) -> str:
     """斜竖（吾 的 五 里那一笔）：笔直、粗细不变地向左下斜，头上有竖的小钩，脚平收在横上。
     (xt, yt) 是头的左上角，(xb, yb) 是脚的左下角，w 是水平方向的宽。"""
-    s = (xb - xt) / (yb - yt)  # 每向下一个单位，向左（负）挪多少
+    s = (xb - xt) / (yb - yt)  # 每向下一个单位，横向挪多少（向左为负）
     return path(
-        f'M{pt(xt, yt)}',
-        f'L{pt(xt + 102, yt + 12)}',
-        f'Q{pt(xt + 101, yt + 22)} {pt(xt + 93.5, yt + 29)}',
-        f'Q{pt(xt + 86, yt + 36)} {pt(xt + w + s * 39, yt + 39)}',
+        *_head(xt, yt, xt + w + s * HEAD_DROP),
         f'L{pt(xb + w, yb)}',
         f'L{pt(xb, yb)}',
     )

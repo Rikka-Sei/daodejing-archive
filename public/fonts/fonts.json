@@ -28,8 +28,8 @@
    "weight": 400,
    "scope": "全部用字",
    "chars": 2088,
-   "bytes": 426408,
-   "sha256": "13c75853036d6ea2c85030973a5a17b7a2593c06882ed3eaa27259ea3cdc3668"
+   "bytes": 426032,
+   "sha256": "80b60b1d392cd9ee1c42a010665dff9fd0d0cbbc7cbf10bc84a82c4cfe3a6e57"
   },
   {
    "file": "noto-serif-sc-500.woff2",
