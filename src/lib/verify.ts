@@ -1,6 +1,6 @@
 /**
  * 构建后检查，对着输出目录做，不依赖页面是怎么生成的：
- * - 站内链接（href、src、样式里的 url()、data-go）必须指向存在的文件，带锚点的链接目标页里必须有这个 id；
+ * - 站内链接（href、src、data-meta、样式里的 url()）必须指向存在的文件，带锚点的链接目标页里必须有这个 id；
  *   站点部署在子路径（base）下时，绝对路径必须带上 base，否则线上会 404。
  * - 页面实际用到的字与固定字体的对照：提示要不要重新生成子集，以及只能靠系统字体显示的字。
  */
@@ -36,7 +36,7 @@ function decode(s: string): string {
   }
 }
 
-/** 反转义页面属性里的 HTML 实体（数据版面包屑的初始内容放在 data-base 里）。 */
+/** 反转义 HTML 实体：页面上画出来的字里可能带 &amp; 之类。 */
 export function unescapeHtml(s: string): string {
   const named: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
   return s.replace(/&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi, (m, hex, dec, name) => {
@@ -46,17 +46,12 @@ export function unescapeHtml(s: string): string {
   });
 }
 
-const REF = /(?:\bhref|\bsrc|\bdata-go)="([^"]+)"|url\(([^)"']+)\)/g;
-const BASE_ATTR = /\bdata-base="([^"]*)"/g;
+const REF = /(?:\bhref|\bsrc|\bdata-meta)="([^"]+)"|url\(([^)"']+)\)/g;
 const ID = /\bid="([^"]+)"/g;
 
-/** 页面里的全部站内引用：属性、样式里的 url()，以及 data-base 里 HTML 片段的链接。 */
+/** 页面里的全部站内引用：属性（阅读器靠 data-meta 读对读表的公共部分）与样式里的 url()。 */
 function references(text: string): string[] {
-  const refs = [...text.matchAll(REF)].map((m) => m[1] ?? m[2]);
-  for (const m of text.matchAll(BASE_ATTR)) {
-    for (const r of unescapeHtml(m[1]).matchAll(REF)) refs.push(r[1] ?? r[2]);
-  }
-  return refs;
+  return [...text.matchAll(REF)].map((m) => m[1] ?? m[2]);
 }
 
 /** 检查输出目录里的站内链接。base 是站点的子路径（如 /daodejing-archive），根部署时为空。返回问题列表，空表示通过。 */
@@ -102,12 +97,8 @@ export function checkLinks(outDir: string, base = ''): string[] {
         problems.push(`${rel}: ${ref} 指向的文件不存在`);
         continue;
       }
-      if (fragment && target.endsWith('.html')) {
-        const ids = idsOf(target);
-        // 数据版里 #<版本id> 由脚本映射到 w-<版本id>
-        if (!ids.has(fragment) && !ids.has(`w-${fragment}`)) {
-          problems.push(`${rel}: ${ref} 的锚点 #${fragment} 在目标页面里不存在`);
-        }
+      if (fragment && target.endsWith('.html') && !idsOf(target).has(fragment)) {
+        problems.push(`${rel}: ${ref} 的锚点 #${fragment} 在目标页面里不存在`);
       }
     }
   }

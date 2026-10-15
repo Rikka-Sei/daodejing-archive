@@ -16,8 +16,10 @@ describe('站内地址', () => {
     expect(u.url('llms.txt')).toBe('/llms.txt');
     expect(u.url()).toBe('/');
     expect(u.coverUrl({ id: 'laozi' })).toBe('/laozi/');
-    expect(u.dataUrl({ id: 'laozi' })).toBe('/laozi/data/');
     expect(u.witnessUrl({ id: 'laozi' }, { id: 'guodian-jia' })).toBe('/laozi/guodian-jia/');
+    expect(u.readerUrl({ id: 'laozi' }, { id: 'guodian-jia' })).toBe('/laozi/guodian-jia/read/');
+    expect(u.chapterUrl({ id: 'laozi' }, 12)).toBe('/laozi/chapters/12/');
+    expect(u.studyUrl({ id: 'laozi' }, { id: 'tt24h-daodejing' })).toBe('/laozi/study/tt24h-daodejing/');
   });
 
   it.each(['/daodejing-archive', '/daodejing-archive/'])('子路径部署（base=%s）：带不带结尾斜杠都一样', async (base) => {
@@ -25,6 +27,8 @@ describe('站内地址', () => {
     expect(u.url('laozi/guodian-jia.txt')).toBe('/daodejing-archive/laozi/guodian-jia.txt');
     expect(u.url('/fonts/a.woff2')).toBe('/daodejing-archive/fonts/a.woff2');
     expect(u.coverUrl({ id: 'laozi' })).toBe('/daodejing-archive/laozi/');
+    expect(u.readerUrl({ id: 'laozi' }, { id: 'beida' })).toBe('/daodejing-archive/laozi/beida/read/');
+    expect(u.chapterUrl({ id: 'laozi' }, 1)).toBe('/daodejing-archive/laozi/chapters/1/');
   });
 });
 

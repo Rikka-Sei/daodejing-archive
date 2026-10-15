@@ -3,8 +3,8 @@ var root=document.documentElement,body=document.body;
 function qsa(s,r){return [].slice.call((r||document).querySelectorAll(s))}
 function $(id){return document.getElementById(id)}
 
-/* 排版、影像、外观：三组开关，记在 localStorage，各页共用 */
-var DEF={layout:'h',plates:'on',theme:'auto'};
+/* 排版、影像、字号、外观：几组开关，记在 localStorage，各页共用 */
+var DEF={layout:'h',plates:'on',theme:'auto',rsize:'m'};
 function get(k){try{return localStorage.getItem('dg.'+k)||DEF[k]}catch(e){return DEF[k]}}
 function put(k,v){try{localStorage.setItem('dg.'+k,v)}catch(e){}}
 function apply(){
@@ -21,6 +21,19 @@ if(get('side')==='off')body.classList.add('nosb');
 $('menu').onclick=function(){if(narrow.matches)body.classList.toggle('open');else collapse(false)};
 $('sbclose').onclick=function(){if(narrow.matches)body.classList.remove('open');else collapse(true)};
 $('side').addEventListener('click',function(ev){if(narrow.matches&&ev.target.closest('a'))body.classList.remove('open')});
+
+/* 侧栏的两条轴：材料｜章节。只换显示的那一栏，不跳转；打开页面时停在哪条轴由页面决定 */
+var side=$('side');
+function setAxis(a){
+  side.dataset.axis=a;
+  qsa('.axis button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.axis===a)});
+  sideSearch();
+}
+qsa('.axis button').forEach(function(b){b.onclick=function(){setAxis(b.dataset.axis)}});
+(function(){
+  var on=side.querySelector('.pane[data-pane=c] .item.on');
+  if(on&&side.dataset.axis==='c')side.scrollTop=Math.max(0,on.offsetTop-side.clientHeight/2);
+})();
 
 /* 目录里的文件夹：展开或收起记在 localStorage，各页共用；当前所在的文件夹总是展开 */
 var dirs=qsa('details.dir'),shut=[];
@@ -71,29 +84,8 @@ var bar=document.querySelector('.top');
 function scrolled(){bar.classList.toggle('scrolled',window.scrollY>2)}
 window.addEventListener('scroll',scrolled,{passive:true});scrolled();
 
-/* 数据版：按版本切换（#<版本id>）；本页没有这些元素时自动跳过 */
-var ov=$('overview'),secs=qsa('section.wit'),links=qsa('#side a[data-w]'),crumb=$('crumb'),hashMode=!!ov,
-    toRead=$('to-read'),readBase=toRead&&toRead.getAttribute('href'),readTpl=toRead&&toRead.dataset.tpl;
-function cur(){var h=location.hash.slice(1);return hashMode&&h&&$('w-'+h)?h:''}
-function show(){
-  var h=cur();
-  ov.hidden=!!h;
-  secs.forEach(function(s){s.hidden=s.id!=='w-'+h});
-  links.forEach(function(a){a.closest('.item').classList.toggle('on',a.dataset.w===h)});
-  var on=h&&links.filter(function(a){return a.dataset.w===h})[0];
-  if(on){var d=on.closest('details.dir');if(d)d.open=true}
-  if(crumb){
-    crumb.innerHTML=crumb.dataset.base;
-    var sep=crumb.querySelector('.sep');
-    if(on&&sep){var b=document.createElement('b');b.textContent=on.dataset.name;crumb.appendChild(sep.cloneNode(true));crumb.appendChild(b)}
-  }
-  if(toRead)toRead.setAttribute('href',h&&readTpl?readTpl.replace('{id}',h):readBase);
-  qsa('.units').forEach(function(u){u.scrollLeft=0});
-  window.scrollTo(0,0);search();
-}
-
-/* 检索：当前版本过滤并高亮；数据版的目录另显示各版本、各文献的命中数 */
-var q=$('q'),hits=$('hits');
+/* 检索：本页有释文就过滤释文并高亮；否则过滤侧栏当前这一栏的目录 */
+var q=$('q'),hits=$('hits'),units=qsa('.u');
 function unmark(el){qsa('mark',el).forEach(function(m){var p=m.parentNode;p.replaceChild(document.createTextNode(m.textContent),m);p.normalize()})}
 function mark(el,s){
   var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),nodes=[],n;
@@ -105,42 +97,51 @@ function mark(el,s){
     var rest=m.nextSibling;if(rest&&rest.nodeType===3&&rest.data.indexOf(s)>=0)mark(rest.parentNode,s);
   });
 }
-function search(){
-  if(!q||q.dataset.go)return;
-  var s=q.value.trim(),h=cur(),shown=0,total=0,groups=hashMode?secs:[document];
-  groups.forEach(function(g){
-    var id=hashMode?g.id.slice(2):'',n=0;
-    qsa('.u',g).forEach(function(u){
-      var p=u.querySelector('p');unmark(p);
-      var ok=!s||p.textContent.indexOf(s)>=0;if(s&&ok)n++;
-      u.hidden=!ok;
-      if(s&&ok&&(!hashMode||id===h))mark(p,s);
-    });
-    total+=n;
-    if(!hashMode||id===h)shown=n;
-    if(hashMode){var a=document.querySelector('#side a[data-w="'+id+'"] .cnt');if(a)a.textContent=s?n:''}
+function unitSearch(){
+  var s=q.value.trim(),shown=0;
+  units.forEach(function(u){
+    var p=u.querySelector('p');unmark(p);
+    var ok=!s||p.textContent.indexOf(s)>=0;
+    if(s&&ok){shown++;mark(p,s)}
+    u.hidden=!ok;
   });
-  dirs.forEach(function(d){
-    var sum=0,c=d.querySelector('summary .cnt');
-    qsa('.kids .cnt',d).forEach(function(k){sum+=+k.textContent||0});
-    if(c)c.textContent=s&&hashMode?sum:'';
+  hits.textContent=s?'本页命中 '+shown+' 条':'';
+}
+function sideSearch(){
+  if(!q||units.length)return;
+  var s=q.value.trim(),pane=side.querySelector('.pane[data-pane='+side.dataset.axis+']');
+  if(!pane)return;
+  function name(it){var t=it.querySelector('.t');return t?t.textContent:''}
+  function hit(it){
+    if(!s)return true;
+    if(it.dataset.n)return it.dataset.n===s||(it.dataset.t||'').indexOf(s)>=0;
+    return name(it).indexOf(s)>=0;
+  }
+  function shown(it){return !it.hidden&&!it.closest('[hidden]')}
+  qsa('details.dir',pane).forEach(function(d){
+    var own=!!s&&name(d.querySelector('summary')).indexOf(s)>=0,any=false;
+    qsa('.item',d.querySelector('.kids')).forEach(function(it){var ok=own||hit(it);it.hidden=!ok;if(ok)any=true});
+    d.hidden=!(own||any);
+    if(s&&!d.hidden)d.open=true;
   });
-  if(hits)hits.textContent=!s?'':hashMode&&!h?'全部版本共命中 '+total+' 条':'本页命中 '+shown+' 条';
+  qsa('.item:not(summary)',pane).forEach(function(it){if(!it.closest('details.dir'))it.hidden=!hit(it)});
+  qsa('.sb-label',pane).forEach(function(l){
+    var t=l.nextElementSibling;
+    while(t&&!t.classList.contains('tree'))t=t.nextElementSibling;
+    var on=!s||!t||qsa('.item:not(summary)',t).some(shown);
+    l.hidden=!on;
+    var h=l.nextElementSibling;if(h&&h.classList.contains('sb-hint'))h.hidden=!on;
+  });
+  var n=qsa('.item:not(summary)',pane).filter(shown).length;
+  hits.textContent=s?(n?'找到 '+n+' 项':'没有找到'):'';
 }
-if(q){
-  q.addEventListener('input',search);
-  var go=q.dataset.go;
-  /* 封面没有释文可滤：回车带着检索词去数据版 */
-  q.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&go&&q.value.trim())location.href=go+'?q='+encodeURIComponent(q.value.trim())});
-  var m=/[?&]q=([^&]*)/.exec(location.search);
-  if(m&&!go){try{q.value=decodeURIComponent(m[1].replace(/\+/g,' '))}catch(e){}}
-}
-if(hashMode){window.addEventListener('hashchange',show);show()}else search();
+if(q){q.addEventListener('input',function(){if(units.length)unitSearch();else sideSearch()})}
 
-/* 竖排时滚轮向下 = 往左翻 */
+/* 竖排时滚轮向下 = 往左翻（阅读器永远是竖排；释文页要选了竖排才是） */
 document.addEventListener('wheel',function(ev){
-  if(root.dataset.layout!=='v'||ev.ctrlKey||Math.abs(ev.deltaX)>=Math.abs(ev.deltaY))return;
-  var u=ev.target.closest&&ev.target.closest('.units');if(!u)return;
+  if(ev.ctrlKey||Math.abs(ev.deltaX)>=Math.abs(ev.deltaY)||!ev.target.closest)return;
+  var u=ev.target.closest('.rd')||(root.dataset.layout==='v'?ev.target.closest('.units'):null);
+  if(!u)return;
   u.scrollLeft-=ev.deltaY;ev.preventDefault();
 },{passive:false});
 })();

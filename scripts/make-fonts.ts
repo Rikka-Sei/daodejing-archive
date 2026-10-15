@@ -1,5 +1,5 @@
 /**
- * 生成站点用的固定字体子集（WOFF2）：思源黑体、思源宋体，SIL OFL 1.1。
+ * 生成站点用的固定字体（WOFF2）：思源黑体、思源宋体的子集，加上 tt24h 的补充字体 DaoDeJingExt（整个转成 WOFF2），都是 SIL OFL 1.1。
  *
  * 先构建站点（npm run build），统计 dist/ 里页面实际出现的字，再从固定来源的字体里裁出这些字，存到 public/fonts/。
  * 来源文件按 URL + SHA-256 固定，下载后先校验；子集的哈希和覆盖的字记在 fonts.json。
@@ -57,6 +57,21 @@ export const SOURCES: Record<Family, Source> = {
 };
 
 const WEIGHTS = [400, 500];
+
+/**
+ * tt24h 的补充字体（造字序列的码位和 Noto 里没有的生僻字），原文件登记在 data/raw/ 里，按 SHA-256 核对后整个转成 WOFF2。
+ * 页面用 unicode-range 声明它，只在用到这些码位时才下载。
+ */
+export const EXT = {
+  name: 'DaoDeJingExt-Light（tt24h 补充字体）',
+  raw: 'data/raw/tt24h-daodejing/v0.1.3/DaoDeJingExt-Light.ttf',
+  sha256: '0a6d66177e80625381aa04440889553d86b8ffedcdb5f7806c2599d3ac666407',
+  licenseRaw: 'data/raw/tt24h-daodejing/v0.1.3/LICENSE-OFL',
+  licenseSha256: '958428ba1d0cac3063a5c0de611b2aa151fb9ca26cd1beba91106605072bbbc3',
+  licenseFile: 'OFL-DaoDeJingExt.txt',
+  file: 'dg-ext-400.woff2',
+  url: 'https://github.com/tt24h/daodejing',
+};
 
 /** 页面用字的三档：全部；去掉释文正文；再去掉来源注释 */
 export type Tier = 'all' | 'text' | 'ui';
@@ -122,6 +137,20 @@ export async function makeSubset(font: Uint8Array, weight: number, chars: string
   return format === 'woff2' ? wawoff2.compress(ttf) : ttf;
 }
 
+/**
+ * 补充字体：核对登记的原文件与授权文本的哈希，整个转成 WOFF2（同样的输入得到逐字节相同的结果）。
+ * 原文件不在 repo 里（没有拉取 data/raw/）就返回 null，这时字体清单里不含补充字体。
+ */
+export async function makeExt(repo: string = REPO): Promise<{ woff2: Uint8Array; licence: Buffer; cmap: Set<number> } | null> {
+  const path = join(repo, EXT.raw);
+  if (!existsSync(path)) return null;
+  const ttf = readFileSync(path);
+  if (sha256(ttf) !== EXT.sha256) throw new Error(`校验失败：${EXT.raw}\n  应为 ${EXT.sha256}\n  实为 ${sha256(ttf)}`);
+  const licence = readFileSync(join(repo, EXT.licenseRaw));
+  if (sha256(licence) !== EXT.licenseSha256) throw new Error(`校验失败：${EXT.licenseRaw}`);
+  return { woff2: await wawoff2.compress(ttf), licence, cmap: codePoints(ttf) };
+}
+
 const hasPages = (dir: string) => existsSync(dir) && readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.html'));
 
 /** 生成子集所用工具的版本，记在 fonts.json 里 */
@@ -167,18 +196,29 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     });
   }
 
-  const covered = new Set([...wanted].filter((c) => haves.every((have) => have.has(c)))); // 黑体、宋体共有的字
+  // 补充字体：登记的原文件在就用（核对哈希），转成 WOFF2；它的字不必再由黑体、宋体提供
+  const ext = await makeExt();
+  const extCmap = ext?.cmap ?? new Set<number>();
+  if (ext) {
+    writeFileSync(join(FONT_DIR, EXT.file), ext.woff2);
+    writeFileSync(join(FONT_DIR, EXT.licenseFile), ext.licence);
+    files.push({ file: EXT.file, family: 'ext', weight: 400, scope: '造字与生僻字（用到才下载）', chars: extCmap.size, bytes: ext.woff2.length, sha256: sha256(ext.woff2) });
+    sources.push({ family: 'ext', name: EXT.name, url: EXT.url, sha256: EXT.sha256, license: 'SIL OFL 1.1', license_file: EXT.licenseFile, reserved_font_name: '' });
+  }
+  const extHas = (c: string) => extCmap.has(c.codePointAt(0)!);
+  const covered = new Set([...wanted].filter((c) => haves.every((have) => have.has(c)) || extHas(c))); // 黑体、宋体共有的字，或补充字体有的字
   const chars = [...covered].sort(byCodePoint).join('');
   const unavailable = [...wanted].filter((c) => !covered.has(c)).sort(byCodePoint).join('');
   const manifest = {
     about:
       '站点自带的固定字体子集，由 scripts/make-fonts.ts（npm run fonts）生成；只含站点用到的字，其余字回退到系统字体。' +
-      '各文件装哪些字见 files[].scope：释文只用宋体 400，所以其余文件只装界面、标题、识语等处的字。',
+      '各文件装哪些字见 files[].scope：释文只用宋体 400，所以其余文件只装界面、标题、识语等处的字。' +
+      '补充字体（ext）整个收录，页面用 unicode-range 声明它，用到才下载。',
     tool: toolVersion(),
     chars,
     unavailable,
     files,
-    licenses: Object.values(SOURCES).map((s) => s.licenseFile),
+    licenses: [...Object.values(SOURCES).map((s) => s.licenseFile), ...(ext ? [EXT.licenseFile] : [])],
     sources,
   };
   writeFileSync(join(FONT_DIR, 'fonts.json'), `${JSON.stringify(manifest, null, 1)}\n`);

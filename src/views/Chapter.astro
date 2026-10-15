@@ -1,0 +1,185 @@
+---
+// 章节对读页：一章，各本同列对齐，逐字对读。每一段（band）是一张表，行是版本，列是字的位置。
+// 格子的画法：与校订本用字不同的着色，写法不同但读法相同的浅底，右上角小字是通行字，校订本的断句标点在右下角。
+// 格子里的字放在不带属性的 <p> 里：它们是释文，只用宋体（见 make-fonts.ts）。
+import Side from '../components/Side.astro';
+import Shell from '../layouts/Shell.astro';
+import {
+  bands,
+  cellKind,
+  chapterTitle,
+  columnKind,
+  compareKey,
+  diffOf,
+  glyphOf,
+  mergeParts,
+  showText,
+  MARK_CHARS,
+  type Cell,
+} from '../lib/alignment';
+import type { Corpus } from '../lib/corpus';
+import { UNIT_NOUN } from '../lib/text';
+import { chapterUrl, coverUrl, readerUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+  n: number;
+}
+const { corpus: c, corpora, n } = Astro.props;
+const al = c.alignment!;
+const ch = al.chapter(n);
+const rows = mergeParts(ch.rows);
+const base = rows[0].cells;
+const eq = al.equivalents;
+const show = (s: string) => showText(s, al.glyphs);
+const nameOf = (id: string) => al.version(id)?.short ?? id;
+
+// 每一列的情形：有共用通行字、用字有差异，或没有可比较的
+const cols = Array.from({ length: ch.columns }, (_, i) => columnKind(rows.map((r) => compareKey(r.cells[i])), eq));
+const segs = bands(base);
+const title = show(chapterTitle(base));
+const jiaoding = c.witness('jiaoding')?.units.find((u) => Number(u.unit_no) === n);
+// 校订本原文里夹着的 ▩🅱 之类是对读表的记号，放在句子里只是杂音，开头这一段不要
+const lead = jiaoding ? Array.from(jiaoding.text).filter((ch) => !MARK_CHARS.has(ch)).join('') : '';
+
+const FLAG: Record<string, string> = { 残: '残字', 衍: '衍文', 脱: '脱文', 补: '补文', 占: '占位' };
+const FLAG_CLASS: Record<string, string> = { 残: 'f-can', 衍: 'f-yan', 补: 'f-bu' };
+
+/** 一格的提示文字：版本、标记、写法与读法、简号或行号 */
+function tip(version: string, cell: Cell): string {
+  const unit = al.version(version)?.unit;
+  const parts = [nameOf(version)];
+  if (cell.f) parts.push(FLAG[cell.f]);
+  if (cell.r) parts.push(`通行字 ${show(cell.r)}`);
+  if (cell.c) parts.push(`正确字 ${show(cell.c)}`);
+  if (cell.l) parts.push(`${unit === 'chapter' ? '' : (UNIT_NOUN[unit ?? 'slip'] ?? '简')} ${cell.l} 的末尾`);
+  if (cell.n) parts.push('有尾注');
+  return parts.join(' · ');
+}
+
+// 本章在各底本里的位置：竹简与帛书的简号、行号，链到阅读器
+const places = al.versions
+  .filter((v) => c.witness(v.id) && al.hasLines(v.id))
+  .map((v) => ({ v, nos: al.linesOf(v.id, n) }))
+  .filter((x) => x.nos.length > 0);
+
+const prev = n > 1 ? n - 1 : 0;
+const next = n < al.chapters.length ? n + 1 : 0;
+const titleOf = (k: number) => show(chapterTitle(al.chapter(k).rows[0].cells, 6));
+---
+
+<Shell title={`第 ${n} 章 · ${c.title}`} desc={`第 ${n} 章在各本中的逐字对读：${title}`} tools="theme" axis="c" script="align">
+  <Side slot="side" corpus={c} corpora={corpora} axis="c" chapter={n} />
+  <Fragment slot="crumb">
+    <a href={coverUrl(c)}>{c.title}</a><span class="sep">›</span><span>章节对读</span><span class="sep">›</span><b>第 {n} 章</b>
+  </Fragment>
+  <h1>第 {n} 章</h1>
+  {
+    lead && (
+      <div class="lead cn">
+        <p>{lead}</p>
+      </div>
+    )
+  }
+  <div class="legend">
+    各本同列对齐。<span class="lg var">浅底</span>是写法不同、读法相同（异体、通假），<span class="lg diff">橙色</span>是用字不同；右上角的小字是通行字，最上一行是这一列的共用通行字，<span class="lg ne">≠</span>表示各本用字有差异。点一个字，高亮这一列。
+  </div>
+  {
+    segs.map(([a, b]) => (
+      <div class="alw">
+        <table class="al" style={`--n:${b - a}`}>
+          <tbody>
+            <tr class="sh">
+              <th scope="row">通行</th>
+              {cols.slice(a, b).map((k) => (
+                <td class:list={[{ ne: k.kind === 'diff' }]}>
+                  {k.shared ? <p>{show(k.shared.reading)}</p> : k.kind === 'diff' ? <p>≠</p> : null}
+                </td>
+              ))}
+            </tr>
+            {rows.map((r, ri) => (
+              <tr data-v={r.version}>
+                <th scope="row">{nameOf(r.version)}</th>
+                {r.cells.slice(a, b).map((cell, k) => {
+                  const i = a + k;
+                  const kind = cellKind(cell);
+                  const diff = ri === 0 ? '' : diffOf(cell, base[i], eq);
+                  const g = kind === 'text' || kind === 'miss' || kind === 'mark' ? glyphOf(cell.t, al.glyphs) : null;
+                  return (
+                    <td
+                      id={ri === 0 ? `c${i}` : undefined}
+                      class:list={[kind === 'blank' ? 'b' : kind, diff, cell.f && FLAG_CLASS[cell.f], { nb: !!cell.n }]}
+                      data-col={i}
+                      title={tip(r.version, cell)}
+                    >
+                      {g && (
+                        <p>
+                          <span class:list={[{ 'f-can': g.damaged }]}>{g.text}</span>
+                          {cell.r && <sup class="r">{show(cell.r)}</sup>}
+                          {cell.c && <sup class="r c">〈{show(cell.c)}〉</sup>}
+                          {cell.p && <i class="p">{cell.p}</i>}
+                        </p>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))
+  }
+  {
+    places.length > 0 && (
+      <section class="where">
+        <h2>在底本里的位置</h2>
+        <dl class="facts">
+          {places.map(({ v, nos }) => (
+            <>
+              <dt>{v.short}</dt>
+              <dd>
+                {UNIT_NOUN[v.unit ?? 'slip']}{' '}
+                {nos.map((no, i) => (
+                  <>
+                    {i > 0 && '、'}
+                    <a href={`${readerUrl(c, c.witness(v.id)!)}#l-${no}`}>{no}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          ))}
+        </dl>
+      </section>
+    )
+  }
+  {
+    ch.notes.length > 0 && (
+      <section class="notes">
+        <h2>尾注</h2>
+        {ch.notes.map((t) => (
+          <div class="note">{t}</div>
+        ))}
+        <div class="note src">注释抄自 tt24h 的原表，只是转成了文字。</div>
+      </section>
+    )
+  }
+  <nav class="pager">
+    {
+      prev > 0 && (
+        <a class="prev" href={chapterUrl(c, prev)}>
+          <small>上一章 · 第 {prev} 章</small>
+          {titleOf(prev)}
+        </a>
+      )
+    }{
+      next > 0 && (
+        <a class="next" href={chapterUrl(c, next)}>
+          <small>下一章 · 第 {next} 章</small>
+          {titleOf(next)}
+        </a>
+      )
+    }
+  </nav>
+</Shell>

@@ -1,38 +1,37 @@
 ---
 // 文献目录：有几个本的文献是文件夹，各本列在里面；只有一个本的直接是一项。
-// current 是当前本的 id；data 为 true 时链接是数据版页内的 #<本 id>。
-import type { Corpus } from '../lib/corpus';
+// current 是当前本的 id。
+import type { Group } from '../lib/corpus';
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
 import MoreButton from './MoreButton.astro';
 import RowMenu from './RowMenu.astro';
 
 interface Props {
-  corpus: Corpus;
+  corpusId: string;
+  groups: Group[];
   current?: string;
-  data?: boolean;
 }
-const { corpus: c, current = '', data = false } = Astro.props;
+const { corpusId, groups, current = '' } = Astro.props;
 ---
 
 <div class="tree">
   {
-    c.groups.map((g) =>
+    groups.map((g) =>
       g.single ? (
-        <Leaf corpusId={c.id} group={g} wit={g.first} current={current} data={data} top={true} />
+        <Leaf corpusId={corpusId} group={g} wit={g.first} current={current} top={true} />
       ) : (
         <details class="dir" data-g={g.id} open>
           <summary class="item">
             <Icon name="folder" class="f-shut" />
             <Icon name="folder-open" class="f-open" />
             <span class="t">{g.name}</span>
-            <span class="cnt" />
             <MoreButton label={g.name} />
-            <RowMenu corpusId={c.id} stem={`${g.id}-all`} name={g.name} whole={true} />
+            <RowMenu corpusId={corpusId} stem={`${g.id}-all`} name={g.name} whole={true} />
           </summary>
           <div class="kids">
             {g.witnesses.map((w) => (
-              <Leaf corpusId={c.id} group={g} wit={w} current={current} data={data} top={false} />
+              <Leaf corpusId={corpusId} group={g} wit={w} current={current} top={false} />
             ))}
           </div>
         </details>

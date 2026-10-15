@@ -1,0 +1,13 @@
+---
+// 竹简、帛书的阅读器：<典籍>/<本>/read/
+import { allCorpora, corpusById } from '../../../lib/site';
+import Reader from '../../../views/Reader.astro';
+
+export function getStaticPaths() {
+  return allCorpora().flatMap((c) => c.readable.map((w) => ({ params: { corpus: c.id, id: w.id } })));
+}
+const corpus = corpusById(Astro.params.corpus!);
+const wit = corpus.witness(Astro.params.id!)!;
+---
+
+<Reader corpus={corpus} wit={wit} corpora={allCorpora()} />

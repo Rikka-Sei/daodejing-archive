@@ -1,11 +1,12 @@
 ---
-// 阅读版封面：标题、文献卡片、凡例。
+// 封面：标题、按材料分类的文献卡片、论文与对照资料、凡例。
 import DocCard from '../components/DocCard.astro';
-import ReadSide from '../components/ReadSide.astro';
+import Icon from '../components/Icon.astro';
+import Side from '../components/Side.astro';
 import Shell from '../layouts/Shell.astro';
 import type { Corpus } from '../lib/corpus';
 import { prefaceItems } from '../lib/preface';
-import { dataUrl, REPO_URL, witnessUrl } from '../lib/url';
+import { chapterUrl, REPO_URL, studyUrl, witnessUrl } from '../lib/url';
 
 interface Props {
   corpus: Corpus;
@@ -13,11 +14,16 @@ interface Props {
 }
 const { corpus: c, corpora } = Astro.props;
 const [nUnits, nPlates] = c.totals;
-const stats = [`${c.witnesses.length} 个版本`, `${nUnits} 条释文`, ...(nPlates ? [`${nPlates} 张影像`] : [])];
+const stats = [
+  `${c.witnesses.length} 个版本`,
+  `${nUnits} 条释文`,
+  ...(nPlates ? [`${nPlates} 张影像`] : []),
+  ...(c.alignment ? [`${c.alignment.chapters.length} 章逐字对读`] : []),
+];
 ---
 
-<Shell title={c.title} desc={`${c.subtitle}。${c.intro}`} themeOnly>
-  <ReadSide slot="side" corpus={c} corpora={corpora} onCover />
+<Shell title={c.title} desc={`${c.subtitle}。${c.intro}`} tools="theme">
+  <Side slot="side" corpus={c} corpora={corpora} onCover />
   <b slot="crumb">{c.title}</b>
   <div class="hero">
     <div class="eyebrow">{c.subtitle}</div>
@@ -25,11 +31,55 @@ const stats = [`${c.witnesses.length} 个版本`, `${nUnits} 条释文`, ...(nPl
     <p class="sub">{c.intro}</p>
     <div class="actions">
       <a class="btn pri" href={witnessUrl(c, c.witnesses[0])}>开始阅读</a>
-      <a class="btn" href={dataUrl(c)}>数据版</a>
+      {c.alignment && <a class="btn" href={chapterUrl(c, 1)}>章节对读</a>}
     </div>
     <div class="stats">{stats.join(' · ')}</div>
   </div>
-  <div class="docs">{c.groups.map((g) => <DocCard corpus={c} group={g} />)}</div>
+  {
+    c.categories.map((cat) => (
+      <section class="cat">
+        <h2>
+          {cat.title}
+          {cat.note && <span class="note">{cat.note}</span>}
+        </h2>
+        {
+          cat.groups.some((g) => g.coverPlate()) ? (
+            <div class="docs">{cat.groups.map((g) => <DocCard corpus={c} group={g} />)}</div>
+          ) : (
+            <div class="rows">
+              {cat.groups.map((g) => (
+                <a class="row" href={witnessUrl(c, g.first)}>
+                  <span class="bd">
+                    <span class="t">{g.name}</span>
+                    <span class="m">{g.witnesses.reduce((n, w) => n + w.units.length, 0)} 条释文</span>
+                  </span>
+                  <Icon name="chev" />
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </section>
+    ))
+  }
+  {
+    c.studies.length > 0 && (
+      <section class="cat">
+        <h2>论文与对照资料</h2>
+        <div class="rows">
+          {c.studies.map((s) => (
+            <a class="row" href={studyUrl(c, s)}>
+              <span class="bd">
+                <span class="t">{s.short ?? s.title}</span>
+                <span class="m">{[s.publisher, s.year, s.license?.name].filter(Boolean).join(' · ')}</span>
+              </span>
+              <Icon name="chev" />
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
   <section id="preface" class="sec">
     <h2>凡例</h2>
     <ol class="preface">{prefaceItems(c).map((t) => <li>{t}</li>)}</ol>

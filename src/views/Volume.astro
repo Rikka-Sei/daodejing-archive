@@ -1,16 +1,16 @@
 ---
-// 阅读版的一个本：版本信息、来源与授权、释文、整页图版、上下本。
+// 一个本的释文页：版本信息、来源与授权、释文、整页图版、上下本。
 import FactsFold from '../components/FactsFold.astro';
 import Gallery from '../components/Gallery.astro';
 import Icon from '../components/Icon.astro';
-import ReadSide from '../components/ReadSide.astro';
+import Side from '../components/Side.astro';
 import SourcesFold from '../components/SourcesFold.astro';
 import Unit from '../components/Unit.astro';
 import Shell from '../layouts/Shell.astro';
 import type { Corpus, Witness } from '../lib/corpus';
 import { LEGEND } from '../lib/legend';
 import { UNIT_NOUN } from '../lib/text';
-import { coverUrl, dataUrl, witnessUrl } from '../lib/url';
+import { coverUrl, readerUrl, witnessUrl } from '../lib/url';
 
 interface Props {
   corpus: Corpus;
@@ -23,10 +23,11 @@ const prev = i > 0 ? c.witnesses[i - 1] : null;
 const next = i + 1 < c.witnesses.length ? c.witnesses[i + 1] : null;
 const noun = UNIT_NOUN[w.units[0].unit_type];
 const cover = coverUrl(c);
+const readable = !!c.alignment?.hasLines(w.id);
 ---
 
 <Shell title={`${w.meta.name} · ${c.title}`} desc={`${w.meta.name}的释文与影像`} wide>
-  <ReadSide slot="side" corpus={c} corpora={corpora} current={w.id} dataHref={`${dataUrl(c)}#${w.id}`} />
+  <Side slot="side" corpus={c} corpora={corpora} current={w.id} placeholder="搜索本页释文" />
   <Fragment slot="crumb">
     <a href={cover}>{c.title}</a><span class="sep">›</span>{
       w.label === '全本' ? (
@@ -38,7 +39,10 @@ const cover = coverUrl(c);
       )
     }
   </Fragment>
-  <h1>{w.meta.name}</h1>
+  <div class="head">
+    <h1>{w.meta.name}</h1>
+    {readable && <a class="btn" href={readerUrl(c, w)}>阅读器</a>}
+  </div>
   <FactsFold wit={w} />
   <SourcesFold corpus={c} wit={w} />
   <div class="legend">{LEGEND}</div>
@@ -49,7 +53,7 @@ const cover = coverUrl(c);
     </summary>
     <div class="body chips">{w.units.map((u) => <a href={`#${u.id}`}>{u.unit_no}</a>)}</div>
   </details>
-  <div class="units">{w.units.map((u) => <Unit unit={u} wit={w} corpusId={c.id} />)}</div>
+  <div class="units">{w.units.map((u) => <Unit unit={u} wit={w} corpusId={c.id} compare={!!c.alignment} />)}</div>
   <Gallery wit={w} corpusId={c.id} />
   <nav class="pager">
     {

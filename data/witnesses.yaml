@@ -1,5 +1,7 @@
-# 版本登记表：本仓库收录的六个出土本。
+# 版本登记表：本仓库收录的版本。kind 是材料的性质：excavated 出土本（一手材料）、rubbing 拓印与石刻（二手）、
+# transmitted 后世流传本、edition 后人校订整理的本子；没写 kind 的按 excavated 算。
 # 每条事实带 evidence：写明依据。值为下方 evidence_sources 中的键，指向一份已存档的网页；
+# 或是 data/sources/ 里的来源 id（依据就是该来源本身，如王弼本、校订本取自 tt24h-daodejing）；
 # "search-summary" 表示只来自网络搜索摘要，尚未对照一手资料核实。
 # 拿不准的字段写 null，核实后再填。
 
@@ -29,6 +31,7 @@ evidence_sources:
 
 witnesses:
   - id: guodian-jia
+    kind: excavated
     name: 郭店楚简《老子》甲组
     medium: 竹简
     excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
@@ -39,6 +42,7 @@ witnesses:
     holder: null
 
   - id: guodian-yi
+    kind: excavated
     name: 郭店楚简《老子》乙组
     medium: 竹简
     excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
@@ -49,6 +53,7 @@ witnesses:
     holder: null
 
   - id: guodian-bing
+    kind: excavated
     name: 郭店楚简《老子》丙组
     medium: 竹简
     excavated: { year: 1993, month: 10, place: 湖北荆门郭店一号楚墓, evidence: cssn-2023-guodian }
@@ -59,6 +64,7 @@ witnesses:
     holder: null
 
   - id: mawangdui-jia
+    kind: excavated
     name: 马王堆帛书《老子》甲本
     medium: 帛
     script: 篆书
@@ -68,6 +74,7 @@ witnesses:
     holder: { name: 湖南博物院, note: 文中称湖南博物院"系统清理馆藏马王堆汉墓文物", evidence: rmrb-2024-mawangdui }
 
   - id: mawangdui-yi
+    kind: excavated
     name: 马王堆帛书《老子》乙本
     medium: 帛
     script: 隶书
@@ -77,6 +84,7 @@ witnesses:
     holder: { name: 湖南博物院, note: 同甲本, evidence: rmrb-2024-mawangdui }
 
   - id: beida
+    kind: excavated
     name: 北京大学藏西汉竹书《老子》
     medium: 竹简
     excavated: { year: null, place: 2009年初北京大学接受捐赠，从海外回归，非考古出土, evidence: sinoss-2013-beida }
@@ -88,3 +96,19 @@ witnesses:
     titles: { on_back: [老子上经, 老子下经], note: 简帛文献中首次发现《老子》书名, evidence: sinoss-2013-beida }
     published: { year: 2012, month: 12, title: 北京大学藏西汉竹书〔贰〕, editor: 韩巍（本卷整理者）, publisher: 上海古籍出版社, evidence: sinoss-2013-beida }
     holder: { name: 北京大学, evidence: sinoss-2013-beida }
+
+  - id: wangbi
+    name: 王弼本《老子》
+    kind: transmitted
+    medium: 刻本
+    scope: 通行本，分八十一章；释文取自 tt24h 实录，底本为浙江書局本（光緒元年）
+    published: { year: 1875, title: 老子道德經（上下篇）, publisher: 浙江書局, editor: 總校 王詒壽, evidence: tt24h-daodejing }
+    holder: null
+
+  - id: jiaoding
+    name: 校订本（tt24h）《老子》
+    kind: edition
+    medium: 整理本
+    scope: tt24h 整理者对照北大汉简、帛书、郭店楚简与王弼本断句校订的本子，分八十一章
+    published: { year: 2026, title: 老子道德经：四种原文表, publisher: tt24h, evidence: tt24h-daodejing }
+    holder: null

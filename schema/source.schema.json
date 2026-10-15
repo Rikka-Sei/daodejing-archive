@@ -14,6 +14,11 @@
     "publisher": { "type": ["string", "null"] },
     "year": { "type": ["integer", "null"] },
     "url": { "type": ["string", "null"] },
+    "short": { "type": "string", "description": "侧栏里用的简称；省略时用 title" },
+    "study": {
+      "type": "boolean",
+      "description": "true：这是一份对照资料或研究成果（如 tt24h 的四种原文表），侧栏的“论文与对照资料”里单独列出。省略即 false"
+    },
     "witnesses": {
       "type": "array",
       "items": { "type": "string" },

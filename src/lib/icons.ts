@@ -18,6 +18,8 @@ export const ICONS = {
   file: '<path d="M7 3.5h6.3l5.2 5.2V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M13.2 3.7v5h5"/>',
   more: '<path d="M5.5 12h.1M12 12h.1M18.5 12h.1" stroke-width="2.6"/>',
   download: '<path d="M12 4.5v10.2m0 0 4-4m-4 4-4-4"/><path d="M5 19.5h14"/>',
+  focus: '<path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/>',
+  back: '<path d="m14.5 6-6 6 6 6"/>',
 } as const;
 
 export type IconName = keyof typeof ICONS;

@@ -1,0 +1,12 @@
+---
+// 一章的逐字对读页：<典籍>/chapters/<章>/
+import { allCorpora, corpusById } from '../../../lib/site';
+import Chapter from '../../../views/Chapter.astro';
+
+export function getStaticPaths() {
+  return allCorpora().flatMap((c) => (c.alignment?.chapters ?? []).map((ch) => ({ params: { corpus: c.id, n: String(ch.n) } })));
+}
+const corpus = corpusById(Astro.params.corpus!);
+---
+
+<Chapter corpus={corpus} corpora={allCorpora()} n={Number(Astro.params.n)} />

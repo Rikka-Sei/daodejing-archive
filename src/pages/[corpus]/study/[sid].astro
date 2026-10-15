@@ -1,0 +1,13 @@
+---
+// 一份论文或对照资料：<典籍>/study/<来源>/
+import { allCorpora, corpusById } from '../../../lib/site';
+import Study from '../../../views/Study.astro';
+
+export function getStaticPaths() {
+  return allCorpora().flatMap((c) => c.studies.map((s) => ({ params: { corpus: c.id, sid: s.id } })));
+}
+const corpus = corpusById(Astro.params.corpus!);
+const source = corpus.studies.find((s) => s.id === Astro.params.sid)!;
+---
+
+<Study corpus={corpus} corpora={allCorpora()} source={source} />

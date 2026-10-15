@@ -1,0 +1,139 @@
+---
+// 侧栏：书名、“材料｜章节”两条轴、检索框。
+// 材料轴：封面、凡例，再按分类列文献（一手的出土文献、拓本、传世本与校订本、论文与对照资料）。
+// 章节轴：依王弼本分章的八十一章，每章后面的圆点表示各出土本有没有这一章。
+import { chapterTitle, showText } from '../lib/alignment';
+import type { Corpus } from '../lib/corpus';
+import { chapterUrl, coverUrl, REPO_URL, studyUrl, url } from '../lib/url';
+import CorpusLinks from './CorpusLinks.astro';
+import Icon from './Icon.astro';
+import SearchBox from './SearchBox.astro';
+import SideItem from './SideItem.astro';
+import Tree from './Tree.astro';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+  /** 打开时停在哪条轴：m 材料，c 章节 */
+  axis?: 'm' | 'c';
+  /** 当前本的 id、当前章、当前对照资料的 id */
+  current?: string;
+  chapter?: number;
+  study?: string;
+  onCover?: boolean;
+  placeholder?: string;
+}
+const { corpus: c, corpora, axis = 'm', current = '', chapter = 0, study = '', onCover = false, placeholder = '筛选目录' } = Astro.props;
+const cover = coverUrl(c);
+const al = c.alignment;
+
+// 章节轴：每章的标题（校订本第一句）与各出土本的有无
+const dotsOf = (al?.versions ?? []).filter((v) => c.witness(v.id)?.kind === 'excavated');
+const chapters = (al?.chapters ?? []).map((ch) => ({
+  n: ch.n,
+  title: showText(chapterTitle(ch.rows[0].cells, 6), al!.glyphs),
+  dots: dotsOf.map((v) => {
+    const p = al!.presence(ch.n, [v.id]);
+    return { v, ...p, text: `${v.short}${p.has ? (p.legible ? ' 有' : ' 有，但字全残缺') : ' 无'}` };
+  }),
+}));
+const parts = (c.chapterParts.length ? c.chapterParts : [{ title: '', to: chapters.length }]).map((p, i, all) => ({
+  title: p.title,
+  from: i ? all[i - 1].to + 1 : 1,
+  to: p.to,
+}));
+---
+
+<div class="sb-top">
+  <button type="button" class="ibtn" id="sbclose" aria-label="收起侧栏"><Icon name="panel" /></button>
+  <a class="brand" href={cover}>{c.title}</a>
+</div>
+{
+  al && (
+    <div class="axis" role="group" aria-label="目录按材料或按章节">
+      <button type="button" data-axis="m" aria-pressed={axis === 'm'}>材料</button>
+      <button type="button" data-axis="c" aria-pressed={axis === 'c'}>章节</button>
+    </div>
+  )
+}
+<SearchBox placeholder={placeholder} />
+<div class="pane" data-pane="m">
+  <nav class="sb-nav">
+    <SideItem href={cover} label="封面" icon="book" on={onCover} />
+    <SideItem href={`${onCover ? '' : cover}#preface`} label="凡例" icon="list" />
+  </nav>
+  <CorpusLinks corpus={c} corpora={corpora} />
+  {
+    c.categories.map((cat) => (
+      <>
+        <div class="sb-label">
+          {cat.title}
+          {cat.note && <span class="note">· {cat.note}</span>}
+        </div>
+        <Tree corpusId={c.id} groups={cat.groups} current={current} />
+      </>
+    ))
+  }
+  {
+    c.studies.length > 0 && (
+      <>
+        <div class="sb-label">论文与对照资料</div>
+        <div class="tree">
+          {c.studies.map((s) => (
+            <SideItem href={studyUrl(c, s)} label={s.short ?? s.title} icon="file" on={s.id === study} />
+          ))}
+        </div>
+      </>
+    )
+  }
+</div>
+{
+  al && (
+    <div class="pane" data-pane="c">
+      <div class="sb-label">
+        依王弼本分章
+      </div>
+      <p class="sb-hint" title={dotsOf.map((v) => v.short).join('、')}>
+        圆点依次是{dotsOf.map((v) => v.short).join('、')}，实心表示有这一章。
+      </p>
+      <div class="tree">
+        {parts.map((part) => (
+          <details class="dir" data-g={`part-${part.from}`} open>
+            <summary class="item">
+              <Icon name="folder" class="f-shut" />
+              <Icon name="folder-open" class="f-open" />
+              <span class="t">{part.title || '全部'}</span>
+              <span class="rng">{part.from}–{part.to} 章</span>
+            </summary>
+            <div class="kids">
+              {chapters
+                .filter((x) => x.n >= part.from && x.n <= part.to)
+                .map((x) => (
+                  <a
+                    class:list={['item', 'ch', { on: x.n === chapter }]}
+                    href={chapterUrl(c, x.n)}
+                    data-n={x.n}
+                    data-t={x.title}
+                    aria-current={x.n === chapter ? 'page' : undefined}
+                  >
+                    <span class="no">{x.n}</span>
+                    <span class="t">{x.title}</span>
+                    <span class="dots" title={x.dots.map((d) => d.text).join('；')}>
+                      {x.dots.map((d) => (
+                        <i class:list={[{ on: d.has && d.legible, lost: d.has && !d.legible }]} />
+                      ))}
+                    </span>
+                  </a>
+                ))}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  )
+}
+<div class="sb-gap"></div>
+<div class="sb-foot">
+  <a href={REPO_URL} target="_blank" rel="noopener">数据仓库</a>
+  <a href={url('llms.txt')}>llms.txt</a>
+</div>

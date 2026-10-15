@@ -1,18 +1,28 @@
 ---
+import Icon from './Icon.astro';
 import Seg from './Seg.astro';
 
 interface Props {
-  /** 只放外观开关（封面没有释文，排版与影像开关用不上） */
-  themeOnly?: boolean;
+  /** theme 只放外观开关（封面、对读页没有释文，排版与影像开关用不上）；text 是释文页；reader 是阅读器 */
+  mode?: 'theme' | 'text' | 'reader';
 }
-const { themeOnly = false } = Astro.props;
+const { mode = 'text' } = Astro.props;
 ---
 
 {
-  !themeOnly && (
+  mode === 'text' && (
     <>
       <Seg k="layout" title="释文排版" options={[['h', '横排'], ['v', '竖排']]} />
       <Seg k="plates" title="单简图版与整页图版" options={[['on', '影像'], ['off', '纯文']]} />
+    </>
+  )
+}
+{
+  mode === 'reader' && (
+    <>
+      <Seg k="rsize" title="字号" options={[['s', '小'], ['m', '中'], ['l', '大']]} />
+      <Seg k="plates" title="单简图版" options={[['on', '影像'], ['off', '纯文']]} />
+      <button type="button" class="ibtn" id="focus" aria-label="专注模式" title="专注模式（F）"><Icon name="focus" /></button>
     </>
   )
 }

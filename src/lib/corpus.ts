@@ -7,10 +7,15 @@
  *
  * 版本（witness）按名字归入“文献”（group）：“郭店楚简《老子》甲组”“……乙组”同属“郭店楚简”，
  * 目录里是一个文件夹，各有几个本就列几个；只有一个本的文献直接是一项。
+ * 文献再按材料的性质（版本登记表里的 kind）归入分类：出土本、拓本、传世本与校订本；
+ * 来源登记里写了 study: true 的（论文、他人编的对照资料）另成一类“论文与对照资料”。
+ * corpus.yaml 里的 chapter_parts 给章节目录分篇（如《老子》的道经、德经）。
+ * 目录里有 alignment/ 时，还读入逐章对读表与逐行释文（见 alignment.ts）。
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parse } from 'yaml';
+import { type Alignment, loadAlignment } from './alignment';
 import { commonId, splitName } from './text';
 import type { Meta, Plate, Unit } from './types';
 
@@ -18,6 +23,16 @@ import type { Meta, Plate, Unit } from './types';
 export const ROOT = process.cwd();
 /** 封面取图：先实物照片，再整页图版，最后单简图版。 */
 export const PLATE_PREFERENCE = ['photo', 'page', 'slip-plate'];
+
+/** 材料的性质：出土本是一手材料，拓印与石刻是二手，传世本与后人校订整理的本子也是史料。 */
+export type Kind = 'excavated' | 'rubbing' | 'transmitted' | 'edition';
+
+/** 侧栏与封面的分类，按这个顺序列；没有版本的分类不显示。 */
+export const CATEGORIES: { id: string; title: string; note: string; kinds: Kind[] }[] = [
+  { id: 'excavated', title: '出土文献', note: '一手', kinds: ['excavated'] },
+  { id: 'rubbing', title: '石刻与拓本', note: '二手', kinds: ['rubbing'] },
+  { id: 'transmitted', title: '传世本与校订本', note: '', kinds: ['transmitted', 'edition'] },
+];
 
 export class Witness {
   constructor(
@@ -36,6 +51,11 @@ export class Witness {
 
   get id(): string {
     return this.meta.id;
+  }
+
+  /** 材料的性质；登记表里没写按出土本算。 */
+  get kind(): Kind {
+    return (this.meta.kind as Kind | undefined) ?? 'excavated';
   }
 
   /** 目录与翻页里用的名字：“郭店楚简 甲组”；只有一个本时就是文献名。 */
@@ -60,6 +80,10 @@ export class Group {
     return this.witnesses[0];
   }
 
+  get kind(): Kind {
+    return this.first.kind;
+  }
+
   /** 影像张数 */
   get plates(): number {
     return this.witnesses.reduce((n, w) => n + w.plates.length, 0);
@@ -76,9 +100,21 @@ export class Group {
   }
 }
 
+/** 一个分类：标题与其下的文献。 */
+export interface Category {
+  id: string;
+  title: string;
+  note: string;
+  groups: Group[];
+}
+
 export class Corpus {
   /** 按版本登记顺序归并同名文献 */
   readonly groups: Group[];
+  /** 文献按材料性质分类，空的分类不列 */
+  readonly categories: Category[];
+  /** 论文与对照资料：来源登记里写了 study: true 的 */
+  readonly studies: (Meta & { id: string })[];
   /** [释文条数, 影像张数] */
   readonly totals: [number, number];
 
@@ -95,6 +131,10 @@ export class Corpus {
     public prefaceExtra: string[] = [],
     /** 授权说明，显示在各本的“来源与授权”里 */
     public licenseNote: string = '',
+    /** 逐章对读表与逐行释文；没有就是 null */
+    public alignment: Alignment | null = null,
+    /** 章节目录分篇，如 [{title: '道经', to: 37}, {title: '德经', to: 81}]；空则不分篇 */
+    public chapterParts: { title: string; to: number }[] = [],
   ) {
     const byGroup = new Map<string, Witness[]>();
     for (const w of witnesses) {
@@ -103,6 +143,13 @@ export class Corpus {
       else byGroup.set(w.group, [w]);
     }
     this.groups = [...byGroup].map(([name, ws]) => new Group(name, ws, commonId(ws.map((w) => w.id))));
+    this.categories = CATEGORIES.map((cat) => ({
+      id: cat.id,
+      title: cat.title,
+      note: cat.note,
+      groups: this.groups.filter((g) => cat.kinds.includes(g.kind)),
+    })).filter((cat) => cat.groups.length > 0);
+    this.studies = sources.filter((s) => s.study) as (Meta & { id: string })[];
     this.totals = [
       witnesses.reduce((n, w) => n + w.units.length, 0),
       witnesses.reduce((n, w) => n + w.plates.length, 0),
@@ -115,6 +162,11 @@ export class Corpus {
 
   witness(id: string): Witness | undefined {
     return this.witnesses.find((w) => w.id === id);
+  }
+
+  /** 有逐行释文可读的本（竹简、帛书）：阅读器的对象 */
+  get readable(): Witness[] {
+    return this.witnesses.filter((w) => this.alignment?.hasLines(w.id));
   }
 }
 
@@ -168,5 +220,7 @@ export function loadCorpus(id: string, path: string, overrides: Meta = {}): Corp
     [...(meta.preface ?? [])],
     [...(meta.preface_extra ?? [])],
     meta.license_note || '各来源自身的声明见仓库中的来源记录。',
+    loadAlignment(base),
+    [...(meta.chapter_parts ?? [])],
   );
 }

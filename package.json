@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "description": "道德经文献工程的展示站：Astro 读取 data/ 生成阅读版、数据版、下载文件与 llms.txt。",
+  "description": "道德经文献工程的展示站：Astro 读取 data/ 生成各本释文页、章节对读页、竖排阅读器、下载文件与 llms.txt。",
   "engines": {
     "node": ">=22.12.0"
   },

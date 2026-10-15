@@ -1,0 +1,91 @@
+---
+// 论文与对照资料：一份他人整理的材料（如 tt24h 的四种原文表）。写它是什么、本站用了它的什么，以及它自己的概述、凡例与参考书目。
+import Icon from '../components/Icon.astro';
+import Side from '../components/Side.astro';
+import Source from '../components/Source.astro';
+import Shell from '../layouts/Shell.astro';
+import type { Corpus } from '../lib/corpus';
+import type { Meta } from '../lib/types';
+import { chapterUrl, coverUrl, witnessUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+  source: Meta;
+}
+const { corpus: c, corpora, source: s } = Astro.props;
+const study = c.alignment?.study;
+const used = (s.witnesses as string[]).map((id) => c.witness(id)).filter((w) => !!w);
+const name = s.short ?? s.title;
+---
+
+<Shell title={`${name} · ${c.title}`} desc={`${s.title}：本站用到的内容与它自己的说明`} tools="theme">
+  <Side slot="side" corpus={c} corpora={corpora} study={s.id} />
+  <Fragment slot="crumb">
+    <a href={coverUrl(c)}>{c.title}</a><span class="sep">›</span><b>{name}</b>
+  </Fragment>
+  <h1>{s.title}</h1>
+  <p class="lead">论文与对照资料</p>
+  <details class="fold" open>
+    <summary>
+      <span class="t">来源与授权</span>
+      <span class="m">{[s.publisher, s.year, s.license?.name].filter(Boolean).join(' · ')}</span>
+      <Icon name="chev" class="chev" />
+    </summary>
+    <div class="body">
+      <ol class="src"><Source source={s} /></ol>
+      <p class="lic">{c.licenseNote}</p>
+    </div>
+  </details>
+  <section class="sec">
+    <h2>本站用了它什么</h2>
+    <p class="plain">
+      它把四种《老子》写成同一张对读表：同一章里各本同行对齐，同一列是同一个位置的字。本站把整张表和各本的逐行原文入库，核对到逐字一致，
+      并据此生成每一章的对读页，也让阅读器里的每个字能查到其他本在同一处写了什么。
+    </p>
+    <div class="rows">
+      {
+        used.map((w) => (
+          <a class="row" href={witnessUrl(c, w!)}>
+            <span class="bd">
+              <span class="t">{w!.title}</span>
+            </span>
+            <Icon name="chev" />
+          </a>
+        ))
+      }
+      {
+        c.alignment && (
+          <a class="row" href={chapterUrl(c, 1)}>
+            <span class="bd">
+              <span class="t">{c.alignment.chapters.length} 章对读表</span>
+              <span class="m">各本同列对齐，标出用字差异与共用通行字</span>
+            </span>
+            <Icon name="chev" />
+          </a>
+        )
+      }
+    </div>
+  </section>
+  {
+    study && (
+      <>
+        <section class="sec">
+          <h2>它自己的概述</h2>
+          {study.overview.map((t) => <p class="plain">{t}</p>)}
+        </section>
+        {study.legend.map((l) => (
+          <section class="sec">
+            <h2>{l.title}</h2>
+            {l.paragraphs.map((t) => <p class="plain">{t}</p>)}
+          </section>
+        ))}
+        <section class="sec">
+          <h2>参考书目</h2>
+          <ol class="refs">{study.references.map((t) => <li>{t}</li>)}</ol>
+        </section>
+      </>
+    )
+  }
+  <div class="foot">以上文字抄自 tt24h 的原表（CC0），只去掉了排版标记。</div>
+</Shell>

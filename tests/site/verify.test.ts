@@ -46,12 +46,6 @@ describe('链接检查', () => {
     ]);
   });
 
-  it('数据版里 #<版本id> 对应页面里的 w-<版本id>', () => {
-    site('<a href="/a/data/#w-a">数据版</a>');
-    put('a/data/index.html', '<section id="w-w-a"></section>');
-    expect(checkLinks(tmp.dir)).toEqual([]);
-  });
-
   it('样式里的 url() 也检查，相对样式文件所在位置', () => {
     site();
     put('_astro/x.css', '@font-face{src:url(../fonts/none.woff2)}');
@@ -65,11 +59,11 @@ describe('链接检查', () => {
     expect(checkLinks(tmp.dir).join()).toContain('/fonts/none.woff2');
   });
 
-  it('data-go 与 data-base 里的链接也检查', () => {
-    site('<input data-go="/a/data/"><div data-base="&lt;a href=&quot;/a/gone/&quot;&gt;x&lt;/a&gt;"></div>');
-    const problems = checkLinks(tmp.dir);
-    expect(problems.some((p) => p.includes('/a/data/'))).toBe(true);
-    expect(problems.some((p) => p.includes('/a/gone/'))).toBe(true);
+  it('阅读器读对读表公共部分的 data-meta 也检查', () => {
+    site('<div data-meta="/a/meta.json"></div>');
+    expect(checkLinks(tmp.dir)).toEqual(['a/w-a/index.html: /a/meta.json 指向的文件不存在']);
+    put('a/meta.json', '{}');
+    expect(checkLinks(tmp.dir)).toEqual([]);
   });
 
   it('地址里的查询串忽略，百分号转义还原成文件名', () => {

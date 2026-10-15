@@ -1,5 +1,7 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { loadCorpus, type Corpus } from '../../src/lib/corpus';
+import { CATEGORIES, loadCorpus, type Corpus, type Kind } from '../../src/lib/corpus';
 import { prefaceItems } from '../../src/lib/preface';
 import { fixtureCorpus, tempDir } from './fixtures';
 
@@ -57,6 +59,64 @@ describe('典籍的读取与分组', () => {
     expect(d.title).toBe('plain');
     expect(d.intro).toBe('释文照录来源，未经复核。');
     expect(d.licenseNote).toBe('各来源自身的声明见仓库中的来源记录。');
+  });
+});
+
+describe('材料分类、对照资料与对读表', () => {
+  let x: Corpus;
+  beforeAll(() => {
+    x = fixtureCorpus(tmp.dir, 'al', { chapter_parts: [{ title: '上篇', to: 1 }, { title: '下篇', to: 2 }] }, true, true);
+  });
+
+  it('版本的性质：登记表里没写 kind 的按出土本算', () => {
+    expect(x.witnesses.map((w) => [w.id, w.kind])).toEqual([
+      ['w-a', 'excavated'],
+      ['w-b', 'excavated'],
+      ['w-c', 'excavated'],
+      ['w-t', 'transmitted'],
+      ['jiaoding', 'edition'],
+    ]);
+  });
+
+  it('文献按性质分类：出土文献一手，传世本与校订本一栏；没有版本的分类不列', () => {
+    expect(x.categories.map((cat) => [cat.id, cat.title, cat.note, cat.groups.map((g) => g.name)])).toEqual([
+      ['excavated', '出土文献', '一手', ['甲书', '乙书']],
+      ['transmitted', '传世本与校订本', '', ['传世本', '校订本']],
+    ]);
+  });
+
+  it('石刻与拓本是二手一栏，排在出土文献之后', () => {
+    const dir = join(tmp.dir, 'rub');
+    fixtureCorpus(tmp.dir, 'rub');
+    const yaml = join(dir, 'witnesses.yaml');
+    writeFileSync(yaml, readFileSync(yaml, 'utf-8').replace('{id: w-c, name: 乙书}', '{id: w-c, name: 乙书, kind: rubbing}'));
+    const c = loadCorpus('rub', dir);
+    expect(c.categories.map((cat) => [cat.id, cat.note, cat.groups.map((g) => g.name)])).toEqual([
+      ['excavated', '一手', ['甲书']],
+      ['rubbing', '二手', ['乙书']],
+    ]);
+  });
+
+  it('每一种性质都归在某个分类里，不会有版本从侧栏上消失', () => {
+    const kinds: Kind[] = ['excavated', 'rubbing', 'transmitted', 'edition'];
+    for (const k of kinds) expect(CATEGORIES.filter((cat) => cat.kinds.includes(k)), k).toHaveLength(1);
+  });
+
+  it('对照资料：来源登记里写了 study: true 的', () => {
+    expect(x.studies.map((s) => s.id)).toEqual(['u']);
+    expect(x.studies[0].short).toBe('对照表');
+    expect(fixtureCorpus(tmp.dir, 'nostudy').studies).toEqual([]);
+  });
+
+  it('读取对读表；阅读器的对象是有逐行释文的本', () => {
+    expect(x.alignment?.chapters).toHaveLength(2);
+    expect(x.readable.map((w) => w.id)).toEqual(['w-a']);
+  });
+
+  it('章节分篇取自展示信息；没有对读表的典籍这些都是空的', () => {
+    expect(x.chapterParts).toEqual([{ title: '上篇', to: 1 }, { title: '下篇', to: 2 }]);
+    const plain = fixtureCorpus(tmp.dir, 'noal');
+    expect([plain.alignment, plain.chapterParts, plain.readable]).toEqual([null, [], []]);
   });
 });
 

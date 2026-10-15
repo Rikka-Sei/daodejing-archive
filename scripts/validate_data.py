@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 data/ 下的全部数据：结构、编号、残缺区间、来源追溯、原始文件哈希，以及影像与文本单位的关联。
+"""校验 data/ 下的全部数据：结构、编号、残缺区间、来源追溯、原始文件哈希，影像与文本单位的关联，以及对读表与逐行释文。
 
 用法：python3 scripts/validate_data.py [--root 仓库根目录]
 有任何问题时退出码为 1。
@@ -12,6 +12,10 @@ from pathlib import Path
 
 import yaml
 from jsonschema import Draft202012Validator
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import alignment as al  # noqa: E402
 
 
 def load_schema(root: Path, name: str) -> Draft202012Validator:
@@ -30,6 +34,57 @@ def schema_errors(validator: Draft202012Validator, doc, where: str):
     for e in sorted(validator.iter_errors(doc), key=lambda e: list(e.path)):
         loc = "/".join(str(p) for p in e.path) or "(根)"
         yield f"{where}: {loc}: {e.message}"
+
+
+def check_alignment(root: Path, witnesses: set[str]) -> tuple[list[str], int]:
+    """对读表与逐行释文（data/alignment/）：版本都已登记、文件名与章号相符、两者互相对得上。
+
+    没有这个目录就跳过。返回 (问题清单, 章数)。
+    """
+    base = root / al.OUT
+    if not base.exists():
+        return [], 0
+    problems: list[str] = []
+
+    def read(name: str):
+        try:
+            return json.loads((base / name).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            problems.append(f"{al.OUT}/{name}: 读不了（{e}）")
+            return None
+
+    versions = read("versions.json")
+    for name in ("equivalents.json", "glyphs.json", "study.json"):
+        read(name)
+    ids: set[str] = set()
+    for v in versions if isinstance(versions, list) else []:
+        vid = v.get("id") if isinstance(v, dict) else None
+        if not isinstance(vid, str):
+            problems.append(f"{al.OUT}/versions.json: 有一项没有 id")
+        elif vid in ids:
+            problems.append(f"{al.OUT}/versions.json: id 重复 {vid}")
+        elif vid not in witnesses:
+            problems.append(f"{al.OUT}/versions.json: {vid} 不是已登记的版本 id")
+        else:
+            ids.add(vid)
+    if not ids:
+        return problems + [f"{al.OUT}/versions.json: 没有任何可用的版本"], 0
+
+    for p in sorted((base / "chapters").glob("*.json")):
+        try:
+            n = json.loads(p.read_text(encoding="utf-8"))["chapter"]
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            problems.append(f"{al.OUT}/chapters/{p.name}: 读不了（{e!r}）")
+            continue
+        if not isinstance(n, int) or p.stem != f"{n:03d}":
+            problems.append(f"{al.OUT}/chapters/{p.name}: 文件名应是章号的三位数字，里面写的是第 {n} 章")
+    try:
+        chapters, lines = al.load(root)
+        problems += [f"{al.OUT}: {x}" for x in al.verify(chapters, lines, known=ids)]
+    except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError) as e:
+        problems.append(f"{al.OUT}: 对读表或逐行释文的结构不对（{type(e).__name__}: {e}）")
+        return problems, 0
+    return problems, len(chapters)
 
 
 def main() -> int:
@@ -168,9 +223,13 @@ def main() -> int:
                 elif not uid.startswith(wid + "."):
                     problems.append(f"{where}: 文本单位 {uid} 不属于版本 {wid}")
 
+    # 对读表与逐行释文
+    align_problems, chapters = check_alignment(root, witnesses)
+    problems += align_problems
+
     for pr in problems:
         print("✗", pr, file=sys.stderr)
-    print(f"检查了 {len(sources)} 个来源、{total} 条文本单位、{plates} 张影像："
+    print(f"检查了 {len(sources)} 个来源、{total} 条文本单位、{plates} 张影像、{chapters} 章对读表："
           f"{'发现 %d 个问题' % len(problems) if problems else '全部通过'}")
     return 1 if problems else 0
 

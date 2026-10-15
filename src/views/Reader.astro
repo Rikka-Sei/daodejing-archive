@@ -1,0 +1,74 @@
+---
+// 阅读器：竹简、帛书的竖排阅读，自右向左，一简或一行一列（长的行按页高折成几列）。
+// 点一个字或拖选几个字，弹出“透视”：其他本在同一处写的什么（脚本 reader.js 按需读取各章的对读表）。
+// 释文取自 tt24h 的实录，每个字都已对到对读表里的一格。
+import Icon from '../components/Icon.astro';
+import Side from '../components/Side.astro';
+import Shell from '../layouts/Shell.astro';
+import { lineHtml } from '../lib/alignment';
+import type { Corpus, Witness } from '../lib/corpus';
+import { UNIT_NOUN } from '../lib/text';
+import { fullUrl, thumbUrl } from '../lib/thumbs';
+import { chapterUrl, coverUrl, url, witnessUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  wit: Witness;
+  corpora: Corpus[];
+}
+const { corpus: c, wit: w, corpora } = Astro.props;
+const al = c.alignment!;
+const lines = al.lines.get(w.id)!;
+const unit = UNIT_NOUN[al.version(w.id)?.unit ?? 'slip'] ?? '简';
+// 郭店的简号带甲乙丙（甲 1），单简图版挂在去掉前缀的简号上
+const plateOf = (no: string) => {
+  const u = w.units.find((x) => String(x.unit_no) === no.replace(/^[甲乙丙]/, ''));
+  return u ? (w.byUnit.get(u.id) ?? []).filter((p) => p.kind === 'slip-plate') : [];
+};
+---
+
+<Shell title={`${w.meta.name} · 阅读器 · ${c.title}`} desc={`${w.meta.name}的竖排阅读器`} wide tools="reader" script="reader">
+  <Side slot="side" corpus={c} corpora={corpora} current={w.id} placeholder="筛选目录" />
+  <Fragment slot="crumb">
+    <a href={coverUrl(c)}>{c.title}</a><span class="sep">›</span>{
+      w.label === '全本' ? (
+        <a href={witnessUrl(c, w)}>{w.group}</a>
+      ) : (
+        <>
+          <span>{w.group}</span><span class="sep">›</span><a href={witnessUrl(c, w)}>{w.label}</a>
+        </>
+      )
+    }<span class="sep">›</span><b>阅读器</b>
+  </Fragment>
+  <div class="rd-bar">
+    <span>共 {lines.length} {unit}，自右向左读。点一个字或拖选几个字，看其他本在同一处写的什么。</span>
+    <span class="grow"></span>
+    <span class="src">释文与定位取自 tt24h《四种原文表》（CC0）</span>
+  </div>
+  <div
+    id="rd"
+    class="rd"
+    tabindex="0"
+    role="document"
+    aria-label={`${w.meta.name}，竖排`}
+    data-chapters={url(`${c.id}/chapters/`)}
+    data-meta={url(`${c.id}/alignment.json`)}
+    data-w={w.id}
+  >
+    {
+      lines.map((l) => (
+        <div class="rl" id={`l-${l.no}`}>
+          <a class="no" href={`#l-${l.no}`}>{unit}<span class="n">{l.no}</span></a>
+          <p set:html={lineHtml(l, al.glyphs, (n) => chapterUrl(c, n))} />
+          {plateOf(l.no).map((p) => (
+            <a class="plate" href={fullUrl(p.file)} target="_blank" rel="noopener">
+              <img loading="lazy" src={thumbUrl(c.id, p.file)} alt={`${unit} ${l.no}图版`} />
+            </a>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+  <button type="button" class="ibtn" id="unfocus" aria-label="退出专注模式" title="退出专注模式（Esc）"><Icon name="back" /></button>
+  <div id="lens" class="lens" role="dialog" aria-label="透视" hidden></div>
+</Shell>

@@ -57,6 +57,7 @@ class ValidateData(unittest.TestCase):
     def run_validator(self):
         r = subprocess.run([sys.executable, str(SCRIPT), "--root", str(self.tmp)],
                            capture_output=True, text=True)
+        self.out = r.stdout
         return r.returncode, r.stderr
 
     def test_valid_data_passes(self):
@@ -136,6 +137,102 @@ class ValidateData(unittest.TestCase):
         code, err = self.run_validator()
         self.assertEqual(code, 1)
         self.assertIn("unit_type", err)
+
+    # ── 对读表与逐行释文（data/alignment/） ──
+
+    def write_alignment(self):
+        """占位的对读表：81 章，每章两列、两个版本（王弼本、郭店甲），郭店甲有逐行释文，两者一致。"""
+        base = self.tmp / "data" / "alignment"
+        (base / "chapters").mkdir(parents=True)
+        (base / "lines").mkdir()
+        versions = [{"id": "wangbi", "label": "弼本", "short": "王弼"},
+                    {"id": "guodian-jia", "label": "郭甲", "short": "郭甲", "unit": "slip"}]
+        for name, doc in [("versions.json", versions), ("equivalents.json", {"fail": [], "blank": [], "same": []}),
+                          ("glyphs.json", {}), ("study.json", {"overview": [], "legend": [], "references": []})]:
+            (base / name).write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        for n in range(1, 82):
+            rows = [{"version": "wangbi", "cells": ["甲", "乙"]},
+                    {"version": "guodian-jia", "cells": ["甲", {"t": "乙", "l": str(n)}]}]
+            (base / "chapters" / f"{n:03d}.json").write_text(
+                json.dumps({"chapter": n, "columns": 2, "rows": rows, "notes": []}, ensure_ascii=False), encoding="utf-8")
+        lines = [{"no": str(n), "text": "甲乙", "refs": [[n, [0, 1]]]} for n in range(1, 82)]
+        (base / "lines" / "guodian-jia.jsonl").write_text(
+            "\n".join(json.dumps(l, ensure_ascii=False) for l in lines) + "\n", encoding="utf-8")
+        return base
+
+    def edit_json(self, path, change):
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        change(doc)
+        path.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+
+    def test_alignment_passes_and_is_counted(self):
+        self.write_alignment()
+        code, err = self.run_validator()
+        self.assertEqual(code, 0, err)
+        self.assertIn("81 章对读表", self.out)
+
+    def test_alignment_is_optional(self):
+        code, err = self.run_validator()
+        self.assertEqual(code, 0, err)
+        self.assertIn("0 章对读表", self.out)
+
+    def test_alignment_version_must_be_registered(self):
+        base = self.write_alignment()
+        self.edit_json(base / "versions.json", lambda v: v.append({"id": "nope", "label": "无", "short": "无"}))
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("nope 不是已登记的版本 id", err)
+
+    def test_alignment_rows_must_use_listed_versions(self):
+        base = self.write_alignment()
+        self.edit_json(base / "versions.json", lambda v: v.pop())
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("guodian-jia", err)
+        self.assertIn("不是已知的版本", err)
+
+    def test_alignment_file_name_must_match_the_chapter(self):
+        base = self.write_alignment()
+        self.edit_json(base / "chapters" / "005.json", lambda c: c.update(chapter=6))
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("005.json: 文件名应是章号的三位数字", err)
+
+    def test_alignment_needs_all_81_chapters(self):
+        base = self.write_alignment()
+        (base / "chapters" / "081.json").unlink()
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("缺第 81 章", err)
+
+    def test_alignment_transcript_must_match_the_table(self):
+        base = self.write_alignment()
+        self.edit_json(base / "chapters" / "003.json", lambda c: c["rows"][1]["cells"].__setitem__(0, "丙"))
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("对到第 3 章第 0 列", err)
+
+    def test_alignment_unreadable_file_fails(self):
+        base = self.write_alignment()
+        (base / "glyphs.json").write_text("{", encoding="utf-8")
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("glyphs.json: 读不了", err)
+
+    def test_alignment_malformed_table_is_reported_not_crashed(self):
+        base = self.write_alignment()
+        (base / "chapters" / "001.json").write_text(json.dumps({"chapter": 1}), encoding="utf-8")
+        code, err = self.run_validator()
+        self.assertEqual(code, 1)
+        self.assertIn("结构不对", err)
+        self.assertNotIn("Traceback", err)
+
+
+class RealData(unittest.TestCase):
+    def test_repository_data_passes(self):
+        r = subprocess.run([sys.executable, "-I", str(SCRIPT), "--root", str(REPO)], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("81 章对读表：全部通过", r.stdout)
 
 
 if __name__ == "__main__":

@@ -27,12 +27,15 @@ export function llmsTxt(corpora: Corpus[], base = ''): { short: string; full: st
       lines.push(`- [${wit.meta.name}](${link(`${c.id}/${wit.id}.txt`)}): ${n}${UNIT_WORD[wit.units[0].unit_type]}。${colophon(wit.meta)}`);
       full.push(witnessTxt(c, wit, 3));
     }
-    lines.push(
-      '',
-      `- [${c.title}（阅读版）](${link(`${c.id}/`)}): 封面、凡例、目录，每本一页，释文可横排或竖排`,
-      `- [${c.title}（数据版）](${link(`${c.id}/data/`)}): 所有版本一页，可跨版本检索`,
-      '',
-    );
+    lines.push('', `- [${c.title}（网页）](${link(`${c.id}/`)}): 封面、凡例、目录，每本一页，释文可横排或竖排`);
+    if (c.alignment) {
+      const n = c.alignment.chapters.length;
+      lines.push(
+        `- [章节对读](${link(`${c.id}/chapters/1/`)}): ${n} 章，各本同列逐字对读；每章的对读表数据是 ${link(`${c.id}/chapters/001.json`)} 起的 JSON`,
+      );
+      for (const s of c.studies) lines.push(`- [${s.short ?? s.title}](${link(`${c.id}/study/${s.id}/`)}): 对照资料的说明与本站用到的部分`);
+    }
+    lines.push('');
   }
   lines.push(
     '## Optional',

@@ -4,12 +4,14 @@
  * 里只裁出“甲乙丙「」A”六个字、保留字重轴得到的小字体：hbSubset(font, '甲乙丙「」A')。
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Blob as FontBlob, Face, Font } from 'harfbuzzjs';
+import { parse } from 'yaml';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import manifest from '../../public/fonts/fonts.json';
 import { hbSubset } from '../../scripts/hb-subset';
-import { codePoints, EXTRA, fetchPinned, main, makeSubset, SOURCES, usedChars } from '../../scripts/make-fonts';
+import { codePoints, EXT, EXTRA, fetchPinned, main, makeExt, makeSubset, SOURCES, usedChars } from '../../scripts/make-fonts';
 import { tempDir } from './fixtures';
 
 let tmp: ReturnType<typeof tempDir>;
@@ -143,6 +145,63 @@ describe('裁出子集', () => {
 
   it('同样的输入得到逐字节相同的结果', async () => {
     expect(await makeSubset(vf, 500, '甲乙丙')).toEqual(await makeSubset(vf, 500, '甲乙丙'));
+  });
+});
+
+describe('补充字体（tt24h 的 DaoDeJingExt）', () => {
+  const sha = (data: Uint8Array) => createHash('sha256').update(data).digest('hex');
+  /** 把仓库里登记的原文件（字体与授权文本）拷进临时目录，之后可以改动其中一份 */
+  const copyRaw = () => {
+    for (const rel of [EXT.raw, EXT.licenseRaw]) {
+      mkdirSync(join(tmp.dir, rel, '..'), { recursive: true });
+      copyFileSync(rel, join(tmp.dir, rel));
+    }
+  };
+
+  it('脚本里固定的哈希与来源记录里登记的一致', () => {
+    const src = parse(readFileSync('data/sources/tt24h-daodejing.yaml', 'utf-8'));
+    const registered = Object.fromEntries((src.retrieval.files as { path: string; sha256: string }[]).map((f) => [f.path, f.sha256]));
+    expect(registered[EXT.raw]).toBe(EXT.sha256);
+    expect(registered[EXT.licenseRaw]).toBe(EXT.licenseSha256);
+  });
+
+  it('整个转成 WOFF2，收着私用区的造字码位', async () => {
+    const ext = (await makeExt())!;
+    expect(Buffer.from(ext.woff2.subarray(0, 4)).toString('latin1')).toBe('wOF2');
+    expect([...ext.cmap].some((cp) => cp >= 0xe000 && cp <= 0xf8ff)).toBe(true);
+    expect(sha(ext.woff2)).toBe(sha((await makeExt())!.woff2)); // 同样的输入得到逐字节相同的结果
+  });
+
+  it('随站点发布的文件就是这样得到的：字节、哈希与字体清单一致，授权文本逐字相同', async () => {
+    const ext = (await makeExt())!;
+    const entry = manifest.files.find((f) => f.family === 'ext')!;
+    expect(entry.file).toBe(EXT.file);
+    expect(sha(ext.woff2)).toBe(entry.sha256);
+    expect(Buffer.from(ext.woff2).equals(readFileSync(`public/fonts/${EXT.file}`))).toBe(true);
+    expect(ext.licence.equals(readFileSync(`public/fonts/${EXT.licenseFile}`))).toBe(true);
+    expect(manifest.licenses).toContain(EXT.licenseFile);
+    expect(manifest.sources.find((x) => x.family === 'ext')?.sha256).toBe(EXT.sha256);
+  });
+
+  it('原文件被改过：报错，不生成', async () => {
+    copyRaw();
+    writeFileSync(join(tmp.dir, EXT.raw), '被改动');
+    await expect(makeExt(tmp.dir)).rejects.toThrow('校验失败');
+  });
+
+  it('授权文本被改过：同样报错', async () => {
+    copyRaw();
+    writeFileSync(join(tmp.dir, EXT.licenseRaw), '被改动');
+    await expect(makeExt(tmp.dir)).rejects.toThrow(`校验失败：${EXT.licenseRaw}`);
+  });
+
+  it('原文件没拉取下来（data/raw/ 不在）：返回 null，字体清单里就没有补充字体', async () => {
+    expect(await makeExt(tmp.dir)).toBeNull();
+  });
+
+  it('原文件和校订好的授权拷贝没问题时通过', async () => {
+    copyRaw();
+    expect(await makeExt(tmp.dir)).not.toBeNull();
   });
 });
 

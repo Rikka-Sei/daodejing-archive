@@ -69,7 +69,7 @@ describe('llms.txt', () => {
     expect(short).toContain('## 版本');
     expect(short).toContain('(https://example.test/x/a/w-a.txt)');
     expect(short).toContain('(https://example.test/x/a/): 封面');
-    expect(short).toContain('(https://example.test/x/a/data/): 所有版本一页');
+    expect(short).not.toContain('chapters/'); // 没有对读表
     expect(short).toContain('## Optional');
     expect(short).toContain('(https://example.test/x/llms-full.txt)');
     expect(full).toContain('[简1] 甲乙丙');
@@ -78,6 +78,14 @@ describe('llms.txt', () => {
 
   it('没有站点地址时写相对链接', () => {
     expect(llmsTxt([c]).short).toContain('(a/w-a.txt)');
+  });
+
+  it('有对读表：列出章节对读、各章的 JSON 与对照资料', () => {
+    const x = fixtureCorpus(tmp.dir, 'x', { title: '对读书' }, true, true);
+    const { short } = llmsTxt([x], 'https://example.test/s');
+    expect(short).toContain('- [章节对读](https://example.test/s/x/chapters/1/): 2 章，各本同列逐字对读；每章的对读表数据是 https://example.test/s/x/chapters/001.json 起的 JSON');
+    expect(short).toContain('- [对照表](https://example.test/s/x/study/u/): 对照资料的说明与本站用到的部分');
+    expect(short).toContain('(https://example.test/s/x/jiaoding.txt)'); // 校订本、传世本的释文同样列出
   });
 
   it('多部典籍：总标题为“典籍”，各部分节', () => {

@@ -14,10 +14,12 @@ export function url(path = ''): string {
   return `${BASE}/${path.replace(/^\/+/, '')}`;
 }
 
-/** 页面地址（目录式，末尾带斜杠）：典籍封面、数据版、某个本。 */
+/** 页面地址（目录式，末尾带斜杠）：典籍封面、某个本、它的阅读器、某一章的对读页、一份对照资料。 */
 export const coverUrl = (c: { id: string }) => url(`${c.id}/`);
-export const dataUrl = (c: { id: string }) => url(`${c.id}/data/`);
 export const witnessUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}/${w.id}/`);
+export const readerUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}/${w.id}/read/`);
+export const chapterUrl = (c: { id: string }, n: number) => url(`${c.id}/chapters/${n}/`);
+export const studyUrl = (c: { id: string }, s: { id: string }) => url(`${c.id}/study/${s.id}/`);
 
 /**
  * 站点地址：http 升成 https。Pages 总是提供 https，但自定义域名前面有 CDN（如 Cloudflare）时，
