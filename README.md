@@ -50,6 +50,7 @@ data/
   alignment/              逐章对读表与逐行释文（tt24h 整理）；由 scripts/import_alignment.py 从 raw/ 生成，不手改
 schema/                   上述数据的 JSON Schema
 scripts/                  导入、抽图版与校验脚本，生成固定字体的脚本，以及 safegit
+font/                     本项目的字库 DaoSong：思源宋体的派生字体，手绘补入生僻字，见 font/README.md
 src/、public/             展示站（Astro），见 docs/site.md
 tests/                    测试（只用占位字符，不含真实释文）
 docs/                     存储设计、展示站与 safegit 说明

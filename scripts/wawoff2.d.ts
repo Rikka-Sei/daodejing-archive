@@ -3,6 +3,8 @@ declare module 'wawoff2' {
   const wawoff2: {
     /** TrueType 字体 → WOFF2 */
     compress(font: Uint8Array): Promise<Uint8Array>;
+    /** WOFF2 → TrueType 字体 */
+    decompress(font: Uint8Array): Promise<Uint8Array>;
   };
   export default wawoff2;
 }

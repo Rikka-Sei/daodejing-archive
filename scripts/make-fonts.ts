@@ -7,6 +7,7 @@
  *
  * 用法：npm run build && npm run fonts [-- --site dist --cache 目录]
  */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -16,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { Blob as FontBlob, Face, versionString } from 'harfbuzzjs';
 import wawoff2 from 'wawoff2';
+import { parse as parseYaml } from 'yaml';
 import { siteChars } from '../src/lib/verify';
 import { hbSubset } from './hb-subset';
 
@@ -57,6 +59,39 @@ export const SOURCES: Record<Family, Source> = {
 };
 
 const WEIGHTS = [400, 500];
+
+/**
+ * 宋体 400 用本项目的派生字体 DaoSong：思源宋体 Regular 加上 font/glyphs/ 里手绘的生僻字（见 font/README.md）。
+ * 字形原样沿用思源宋体，所以和 500 字重的思源宋体、黑体放在一起风格一致。制作字体用 Python（font/build.py），只在重新生成字体时需要。
+ */
+export const DERIVED = {
+  name: 'DaoSong',
+  slug: 'dao-song',
+  weight: 400,
+  dir: 'font',
+  licenseFile: 'OFL-DaoSong.txt',
+  url: 'https://github.com/Rikka-Sei/daodejing-archive/tree/main/font',
+};
+
+interface DerivedConfig {
+  family: string;
+  version: string;
+  glyphs: { cp: number; char: string; ids: string; svg: string; note: string }[];
+}
+
+/** 读 font/font.yaml */
+export function derivedConfig(repo: string = REPO): DerivedConfig {
+  return parseYaml(readFileSync(join(repo, DERIVED.dir, 'font.yaml'), 'utf-8')) as DerivedConfig;
+}
+
+/** 调 Python 生成 DaoSong（TTF）；upstream 是固定版本的思源宋体变体字体的路径。 */
+export function buildDerived(upstream: string, out: string, repo: string = REPO): Buffer {
+  const run = spawnSync('python3', [join(repo, DERIVED.dir, 'build.py'), '--upstream', upstream, '--out', out], { encoding: 'utf-8' });
+  if (run.status !== 0) {
+    throw new Error(`生成 ${DERIVED.name} 失败（需要 python3 与 fonttools、skia-pathops、pyyaml，见 font/README.md）：\n${run.stderr || run.stdout || run.error}`);
+  }
+  return readFileSync(out);
+}
 
 /**
  * tt24h 的补充字体（造字序列的码位和 Noto 里没有的生僻字），原文件登记在 data/raw/ 里，按 SHA-256 核对后整个转成 WOFF2。
@@ -129,11 +164,11 @@ export function codePoints(font: Uint8Array): Set<number> {
 }
 
 /**
- * 在变体字体上取定字重（得到静态字体），只留 chars 里的字，存成 WOFF2。
+ * 在变体字体上取定字重（得到静态字体；weight 为 null 表示字体本来就是静态的），只留 chars 里的字，存成 WOFF2。
  * 竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时画的 .notdef 方框都保留。
  */
-export async function makeSubset(font: Uint8Array, weight: number, chars: string, format: 'woff2' | 'truetype' = 'woff2'): Promise<Uint8Array> {
-  const ttf = await hbSubset(font, chars, { wght: weight });
+export async function makeSubset(font: Uint8Array, weight: number | null, chars: string, format: 'woff2' | 'truetype' = 'woff2'): Promise<Uint8Array> {
+  const ttf = await hbSubset(font, chars, weight === null ? {} : { wght: weight });
   return format === 'woff2' ? wawoff2.compress(ttf) : ttf;
 }
 
@@ -170,18 +205,25 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
   mkdirSync(FONT_DIR, { recursive: true });
   const files: Record<string, string | number>[] = [];
   const sources: Record<string, string>[] = [];
-  const haves: Set<string>[] = [];
+  let serifHas = new Set<string>(); // 宋体收了哪些页面用字（含派生字体补的字）
   for (const [family, s] of Object.entries(SOURCES) as [Family, Source][]) {
     const font = await fetchPinned(s.url, s.sha256, cache);
     writeFileSync(join(FONT_DIR, s.licenseFile), await fetchPinned(s.licenseUrl, s.licenseSha256, cache));
-    const cmap = codePoints(font);
+    // 宋体 400 用派生字体 DaoSong（在固定版本的思源宋体上补字），其余字重与黑体直接用上游字体
+    let derived: Buffer | undefined;
+    if (family === 'serif') {
+      const upstream = join(cache, `${s.sha256.slice(0, 12)}-${decodeURIComponent(basename(s.url))}`);
+      derived = buildDerived(upstream, join(cache, 'DaoSong-Regular.ttf'));
+    }
+    const cmap = codePoints(derived ?? font);
     const have = new Set([...wanted].filter((c) => cmap.has(c.codePointAt(0)!)));
-    haves.push(have);
+    if (family === 'serif') serifHas = have;
     for (const weight of WEIGHTS) {
       const [scope, tier] = SCOPE[`${family}-${weight}`];
       const pool = [...have].filter((c) => pools[tier].has(c)).sort(byCodePoint);
-      const file = `${s.slug}-${weight}.woff2`;
-      const data = await makeSubset(font, weight, pool.join(''));
+      const own = derived !== undefined && weight === DERIVED.weight;
+      const file = `${own ? DERIVED.slug : s.slug}-${weight}.woff2`;
+      const data = own ? await makeSubset(derived!, null, pool.join('')) : await makeSubset(font, weight, pool.join(''));
       writeFileSync(join(FONT_DIR, file), data);
       files.push({ file, family, weight, scope, chars: pool.length, bytes: data.length, sha256: sha256(data) });
     }
@@ -193,7 +235,23 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
       license: 'SIL OFL 1.1',
       license_file: s.licenseFile,
       reserved_font_name: 'Source',
+      weights: derived ? String(WEIGHTS.filter((w) => w !== DERIVED.weight)) : String(WEIGHTS),
     });
+    if (derived) {
+      const cfg = derivedConfig();
+      writeFileSync(join(FONT_DIR, DERIVED.licenseFile), readFileSync(join(REPO, DERIVED.dir, 'OFL.txt')));
+      sources.push({
+        family,
+        name: `${DERIVED.name} ${cfg.version}（${s.name} Regular 的派生字体，补绘 ${cfg.glyphs.length} 字：${cfg.glyphs.map((g) => g.char).join('')}）`,
+        url: DERIVED.url,
+        upstream_sha256: s.sha256,
+        license: 'SIL OFL 1.1',
+        license_file: DERIVED.licenseFile,
+        reserved_font_name: '',
+        weights: String(DERIVED.weight),
+        derived_from: s.name,
+      });
+    }
   }
 
   // 补充字体：登记的原文件在就用（核对哈希），转成 WOFF2；它的字不必再由黑体、宋体提供
@@ -206,7 +264,8 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     sources.push({ family: 'ext', name: EXT.name, url: EXT.url, sha256: EXT.sha256, license: 'SIL OFL 1.1', license_file: EXT.licenseFile, reserved_font_name: '' });
   }
   const extHas = (c: string) => extCmap.has(c.codePointAt(0)!);
-  const covered = new Set([...wanted].filter((c) => haves.every((have) => have.has(c)) || extHas(c))); // 黑体、宋体共有的字，或补充字体有的字
+  // 宋体有的字；黑体缺的字回退到宋体（--sans 里列了 DG Serif），所以只看宋体。或者补充字体有这个字
+  const covered = new Set([...wanted].filter((c) => serifHas.has(c) || extHas(c)));
   const chars = [...covered].sort(byCodePoint).join('');
   const unavailable = [...wanted].filter((c) => !covered.has(c)).sort(byCodePoint).join('');
   const manifest = {
@@ -218,7 +277,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     chars,
     unavailable,
     files,
-    licenses: [...Object.values(SOURCES).map((s) => s.licenseFile), ...(ext ? [EXT.licenseFile] : [])],
+    licenses: [...Object.values(SOURCES).map((s) => s.licenseFile), DERIVED.licenseFile, ...(ext ? [EXT.licenseFile] : [])],
     sources,
   };
   writeFileSync(join(FONT_DIR, 'fonts.json'), `${JSON.stringify(manifest, null, 1)}\n`);

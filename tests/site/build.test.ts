@@ -131,7 +131,7 @@ describe.each(cases)('$name', ({ dir, base, flags }) => {
     const page = read('laozi/index.html');
     expect(page).toMatch(new RegExp(`href="${base}/_astro/Shell\\.[\\w-]+\\.css"`));
     expect(page).toMatch(new RegExp(`src="${base}/_astro/app\\.[\\w-]+\\.js"`));
-    expect(page).toContain(`url(${base}/fonts/noto-serif-sc-400.woff2)`);
+    expect(page).toContain(`url(${base}/fonts/dao-song-400.woff2)`);
     // 补充字体只管私用区与生僻字，用到才下载
     expect(page).toContain(`url(${base}/fonts/dg-ext-400.woff2) format("woff2");unicode-range:U+E000-F8FF,U+20000-3FFFF`);
   });

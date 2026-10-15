@@ -1,0 +1,26 @@
+# 字库的登记：字体名、上游字体、手绘的字。font/build.py 按这个文件生成字体，tests/test_font.py 核对它。
+#
+# 这是思源宋体（Noto Serif SC）Regular 的派生字体：除下面登记的字，其余字形原样沿用上游，所以和正文用的思源宋体是同一套字形。
+# 上游的 SIL OFL 1.1 要求派生字体换名、带上授权文本，不单独出售字体本身；见 font/OFL.txt 与 font/README.md。
+family: DaoSong
+style: Regular
+version: '0.1.0'
+vendor: RKSI
+designer: Rikka-Sei
+license: SIL OFL 1.1
+
+upstream:
+  name: Noto Serif SC
+  url: https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf
+  sha256: 050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9
+  weight: 400
+
+# 手绘的字：码位、字、结构（IDS，仅作说明）、SVG 文件。字形依据 Unicode 字表（The Unicode Standard 18.0，
+# CJK Unified Ideographs Extension B / F 字表）里的通用字形，笔画尺寸按思源宋体 Regular 量得，逐笔手绘，没有取用任何字体的现成轮廓。
+glyphs:
+  - { cp: 0x200A4, char: 𠂤, ids: ⿱丿㠯, svg: glyphs/u200A4.svg, note: 堆的本字，字表中的写法近“自” }
+  - { cp: 0x20541, char: 𠕁, ids: ⿵冂卄, svg: glyphs/u20541.svg, note: 冂内套卄，近“冊” }
+  - { cp: 0x20695, char: 𠚕, ids: ⿶凵⿳从一从, svg: glyphs/u20695.svg, note: 凵内叠两个从，近“齿” }
+  - { cp: 0x23429, char: 𣐩, ids: ⿱白木, svg: glyphs/u23429.svg, note: 上白下木，近“杲” }
+  - { cp: 0x24900, char: 𤤀, ids: ⿰王屯, svg: glyphs/u24900.svg, note: 左王右屯 }
+  - { cp: 0x2D1C1, char: 𭇁, ids: ⿱𫝀口, svg: glyphs/u2D1C1.svg, note: 上 𫝀（U+2B740，丿一竖折一）下口 }

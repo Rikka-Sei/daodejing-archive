@@ -9,7 +9,7 @@
   --tint:light-dark(#f8f1ec,#35302c);--tint2:light-dark(#f6e3d9,#4a3429);--ac-tx:light-dark(#b0502f,#f0a98c);
   --shadow:0 1px 2px light-dark(rgba(0,0,0,.05),transparent);--ring:rgba(76,132,236,.55);
   --lift:0 4px 24px light-dark(rgba(0,0,0,.10),rgba(0,0,0,.5)),0 0 0 .5px light-dark(rgba(0,0,0,.03),rgba(255,255,255,.04));
-  --sans:"DG Sans","DG Ext",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","WenQuanYi Zen Hei Mono","HanaMinB","Hanazono Mincho B","BabelStone Han","PingFang HK",sans-serif;
+  --sans:"DG Sans","DG Ext","DG Serif",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","WenQuanYi Zen Hei Mono","HanaMinB","Hanazono Mincho B","BabelStone Han","PingFang HK",sans-serif;
   --serif:"DG Serif","DG Ext","Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","Source Han Serif SC","SimSun","WenQuanYi Zen Hei Mono","HanaMinB","Hanazono Mincho B","BabelStone Han","Songti TC",serif}
 html[data-theme=light]{color-scheme:light}
 html[data-theme=dark]{color-scheme:dark}

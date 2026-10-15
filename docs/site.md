@@ -34,6 +34,7 @@ src/
   styles/site.css        样式
 public/fonts/            固定字体子集与授权文本
 scripts/make-fonts.ts    生成固定字体子集（npm run fonts）
+font/                    本项目的字库 DaoSong（思源宋体的派生字体，手绘补字），见 font/README.md
 tests/site/              测试
 ```
 
@@ -73,13 +74,13 @@ tests/site/              测试
 
 ## 固定字体
 
-页面不依赖观看者机器上的字体：随站点发布思源黑体、思源宋体的子集（SIL OFL 1.1，共约 880 KB），子集里没有的字由浏览器逐字回退到系统字体。构建结束时会列出页面用到、但子集里没有的字。
+页面不依赖观看者机器上的字体：随站点发布思源黑体、宋体的子集（SIL OFL 1.1，共约 1 MB），子集里没有的字由浏览器逐字回退到系统字体。构建结束时会列出页面用到、但子集里没有的字。宋体 400（释文正文）用的是 DaoSong：思源宋体 Regular 的派生字体，Noto 与补充字体都没有的 6 个生僻字（𠂤𠕁𠚕𣐩𤤀𭇁）在 `font/` 里逐笔手绘补进去，其余字形原样沿用；见 [font/README.md](../font/README.md)。黑体缺的字（界面与注释里偶尔出现的这几个字）回退到宋体，所以样式里 `--sans` 的字体列表带着 DG Serif。
 
 ```bash
 npm run build && npm run fonts    # 统计 dist/ 里的用字，重新裁出子集到 public/fonts/
 ```
 
-来源字体按 URL 和 SHA-256 固定：首次运行会下载（两个字体共约 43 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：取定字重，保留竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
+来源字体按 URL 和 SHA-256 固定：首次运行会下载（两个字体共约 43 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。宋体 400 先用 `font/build.py`（Python，需要 fonttools、skia-pathops、pyyaml）从固定版本的思源宋体生成 DaoSong，再裁子集；字体清单 `fonts.json` 的 `sources` 里登记派生关系与上游哈希。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：取定字重，保留竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
 
 对读表和实录里有 Unicode 没有收的造字（用私用区码位）和扩展 B 区到扩展 H 区的生僻字，用 tt24h 随源码发布的补充字体 DaoDeJingExt（`dg-ext-400.woff2`，约 144 KB，SIL OFL 1.1）显示。它整个收录、不裁剪；页面用 `unicode-range: U+E000-F8FF, U+20000-3FFFF` 声明它，页面上出现这些字才下载，也不预加载。字体文件和授权文本随源码存在 `data/raw/tt24h-daodejing/`，已登记在 `data/sources/tt24h-daodejing.yaml`；`npm run fonts` 从那里读入，并按脚本里固定的 SHA-256 校验，通过才转成 WOFF2。
 

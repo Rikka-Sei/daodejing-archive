@@ -11,7 +11,8 @@ import { parse } from 'yaml';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import manifest from '../../public/fonts/fonts.json';
 import { hbSubset } from '../../scripts/hb-subset';
-import { codePoints, EXT, EXTRA, fetchPinned, main, makeExt, makeSubset, SOURCES, usedChars } from '../../scripts/make-fonts';
+import wawoff2 from 'wawoff2';
+import { codePoints, DERIVED, derivedConfig, EXT, EXTRA, fetchPinned, main, makeExt, makeSubset, SOURCES, usedChars } from '../../scripts/make-fonts';
 import { tempDir } from './fixtures';
 
 let tmp: ReturnType<typeof tempDir>;
@@ -216,5 +217,49 @@ describe('命令', () => {
   it('没构建过站点：提示先构建', async () => {
     await expect(main(['--site', tmp.dir])).rejects.toThrow('npm run build');
     await expect(main(['--site', join(tmp.dir, 'none')])).rejects.toThrow('npm run build');
+  });
+});
+
+describe('派生字体 DaoSong（宋体 400）', () => {
+  const cfg = derivedConfig();
+  const entry = manifest.files.find((f) => f.family === 'serif' && f.weight === DERIVED.weight)!;
+  const ttf = () => wawoff2.decompress(readFileSync(`public/fonts/${entry.file}`));
+
+  it('宋体 400 的文件就是 DaoSong，授权文本与 font/OFL.txt 逐字相同', () => {
+    expect(entry.file).toBe(`${DERIVED.slug}-400.woff2`);
+    expect(manifest.licenses).toContain(DERIVED.licenseFile);
+    expect(readFileSync(`public/fonts/${DERIVED.licenseFile}`).equals(readFileSync('font/OFL.txt'))).toBe(true);
+  });
+
+  it('登记的手绘字都在这个字体里，字体清单里不再有缺字', async () => {
+    const have = codePoints(await ttf());
+    expect(cfg.glyphs.length).toBeGreaterThan(0);
+    for (const g of cfg.glyphs) {
+      expect(have.has(g.cp), g.char).toBe(true);
+      expect(manifest.chars).toContain(g.char);
+      expect(manifest.unavailable).not.toContain(g.char);
+    }
+  });
+
+  it('字体里的名字是 DaoSong，不再叫思源（也没有保留名 Source）', async () => {
+    const face = new Face(new FontBlob(await ttf()));
+    for (const id of [1, 4, 6]) {
+      const name = face.getName(id, 'en');
+      expect(name, `name ${id}`).toContain(cfg.family);
+      expect(name, `name ${id}`).not.toMatch(/Noto|Source/);
+    }
+    expect(face.getName(13, 'en')).toContain('SIL Open Font License');
+  });
+
+  it('字体清单的来源里登记了派生关系与上游哈希', () => {
+    const own = manifest.sources.find((x) => x.license_file === DERIVED.licenseFile) as unknown as Record<string, string>;
+    expect(own.upstream_sha256).toBe(SOURCES.serif.sha256);
+    expect(own.weights).toBe('400');
+    expect(manifest.sources.find((x) => x.license_file === SOURCES.serif.licenseFile)?.weights).toBe('500');
+  });
+
+  it('静态字体的子集不再取定字重（weight 为 null）', async () => {
+    const out = await makeSubset(await ttf(), null, '甲', 'truetype');
+    expect(codePoints(out).has('甲'.codePointAt(0)!)).toBe(true);
   });
 });
