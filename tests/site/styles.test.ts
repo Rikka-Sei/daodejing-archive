@@ -12,8 +12,10 @@ describe('样式', () => {
     expect(rule('table.al td.hl:after,table.al td.pin:after')).toContain('z-index:-1');
   });
 
-  it('侧栏的子项不被压缩，滚动条位置固定：两条轴里检索框一样大', () => {
+  it('侧栏的子项不被压缩、滚动条不占宽度：任何页面、两条轴里检索框一样大，左右边距一致', () => {
     expect(rule('#side>*')).toContain('flex:none');
-    expect(rule('#side')).toContain('scrollbar-gutter:stable');
+    expect(rule('#side')).toContain('scrollbar-width:none');
+    expect(rule('#side')).not.toContain('scrollbar-gutter');
+    expect(css).toContain('#side::-webkit-scrollbar{display:none}');
   });
 });

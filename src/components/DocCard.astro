@@ -2,7 +2,7 @@
 // 封面上的一张文献卡片：实物影像、名称、概况；有几个本，就列几个。
 import type { Corpus, Group } from '../lib/corpus';
 import { COVER_WIDTH, thumbUrl } from '../lib/thumbs';
-import { witnessUrl } from '../lib/url';
+import { openUrl } from '../lib/url';
 
 interface Props {
   corpus: Corpus;
@@ -15,7 +15,7 @@ const meta = [...(g.single ? [] : [`${g.witnesses.length} 个版本`]), `${units
 ---
 
 <article class="doc">
-  <a class="cov" href={witnessUrl(c, g.first)}
+  <a class="cov" href={openUrl(c, g.first)}
     ><span class="pic"
       >{
         plate ? (
@@ -30,7 +30,7 @@ const meta = [...(g.single ? [] : [`${g.witnesses.length} 个版本`]), `${units
     !g.single && (
       <div class="subs">
         {g.witnesses.map((w) => (
-          <a href={witnessUrl(c, w)}>{w.label}</a>
+          <a href={openUrl(c, w)}>{w.label}</a>
         ))}
       </div>
     )

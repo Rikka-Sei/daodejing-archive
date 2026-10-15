@@ -1,0 +1,69 @@
+---
+// 透视：简牍排布。按卷把每枚简、每一行排开（自右向左），颜色是章次；点一格进阅读器。
+// 选一章，各本里写了这一章的简与行就亮起来，其余变淡。
+import Side from '../components/Side.astro';
+import Shell from '../layouts/Shell.astro';
+import type { Corpus } from '../lib/corpus';
+import { rollsOf } from '../lib/layout';
+import { UNIT_NOUN } from '../lib/text';
+import { coverUrl, readerUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+}
+const { corpus: c, corpora } = Astro.props;
+const al = c.alignment!;
+const total = al.chapters.length;
+const sections = c.readable.map((w) => {
+  const unit = UNIT_NOUN[al.version(w.id)?.unit ?? 'slip'] ?? '简';
+  return { w, unit, rolls: rollsOf(al.lines.get(w.id)!, c.chapterParts) };
+});
+const HEIGHT = 60; // 一简最多按这么多字画高
+---
+
+<Shell title={`透视 · ${c.title}`} desc={`${c.title}的简牍排布：各本的简与行落在哪些章`} wide tools="theme" script="layout">
+  <Side slot="side" corpus={c} corpora={corpora} onLens />
+  <Fragment slot="crumb">
+    <a href={coverUrl(c)}>{c.title}</a><span class="sep">›</span><b>透视</b>
+  </Fragment>
+  <h1>透视</h1>
+  <p class="lead">简牍排布：按卷把每枚简、每一行排开，自右向左，格里的颜色是章次，长短是字数。点一格进阅读器。</p>
+  <div class="lv-bar" data-total={total}>
+    <label>选一章 <input id="lv-n" type="number" min="1" max={total} inputmode="numeric" placeholder={`1–${total}`} /></label>
+    <button type="button" id="lv-clear" hidden>清除</button>
+    <span class="lv-say" id="lv-say" aria-live="polite"></span>
+    <span class="lv-scale" aria-hidden="true"><i style="--n:1"></i><i style="--n:27"></i><i style="--n:54"></i><i style="--n:81"></i></span>
+  </div>
+  {
+    sections.map(({ w, unit, rolls }) => (
+      <section class="lv" data-w={w.id} data-unit={unit} data-name={w.label === '全本' ? w.group : w.label}>
+        <h2>{w.title}</h2>
+        {rolls.map((roll) => (
+          <div class="roll">
+            <div class="rt">
+              {roll.title && <b>{roll.title}</b>}
+              <span>{roll.tiles.length} {unit}</span>
+            </div>
+            <div class="sl-row">
+              {roll.tiles.map((t) => (
+                <a
+                  class="sl"
+                  href={`${readerUrl(c, w)}#l-${t.no}`}
+                  data-ch={[...new Set(t.runs.map((r) => r.n))].join(' ')}
+                  data-no={t.no}
+                  title={`${unit} ${t.no}：${t.runs.map((r) => `第 ${r.n} 章 ${r.len} 字`).join('；')}`}
+                >
+                  <span class="no">{t.no.replace(/^[甲乙丙]/, '')}</span>
+                  <span class="bar" style={`height:${Math.round(Math.min(t.len, HEIGHT) * 2.6) + 10}px`}>
+                    {t.runs.map((r) => <i style={`flex:${r.len};--n:${r.n}`} />)}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    ))
+  }
+</Shell>

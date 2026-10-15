@@ -1,7 +1,7 @@
 ---
 // 文献目录：有几个本的文献是文件夹，各本列在里面；只有一个本的直接是一项。
 // current 是当前本的 id。
-import type { Group } from '../lib/corpus';
+import type { Group, Witness } from '../lib/corpus';
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
 import MoreButton from './MoreButton.astro';
@@ -11,15 +11,17 @@ interface Props {
   corpusId: string;
   groups: Group[];
   current?: string;
+  /** 点开一个本去哪 */
+  open: (w: Witness) => string;
 }
-const { corpusId, groups, current = '' } = Astro.props;
+const { corpusId, groups, current = '', open } = Astro.props;
 ---
 
 <div class="tree">
   {
     groups.map((g) =>
       g.single ? (
-        <Leaf corpusId={corpusId} group={g} wit={g.first} current={current} top={true} />
+        <Leaf corpusId={corpusId} group={g} wit={g.first} href={open(g.first)} current={current} top={true} />
       ) : (
         <details class="dir" data-g={g.id} open>
           <summary class="item">
@@ -31,7 +33,7 @@ const { corpusId, groups, current = '' } = Astro.props;
           </summary>
           <div class="kids">
             {g.witnesses.map((w) => (
-              <Leaf corpusId={corpusId} group={g} wit={w} current={current} top={false} />
+              <Leaf corpusId={corpusId} group={g} wit={w} href={open(w)} current={current} top={false} />
             ))}
           </div>
         </details>

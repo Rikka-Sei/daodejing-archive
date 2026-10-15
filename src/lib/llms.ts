@@ -29,6 +29,7 @@ export function llmsTxt(corpora: Corpus[], base = ''): { short: string; full: st
     }
     lines.push('', `- [${c.title}（网页）](${link(`${c.id}/`)}): 封面、目录，每本一页，释文可横排或竖排`);
     lines.push(`- [凡例](${link(`${c.id}/preface/`)}): 收录与呈现的体例`);
+    if (c.readable.length) lines.push(`- [透视](${link(`${c.id}/lens/`)}): 简牍排布，按卷排开各本的简与行，标出各落在哪些章`);
     if (c.alignment) {
       const n = c.alignment.chapters.length;
       lines.push(

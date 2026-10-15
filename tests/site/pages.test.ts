@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Corpus } from '../../src/lib/corpus';
 import Chapter from '../../src/views/Chapter.astro';
 import Cover from '../../src/views/Cover.astro';
+import Lens from '../../src/views/Lens.astro';
 import Preface from '../../src/views/Preface.astro';
 import Reader from '../../src/views/Reader.astro';
 import Study from '../../src/views/Study.astro';
@@ -31,6 +32,7 @@ const volume = (i: number, cs = corpora) => render(Volume, { props: { corpus: cs
 const xVolume = (id: string) => render(Volume, { props: { corpus: x, wit: x.witness(id)!, corpora: [x] } });
 const chapter = (n: number) => render(Chapter, { props: { corpus: x, corpora: [x], n } });
 const reader = (id = 'w-a') => render(Reader, { props: { corpus: x, wit: x.witness(id)!, corpora: [x] } });
+const lens = () => render(Lens, { props: { corpus: x, corpora: [x] } });
 const study = () => render(Study, { props: { corpus: x, corpora: [x], source: x.studies[0] } });
 
 describe('封面', () => {
@@ -99,7 +101,8 @@ describe('封面', () => {
 describe('封面（有对读表）', () => {
   it('第二个按钮去章节对读，数字里带上章数', async () => {
     const page = await cover(x, [x]);
-    expect(page).toContain('<a class="btn pri" href="/x/w-a/">开始阅读</a><a class="btn" href="/x/chapters/1/">章节对读</a>');
+    // 有逐行释文的本，开始阅读进阅读器
+    expect(page).toContain('<a class="btn pri" href="/x/w-a/read/">开始阅读</a><a class="btn" href="/x/chapters/1/">章节对读</a><a class="btn" href="/x/lens/">透视</a>');
     expect(page).toContain('<div class="stats">5 个版本 · 10 条释文 · 3 张影像 · 2 章逐字对读</div>');
   });
 
@@ -458,7 +461,8 @@ describe('阅读器', () => {
   it('侧栏停在材料一栏，当前本标出', async () => {
     const page = await reader();
     expect(page).toContain('<aside id="side" data-axis="m">');
-    expect(page).toContain('class="item leaf on"><a class="lk" href="/x/w-a/" aria-current="page">');
+    expect(page).toContain('class="item leaf on"><a class="lk" href="/x/w-a/read/" aria-current="page">');
+    expect(page).toContain('<a class="ver" href="/x/w-a/">版本信息与下载 ›</a>');
   });
 });
 
@@ -512,5 +516,30 @@ describe('真实数据', () => {
     expect(page).toContain('<span class="t">道经</span><span class="rng">1–37 章</span>');
     expect(page).toContain('<span class="t">德经</span><span class="rng">38–81 章</span>');
     expect(count(page, 'class="item ch"')).toBe(81);
+  });
+});
+
+describe('透视（简牍排布）', () => {
+  it('侧栏在凡例后有“透视”；没有逐行释文的典籍没有', async () => {
+    const page = await cover(x, [x]);
+    expect(page).toContain('<a class="item" href="/x/lens/">');
+    expect(await cover()).not.toContain('/lens/'); // 占位典籍 a 没有对读表
+    expect(await lens()).toContain('<a class="item on" href="/x/lens/">');
+  });
+
+  it('有逐行释文的本都列出，一简一格，带章次、字数和阅读器链接', async () => {
+    const page = await lens();
+    expect(page).toContain('<h1>透视</h1>');
+    expect(page).toContain('<title>透视 · 典籍叉</title>');
+    expect(count(page, '<section class="lv"')).toBe(x.readable.length);
+    expect(page).toContain('data-ch="1 2" data-no="2"'); // w-a 第 2 简跨第 1、2 章
+    expect(page).toContain('href="/x/w-a/read/#l-2"');
+    expect(page).toContain('title="简 2：第 1 章 2 字；第 2 章 2 字"');
+    expect(page).toContain('<input id="lv-n" type="number" min="1" max="2"');
+  });
+
+  it('各本点开直接进阅读器：侧栏与封面卡片', async () => {
+    expect(await lens()).toContain('class="lk" href="/x/w-a/read/"');
+    expect(await lens()).toContain('class="lk" href="/x/w-t/"'); // 传世本进本的页面
   });
 });

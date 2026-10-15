@@ -1,7 +1,6 @@
 ---
 // 目录里的一个本。top：它自己就是一项文献（文献只有一个本），前面带文件图标。
 import type { Group, Witness } from '../lib/corpus';
-import { witnessUrl } from '../lib/url';
 import Icon from './Icon.astro';
 import MoreButton from './MoreButton.astro';
 import RowMenu from './RowMenu.astro';
@@ -10,16 +9,18 @@ interface Props {
   corpusId: string;
   group: Group;
   wit: Witness;
+  /** 点开去哪：有逐行释文的进阅读器，其余进本的页面 */
+  href: string;
   /** 当前本的 id */
   current: string;
   top: boolean;
 }
-const { corpusId, group: g, wit: w, current, top } = Astro.props;
+const { corpusId, group: g, wit: w, href, current, top } = Astro.props;
 const on = w.id === current;
 ---
 
 <div class:list={['item', 'leaf', { on }]}>
-  <a class="lk" href={witnessUrl({ id: corpusId }, w)} aria-current={on ? 'page' : undefined}
+  <a class="lk" href={href} aria-current={on ? 'page' : undefined}
     >{top && <Icon name="file" />}<span class="t">{top ? g.name : w.label}</span></a
   >
   <MoreButton label={w.title} />

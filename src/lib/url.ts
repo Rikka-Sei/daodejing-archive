@@ -20,6 +20,10 @@ export const witnessUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}
 export const readerUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}/${w.id}/read/`);
 export const chapterUrl = (c: { id: string }, n: number) => url(`${c.id}/chapters/${n}/`);
 export const studyUrl = (c: { id: string }, s: { id: string }) => url(`${c.id}/study/${s.id}/`);
+/** 打开一个本的入口：有逐行释文的竹简、帛书进阅读器，其余进本的页面。 */
+export const openUrl = (c: { id: string; readable: { id: string }[] }, w: { id: string }) =>
+  c.readable.some((r) => r.id === w.id) ? readerUrl(c, w) : witnessUrl(c, w);
+export const lensUrl = (c: { id: string }) => url(`${c.id}/lens/`);
 export const prefaceUrl = (c: { id: string }) => url(`${c.id}/preface/`);
 
 /**

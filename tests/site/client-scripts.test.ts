@@ -461,3 +461,98 @@ describe('对读表页脚本', () => {
     expect(p.listening()).toBe(0);
   });
 });
+
+// ── 透视页（简牍排布） ───────────────────────────────────────
+
+class Tile {
+  classes = new Set<string>();
+  dataset: { ch: string; no: string };
+  constructor(ch: string, no: string) {
+    this.dataset = { ch, no };
+  }
+  classList = { toggle: (c: string, on: boolean) => void (on ? this.classes.add(c) : this.classes.delete(c)) };
+}
+
+/** 假的透视页：两个本，一共三简。hash 是打开页面时地址里的 #… */
+function layoutPage(hash = '', present = true) {
+  const tiles = [new Tile('1', '1'), new Tile('1 2', '2'), new Tile('2', '1')];
+  const sections = [
+    { dataset: { name: '甲组', unit: '简' }, querySelectorAll: () => tiles.slice(0, 2).filter((t) => t.classes.has('hit')) },
+    { dataset: { name: '乙本', unit: '行' }, querySelectorAll: () => tiles.slice(2).filter((t) => t.classes.has('hit')) },
+  ];
+  const input = { value: '', max: '3', focus: vi.fn(), addEventListener: (t: string, f: Handler) => void (on[`i:${t}`] = f) };
+  const say = { textContent: '' };
+  const clear = { hidden: true, addEventListener: (t: string, f: Handler) => void (on[`c:${t}`] = f) };
+  const on: Record<string, Handler> = {};
+  const body = new Set<string>();
+  const replaceState = vi.fn();
+  runInNewContext(script('layout.js'), {
+    document: {
+      getElementById: (id: string) => (!present ? null : id === 'lv-n' ? input : id === 'lv-say' ? say : id === 'lv-clear' ? clear : null),
+      querySelectorAll: (sel: string) => (sel === '.sl' ? tiles : sel === 'section.lv' ? sections : []),
+      body: { classList: { toggle: (c: string, v: boolean) => void (v ? body.add(c) : body.delete(c)) } },
+    },
+    location: { hash, pathname: '/c/lens/', search: '' },
+    history: { replaceState },
+  });
+  return {
+    input,
+    say,
+    clear,
+    body,
+    replaceState,
+    hits: () => tiles.map((t) => t.classes.has('hit')),
+    type: (v: string) => {
+      input.value = v;
+      on['i:input']({});
+    },
+    clickClear: () => on['c:click']({}),
+    listening: () => Object.keys(on).length,
+  };
+}
+
+describe('透视页脚本', () => {
+  it('选一章：写了这一章的简亮起来，页面标出各本的简号；地址带 #ch<章>', () => {
+    const p = layoutPage();
+    p.type('2');
+    expect(p.hits()).toEqual([false, true, true]);
+    expect(p.body.has('lv-pick')).toBe(true);
+    expect(p.clear.hidden).toBe(false);
+    expect(p.say.textContent).toBe('第 2 章：甲组 简 2；乙本 行 1');
+    expect(p.replaceState).toHaveBeenLastCalledWith(null, '', '#ch2');
+  });
+
+  it('清空或超出范围：恢复原样，地址不带锚点', () => {
+    const p = layoutPage();
+    p.type('1');
+    p.type('9');
+    expect(p.hits()).toEqual([false, false, false]);
+    expect(p.body.has('lv-pick')).toBe(false);
+    expect(p.say.textContent).toBe('');
+    expect(p.replaceState).toHaveBeenLastCalledWith(null, '', '/c/lens/');
+    p.type('2');
+    p.clickClear();
+    expect(p.input.value).toBe('');
+    expect(p.clear.hidden).toBe(true);
+  });
+
+  it('地址里带 #ch<章> 打开就选好那一章；写得不对的忽略', () => {
+    const p = layoutPage('#ch1');
+    expect(p.input.value).toBe('1');
+    expect(p.hits()).toEqual([true, true, false]);
+    expect(layoutPage('#ch').input.value).toBe('');
+    expect(layoutPage('#top').body.size).toBe(0);
+  });
+
+  it('这一章哪个本都没有：照实说', () => {
+    const p = layoutPage();
+    p.input.max = '3';
+    p.type('3');
+    expect(p.hits()).toEqual([false, false, false]);
+    expect(p.say.textContent).toBe('第 3 章在这些本里都没有简或行');
+  });
+
+  it('页面里没有选章框：什么也不做', () => {
+    expect(layoutPage('', false).listening()).toBe(0);
+  });
+});

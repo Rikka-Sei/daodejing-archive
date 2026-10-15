@@ -24,7 +24,8 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 
 /* 外壳：侧栏 288px，主栏 */
 #app{display:flex;min-height:100vh}
-#side{flex:none;width:288px;height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 8px;background:var(--side);border-right:.5px solid var(--bd);scrollbar-width:thin;scrollbar-gutter:stable both-edges}
+#side{flex:none;width:288px;height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 8px;background:var(--side);border-right:.5px solid var(--bd);scrollbar-width:none}
+#side::-webkit-scrollbar{display:none}
 #side>*{flex:none}
 .sb-top{display:flex;align-items:center;gap:4px;height:40px;margin-top:0;flex:none}
 .ibtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--tx2)}
@@ -350,3 +351,27 @@ body.focus .rd{padding-top:28px}
   .doc .subs{grid-column:2;grid-row:2;align-self:start;margin-top:0;padding:0 14px 12px}
 }
 @media(prefers-reduced-motion:reduce){.doc .pic img,details.fold .chev{transition:none}}
+
+/* 透视页：简牍排布。一简一格自右向左，颜色是章次（色相随章次走），长短是字数 */
+.lv-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 8px;font-size:13px;color:var(--tx2)}
+.lv-bar input{width:72px;height:28px;margin-left:6px;padding:0 8px;border:.5px solid var(--bd);border-radius:8px;background:var(--panel);font:inherit;color:var(--tx)}
+.lv-bar button{height:28px;padding:0 10px;border-radius:8px;background:var(--fill);color:var(--tx2)}
+.lv-say{flex:1 1 240px;min-width:0;color:var(--ac)}
+.lv-scale{display:inline-flex;height:8px;border-radius:4px;overflow:hidden}
+.lv-scale i{width:18px;background:hsl(calc(var(--n)*3.6) 38% 66%)}
+.lv h2{margin:32px 0 8px;font:500 17px/24px var(--serif)}
+.roll{margin:0 0 16px}
+.rt{display:flex;gap:8px;margin:0 0 6px;font-size:12px;color:var(--tx3)}
+.rt b{font-weight:500;color:var(--tx2)}
+.sl-row{display:flex;flex-direction:row-reverse;flex-wrap:wrap;justify-content:flex-end;gap:6px 4px;align-items:flex-start}
+.sl{display:flex;flex-direction:column;align-items:center;gap:2px;width:26px;border-radius:6px;color:var(--tx3);font-size:11px;line-height:14px;white-space:nowrap}
+.sl .no{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.sl:hover{background:var(--hover)}
+.sl .bar{display:flex;flex-direction:column;width:14px;border-radius:4px;overflow:hidden}
+.sl .bar i{display:block;min-height:2px;background:hsl(calc(var(--n)*3.6) 38% 66%)}
+.lv-pick .sl:not(.hit){opacity:.28}
+.lv-pick .sl.hit{color:var(--tx);box-shadow:0 0 0 1px var(--ac)}
+:root[data-theme=dark] .sl .bar i,:root[data-theme=dark] .lv-scale i{background:hsl(calc(var(--n)*3.6) 30% 48%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .sl .bar i,:root:not([data-theme=light]) .lv-scale i{background:hsl(calc(var(--n)*3.6) 30% 48%)}}
+.rd-bar .ver{color:var(--tx3)}
+.rd-bar .ver:hover{color:var(--tx)}

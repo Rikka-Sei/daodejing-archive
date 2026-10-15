@@ -1,0 +1,14 @@
+---
+// 一部典籍的透视：简牍排布。只有带逐行释文的竹简、帛书的典籍才有。
+import { allCorpora, corpusById } from '../../lib/site';
+import Lens from '../../views/Lens.astro';
+
+export function getStaticPaths() {
+  return allCorpora()
+    .filter((c) => c.readable.length > 0)
+    .map((c) => ({ params: { corpus: c.id } }));
+}
+const corpus = corpusById(Astro.params.corpus!);
+---
+
+<Lens corpus={corpus} corpora={allCorpora()} />

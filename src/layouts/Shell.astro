@@ -3,6 +3,7 @@
 import '../styles/site.css';
 import alignUrl from '../scripts/align.js?url';
 import appUrl from '../scripts/app.js?url';
+import layoutUrl from '../scripts/layout.js?url';
 import readerUrl from '../scripts/reader.js?url';
 import Icon from '../components/Icon.astro';
 import Tools from '../components/Tools.astro';
@@ -18,8 +19,8 @@ interface Props {
   tools?: 'theme' | 'text' | 'reader';
   /** 侧栏打开时停在哪条轴：m 材料，c 章节 */
   axis?: 'm' | 'c';
-  /** 这个页面用的脚本：align 是对读页的列高亮，reader 是阅读器的透视 */
-  script?: 'align' | 'reader';
+  /** 这个页面用的脚本：align 是对读页的列高亮，reader 是阅读器的透视，layout 是透视页的选章 */
+  script?: 'align' | 'reader' | 'layout';
 }
 const { title, desc, wide = false, tools = 'text', axis = 'm', script } = Astro.props;
 ---
@@ -53,5 +54,6 @@ const { title, desc, wide = false, tools = 'text', axis = 'm', script } = Astro.
     <script is:inline src={appUrl}></script>
     {script === 'align' && <script is:inline src={alignUrl}></script>}
     {script === 'reader' && <script is:inline src={readerUrl}></script>}
+    {script === 'layout' && <script is:inline src={layoutUrl}></script>}
   </body>
 </html>

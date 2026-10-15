@@ -2,6 +2,7 @@ import { quotePath } from './html';
 
 /** 线条图标，24×24 网格，描边由样式统一设置。 */
 export const ICONS = {
+  slips: '<rect x="4" y="4" width="4.4" height="16" rx="1.2"/><rect x="9.8" y="4" width="4.4" height="10.5" rx="1.2"/><rect x="15.6" y="4" width="4.4" height="13" rx="1.2"/>',
   panel: '<rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9.5 5v14"/>',
   search: '<circle cx="10.8" cy="10.8" r="6.3"/><path d="m20 20-4.7-4.7"/>',
   book: '<path d="M12 6.8C10.3 5.4 7.8 4.9 3.8 5.1v12.6c4-.2 6.5.3 8.2 1.7 1.7-1.4 4.2-1.9 8.2-1.7V5.1c-4-.2-6.5.3-8.2 1.7Z"/><path d="M12 6.8v12.6"/>',

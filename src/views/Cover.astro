@@ -5,7 +5,7 @@ import Icon from '../components/Icon.astro';
 import Side from '../components/Side.astro';
 import Shell from '../layouts/Shell.astro';
 import type { Corpus } from '../lib/corpus';
-import { chapterUrl, REPO_URL, studyUrl, witnessUrl } from '../lib/url';
+import { chapterUrl, lensUrl, openUrl, REPO_URL, studyUrl } from '../lib/url';
 
 interface Props {
   corpus: Corpus;
@@ -29,8 +29,9 @@ const stats = [
     <h1>{c.title}</h1>
     <p class="sub">{c.intro}</p>
     <div class="actions">
-      <a class="btn pri" href={witnessUrl(c, c.witnesses[0])}>开始阅读</a>
+      <a class="btn pri" href={openUrl(c, c.witnesses[0])}>开始阅读</a>
       {c.alignment && <a class="btn" href={chapterUrl(c, 1)}>章节对读</a>}
+      {c.readable.length > 0 && <a class="btn" href={lensUrl(c)}>透视</a>}
     </div>
     <div class="stats">{stats.join(' · ')}</div>
   </div>
@@ -47,7 +48,7 @@ const stats = [
           ) : (
             <div class="rows">
               {cat.groups.map((g) => (
-                <a class="row" href={witnessUrl(c, g.first)}>
+                <a class="row" href={openUrl(c, g.first)}>
                   <span class="bd">
                     <span class="t">{g.name}</span>
                     <span class="m">{g.witnesses.reduce((n, w) => n + w.units.length, 0)} 条释文</span>
