@@ -8,7 +8,7 @@ import Shell from '../layouts/Shell.astro';
 import { lineHtml } from '../lib/alignment';
 import type { Corpus, Witness } from '../lib/corpus';
 import { UNIT_NOUN } from '../lib/text';
-import { fullUrl, thumbUrl } from '../lib/thumbs';
+import { fullUrl, READER_WIDTH, thumbUrl } from '../lib/thumbs';
 import { chapterUrl, coverUrl, url, witnessUrl } from '../lib/url';
 
 interface Props {
@@ -63,7 +63,7 @@ const plateOf = (no: string) => {
           <p set:html={lineHtml(l, al.glyphs, (n) => chapterUrl(c, n))} />
           {plateOf(l.no).map((p) => (
             <a class="plate" href={fullUrl(p.file)} target="_blank" rel="noopener">
-              <img loading="lazy" src={thumbUrl(c.id, p.file)} alt={`${unit} ${l.no}图版`} />
+              <img loading="lazy" src={thumbUrl(c.id, p.file, READER_WIDTH)} alt={`${unit} ${l.no}图版`} />
             </a>
           ))}
         </div>

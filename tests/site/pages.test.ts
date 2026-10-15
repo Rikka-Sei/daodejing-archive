@@ -445,7 +445,7 @@ describe('阅读器', () => {
   it('单简图版挂在对应的简下', async () => {
     const page = await reader();
     expect(page).toContain('<a class="plate" href="https://raw.githubusercontent.com/Rikka-Sei/daodejing-archive/main/data/images/a1.jpg"');
-    expect(page).toContain('<img loading="lazy" src="/x/thumbs/a1.jpg" alt="简 1图版">');
+    expect(page).toContain('<img loading="lazy" src="/x/thumbs/a1@960.jpg" alt="简 1图版">');
     expect(count(page, 'class="plate"')).toBe(1);
   });
 

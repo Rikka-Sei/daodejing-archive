@@ -9,8 +9,8 @@
   --tint:light-dark(#f8f1ec,#35302c);--tint2:light-dark(#f6e3d9,#4a3429);--ac-tx:light-dark(#b0502f,#f0a98c);
   --shadow:0 1px 2px light-dark(rgba(0,0,0,.05),transparent);--ring:rgba(76,132,236,.55);
   --lift:0 4px 24px light-dark(rgba(0,0,0,.10),rgba(0,0,0,.5)),0 0 0 .5px light-dark(rgba(0,0,0,.03),rgba(255,255,255,.04));
-  --sans:"DG Sans","DG Ext",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","WenQuanYi Zen Hei Mono",sans-serif;
-  --serif:"DG Serif","DG Ext","Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","Source Han Serif SC","SimSun","WenQuanYi Zen Hei Mono",serif}
+  --sans:"DG Sans","DG Ext",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","WenQuanYi Zen Hei Mono","HanaMinB","Hanazono Mincho B","BabelStone Han","PingFang HK",sans-serif;
+  --serif:"DG Serif","DG Ext","Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","Source Han Serif SC","SimSun","WenQuanYi Zen Hei Mono","HanaMinB","Hanazono Mincho B","BabelStone Han","Songti TC",serif}
 html[data-theme=light]{color-scheme:light}
 html[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box}
@@ -292,8 +292,8 @@ html[data-rsize=l] .rd{--rf:27px}
 .rl p{margin:0;height:100%;font:var(--rf)/1.9 var(--serif);letter-spacing:.02em}
 .rd .no{display:block;margin-left:10px;font:13px/1.7 var(--sans);color:var(--tx3)}
 .rd .n{text-combine-upright:digits 3}
-.rd .plate{display:block;margin-right:10px}
-.rd .plate img{width:auto;max-width:none;height:70%;max-height:none}
+.rd .plate{display:block;height:100%;margin-right:10px}
+.rd .plate img{display:block;width:auto;max-width:none;height:100%;max-height:none;object-fit:contain}
 .rd .c{border-radius:4px;cursor:pointer}
 .rd .c:hover{background:var(--hover)}
 .rd .c.sel,.rd ::selection{background:var(--tint2)}

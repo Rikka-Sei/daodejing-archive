@@ -19,7 +19,7 @@ export const FILES: FontFile[] = (manifest as { files: FontFile[] }).files;
 /** CSS 里的字体族名 */
 export const FAMILY = { sans: 'DG Sans', serif: 'DG Serif', ext: 'DG Ext' } as const;
 /** 补充字体负责的码位：私用区（造字）与 U+20000 以后的生僻字 */
-const RANGE: Partial<Record<FontFile['family'], string>> = { ext: 'U+E000-F8FF,U+20000-2FFFF' };
+const RANGE: Partial<Record<FontFile['family'], string>> = { ext: 'U+E000-F8FF,U+20000-3FFFF' };
 /** 每页都用到的两个字重，提前加载 */
 const PRELOAD: [FontFile['family'], number][] = [
   ['sans', 400],

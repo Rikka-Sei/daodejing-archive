@@ -10,6 +10,8 @@ import { REPO_RAW, url } from './url';
 export const WIDTH = 360;
 /** 封面卡片的缩略图宽度，高分屏下仍然清楚 */
 export const COVER_WIDTH = 720;
+/** 阅读器里单简图版的宽度：图撑满一简的高度，要够大才不发虚 */
+export const READER_WIDTH = 960;
 
 export function fullUrl(rel: string): string {
   return REPO_RAW + quotePath(rel);
@@ -43,11 +45,16 @@ export interface ThumbJob {
   width: number;
 }
 
-/** 一部典籍需要的全部缩略图：每张影像一张默认宽度的，每部文献的封面图再加一张封面宽度的。 */
+/** 一部典籍需要的全部缩略图：每张影像一张默认宽度的，每部文献的封面图再加一张封面宽度的，阅读器用的单简图版再加一张大的。 */
 export function thumbJobs(c: Corpus): ThumbJob[] {
   const jobs = new Map<string, ThumbJob>();
   const add = (rel: string, width: number) => jobs.set(thumbName(rel, width), { name: thumbName(rel, width), rel, width });
-  for (const w of c.witnesses) for (const p of w.plates) add(p.file, WIDTH);
+  for (const w of c.witnesses) {
+    for (const p of w.plates) {
+      add(p.file, WIDTH);
+      if (p.kind === 'slip-plate' && c.readable.includes(w)) add(p.file, READER_WIDTH);
+    }
+  }
   for (const g of c.groups) {
     const cover = g.coverPlate();
     if (cover) add(cover.file, COVER_WIDTH);

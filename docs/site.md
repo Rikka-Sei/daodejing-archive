@@ -81,7 +81,7 @@ npm run build && npm run fonts    # 统计 dist/ 里的用字，重新裁出子�
 
 来源字体按 URL 和 SHA-256 固定：首次运行会下载（两个字体共约 43 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：取定字重，保留竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
 
-对读表和实录里有 Unicode 没有收的造字（用私用区码位）和扩展 B 区以后的生僻字，用 tt24h 随源码发布的补充字体 DaoDeJingExt（`dg-ext-400.woff2`，约 144 KB，SIL OFL 1.1）显示。它整个收录、不裁剪；页面用 `unicode-range: U+E000-F8FF, U+20000-2FFFF` 声明它，页面上出现这些字才下载，也不预加载。字体文件和授权文本随源码存在 `data/raw/tt24h-daodejing/`，已登记在 `data/sources/tt24h-daodejing.yaml`；`npm run fonts` 从那里读入，并按脚本里固定的 SHA-256 校验，通过才转成 WOFF2。
+对读表和实录里有 Unicode 没有收的造字（用私用区码位）和扩展 B 区到扩展 H 区的生僻字，用 tt24h 随源码发布的补充字体 DaoDeJingExt（`dg-ext-400.woff2`，约 144 KB，SIL OFL 1.1）显示。它整个收录、不裁剪；页面用 `unicode-range: U+E000-F8FF, U+20000-3FFFF` 声明它，页面上出现这些字才下载，也不预加载。字体文件和授权文本随源码存在 `data/raw/tt24h-daodejing/`，已登记在 `data/sources/tt24h-daodejing.yaml`；`npm run fonts` 从那里读入，并按脚本里固定的 SHA-256 校验，通过才转成 WOFF2。
 
 ## 构建后检查
 

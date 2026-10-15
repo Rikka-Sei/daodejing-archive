@@ -24,7 +24,7 @@ describe('字体引用', () => {
     const ext: FontFile = { file: 'x-400.woff2', family: 'ext', weight: 400 };
     const css = facesCss([...FAKE, ext]);
     expect(css).toContain(
-      'font-family:"DG Ext";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/x-400.woff2) format("woff2");unicode-range:U+E000-F8FF,U+20000-2FFFF',
+      'font-family:"DG Ext";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/x-400.woff2) format("woff2");unicode-range:U+E000-F8FF,U+20000-3FFFF',
     );
     expect(css.match(/unicode-range/g)).toHaveLength(1);
     expect(preloadHrefs([...FAKE, ext])).toEqual(['/fonts/s-400.woff2', '/fonts/f-400.woff2']); // 不提前加载

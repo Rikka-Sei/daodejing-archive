@@ -18,4 +18,9 @@ describe('样式', () => {
     expect(rule('#side')).not.toContain('scrollbar-gutter');
     expect(css).toContain('#side::-webkit-scrollbar{display:none}');
   });
+
+  it('阅读器里的单简图版撑满一简的高度', () => {
+    expect(rule('.rd .plate')).toContain('height:100%');
+    expect(rule('.rd .plate img')).toContain('height:100%');
+  });
 });

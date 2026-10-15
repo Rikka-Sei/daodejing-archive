@@ -42,6 +42,12 @@ describe('需要哪些缩略图', () => {
       { name: 'b1@720.jpg', rel: 'data/images/b1.jpg', width: 720 },
     ]);
   });
+
+  it('有阅读器的本，单简图版再加一张阅读器用的大图；整页图版和没有阅读器的本不加', () => {
+    const c = fixtureCorpus(tmp.dir, 'x', {}, true, true);
+    const big = thumbJobs(c).filter((j) => j.width === 960).map((j) => j.name);
+    expect(big).toEqual(['a1@960.jpg']); // w-a 有逐行释文，它的单简图版
+  });
 });
 
 describe('生成缩略图', () => {
