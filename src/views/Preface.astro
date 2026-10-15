@@ -1,0 +1,23 @@
+---
+// 凡例：本站收录与呈现的体例，按数据生成。
+import Side from '../components/Side.astro';
+import Shell from '../layouts/Shell.astro';
+import type { Corpus } from '../lib/corpus';
+import { prefaceItems } from '../lib/preface';
+import { coverUrl } from '../lib/url';
+
+interface Props {
+  corpus: Corpus;
+  corpora: Corpus[];
+}
+const { corpus: c, corpora } = Astro.props;
+---
+
+<Shell title={`凡例 · ${c.title}`} desc={`${c.title}的凡例：收录与呈现的体例`} tools="theme">
+  <Side slot="side" corpus={c} corpora={corpora} onPreface />
+  <Fragment slot="crumb">
+    <a href={coverUrl(c)}>{c.title}</a><span class="sep">›</span><b>凡例</b>
+  </Fragment>
+  <h1>凡例</h1>
+  <ol class="preface">{prefaceItems(c).map((t) => <li>{t}</li>)}</ol>
+</Shell>

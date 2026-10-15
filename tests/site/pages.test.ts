@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Corpus } from '../../src/lib/corpus';
 import Chapter from '../../src/views/Chapter.astro';
 import Cover from '../../src/views/Cover.astro';
+import Preface from '../../src/views/Preface.astro';
 import Reader from '../../src/views/Reader.astro';
 import Study from '../../src/views/Study.astro';
 import Volume from '../../src/views/Volume.astro';
@@ -25,6 +26,7 @@ beforeAll(() => {
 });
 
 const cover = (c = a, cs = corpora) => render(Cover, { props: { corpus: c, corpora: cs } });
+const preface = (c = a, cs = corpora) => render(Preface, { props: { corpus: c, corpora: cs } });
 const volume = (i: number, cs = corpora) => render(Volume, { props: { corpus: cs[0], wit: cs[0].witnesses[i], corpora: cs } });
 const xVolume = (id: string) => render(Volume, { props: { corpus: x, wit: x.witness(id)!, corpora: [x] } });
 const chapter = (n: number) => render(Chapter, { props: { corpus: x, corpora: [x], n } });
@@ -32,12 +34,12 @@ const reader = (id = 'w-a') => render(Reader, { props: { corpus: x, wit: x.witne
 const study = () => render(Study, { props: { corpus: x, corpora: [x], source: x.studies[0] } });
 
 describe('封面', () => {
-  it('书名、开始阅读、凡例；没有对读表的典籍只有一个按钮', async () => {
+  it('书名与开始阅读；没有对读表的典籍只有一个按钮', async () => {
     const page = await cover();
     expect(page).toContain('<h1>典籍甲</h1>');
     expect(page).toContain('<div class="eyebrow">甲乙</div>');
     expect(page).toContain('<div class="actions"><a class="btn pri" href="/a/w-a/">开始阅读</a></div>');
-    expect(page).toContain('id="preface"');
+    expect(page).not.toContain('id="preface"'); // 凡例是单独一页
     expect(page).not.toContain('class="axis"');
   });
 
@@ -62,8 +64,13 @@ describe('封面', () => {
     expect(page).toContain('3 个版本 · 6 条释文 · 3 张影像');
   });
 
-  it('凡例按数据生成', async () => {
-    const page = await cover();
+  it('凡例按数据生成，是单独一页；侧栏里“凡例”选中，“封面”不选中', async () => {
+    const page = await preface();
+    expect(page).toContain('<h1>凡例</h1>');
+    expect(page).toContain('<title>凡例 · 典籍甲</title>');
+    expect(page).toContain('<a class="item on" href="/a/preface/">');
+    expect(page).toContain('<a class="item" href="/a/">');
+    expect((await cover()).toString()).toContain('<a class="item" href="/a/preface/">');
     expect(page).toContain('释文照录来源，不改字'); // 没给 preface：用通用体例
     expect(page).toContain('只核对过一个来源'); // 全部 unverified，按数据补
     expect(page).toContain('SHA-256');
@@ -185,7 +192,8 @@ describe('侧栏', () => {
     expect(page).toContain('<span class="t">上篇</span><span class="rng">1–1 章</span>');
     expect(page).toContain('<span class="t">下篇</span><span class="rng">2–2 章</span>');
     expect(page).toContain('<a class="item ch" href="/x/chapters/1/" data-n="1" data-t="甲乙丙">');
-    expect(page).toContain('圆点依次是甲组、乙组，实心表示有这一章。'); // 传世本、校订本不在圆点里
+    expect(page).not.toContain('圆点依次是'); // 圆点的含义悬停看，不在栏里写说明
+    expect(page).not.toContain('依王弼本分章');
     expect(page).toContain('<span class="dots" title="甲组 有；乙组 有"><i class="on"></i><i class="on"></i></span>');
     expect(page).toContain('<span class="dots" title="甲组 有；乙组 无"><i class="on"></i><i></i></span>'); // 第 2 章没有 w-b
   });

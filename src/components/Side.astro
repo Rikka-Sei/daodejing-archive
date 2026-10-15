@@ -1,10 +1,10 @@
 ---
 // 侧栏：书名、“材料｜章节”两条轴、检索框。
 // 材料轴：封面、凡例，再按分类列文献（一手的出土文献、拓本、传世本与校订本、论文与对照资料）。
-// 章节轴：依王弼本分章的八十一章，每章后面的圆点表示各出土本有没有这一章。
+// 章节轴：依王弼本分章的八十一章，每章后面的圆点表示各出土本有没有这一章（悬停看各本）。
 import { chapterTitle, showText } from '../lib/alignment';
 import type { Corpus } from '../lib/corpus';
-import { chapterUrl, coverUrl, REPO_URL, studyUrl, url } from '../lib/url';
+import { chapterUrl, coverUrl, prefaceUrl, REPO_URL, studyUrl, url } from '../lib/url';
 import CorpusLinks from './CorpusLinks.astro';
 import Icon from './Icon.astro';
 import SearchBox from './SearchBox.astro';
@@ -21,9 +21,10 @@ interface Props {
   chapter?: number;
   study?: string;
   onCover?: boolean;
+  onPreface?: boolean;
   placeholder?: string;
 }
-const { corpus: c, corpora, axis = 'm', current = '', chapter = 0, study = '', onCover = false, placeholder = '筛选目录' } = Astro.props;
+const { corpus: c, corpora, axis = 'm', current = '', chapter = 0, study = '', onCover = false, onPreface = false, placeholder = '筛选目录' } = Astro.props;
 const cover = coverUrl(c);
 const al = c.alignment;
 
@@ -60,7 +61,7 @@ const parts = (c.chapterParts.length ? c.chapterParts : [{ title: '', to: chapte
 <div class="pane" data-pane="m">
   <nav class="sb-nav">
     <SideItem href={cover} label="封面" icon="book" on={onCover} />
-    <SideItem href={`${onCover ? '' : cover}#preface`} label="凡例" icon="list" />
+    <SideItem href={prefaceUrl(c)} label="凡例" icon="list" on={onPreface} />
   </nav>
   <CorpusLinks corpus={c} corpora={corpora} />
   {
@@ -90,12 +91,6 @@ const parts = (c.chapterParts.length ? c.chapterParts : [{ title: '', to: chapte
 {
   al && (
     <div class="pane" data-pane="c">
-      <div class="sb-label">
-        依王弼本分章
-      </div>
-      <p class="sb-hint" title={dotsOf.map((v) => v.short).join('、')}>
-        圆点依次是{dotsOf.map((v) => v.short).join('、')}，实心表示有这一章。
-      </p>
       <div class="tree">
         {parts.map((part) => (
           <details class="dir" data-g={`part-${part.from}`} open>

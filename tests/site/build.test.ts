@@ -51,7 +51,7 @@ describe.each(cases)('$name', ({ dir, base, flags }) => {
 
   it('页面、下载文件与固定字体都在', () => {
     const al = c.alignment!;
-    const files = ['index.html', 'llms.txt', 'llms-full.txt', 'laozi/index.html', 'laozi/alignment.json'];
+    const files = ['index.html', 'llms.txt', 'llms-full.txt', 'laozi/index.html', 'laozi/preface/index.html', 'laozi/alignment.json'];
     for (const w of c.witnesses) files.push(`laozi/${w.id}/index.html`, `laozi/${w.id}.txt`, `laozi/${w.id}.jsonl`);
     for (const w of c.readable) files.push(`laozi/${w.id}/read/index.html`);
     for (const g of c.groups.filter((x) => !x.single)) files.push(`laozi/${g.id}-all.txt`, `laozi/${g.id}-all.jsonl`);

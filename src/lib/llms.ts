@@ -27,7 +27,8 @@ export function llmsTxt(corpora: Corpus[], base = ''): { short: string; full: st
       lines.push(`- [${wit.meta.name}](${link(`${c.id}/${wit.id}.txt`)}): ${n}${UNIT_WORD[wit.units[0].unit_type]}。${colophon(wit.meta)}`);
       full.push(witnessTxt(c, wit, 3));
     }
-    lines.push('', `- [${c.title}（网页）](${link(`${c.id}/`)}): 封面、凡例、目录，每本一页，释文可横排或竖排`);
+    lines.push('', `- [${c.title}（网页）](${link(`${c.id}/`)}): 封面、目录，每本一页，释文可横排或竖排`);
+    lines.push(`- [凡例](${link(`${c.id}/preface/`)}): 收录与呈现的体例`);
     if (c.alignment) {
       const n = c.alignment.chapters.length;
       lines.push(

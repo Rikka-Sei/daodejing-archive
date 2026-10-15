@@ -1,0 +1,12 @@
+---
+// 一部典籍的凡例。
+import { allCorpora, corpusById } from '../../lib/site';
+import Preface from '../../views/Preface.astro';
+
+export function getStaticPaths() {
+  return allCorpora().map((c) => ({ params: { corpus: c.id } }));
+}
+const corpus = corpusById(Astro.params.corpus!);
+---
+
+<Preface corpus={corpus} corpora={allCorpora()} />

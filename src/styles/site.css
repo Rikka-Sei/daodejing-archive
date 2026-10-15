@@ -24,7 +24,8 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 
 /* 外壳：侧栏 288px，主栏 */
 #app{display:flex;min-height:100vh}
-#side{flex:none;width:288px;height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 8px;background:var(--side);border-right:.5px solid var(--bd)}
+#side{flex:none;width:288px;height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column;padding:0 8px;background:var(--side);border-right:.5px solid var(--bd);scrollbar-width:thin;scrollbar-gutter:stable both-edges}
+#side>*{flex:none}
 .sb-top{display:flex;align-items:center;gap:4px;height:40px;margin-top:0;flex:none}
 .ibtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--tx2)}
 .ibtn:hover{background:var(--hover)}
@@ -213,7 +214,6 @@ html[data-layout=v] .plate img{width:auto;max-width:none;height:62%;max-height:n
 .axis button[aria-pressed=true]{background:var(--on);color:var(--tx);box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.08)}
 #side[data-axis=m] .pane[data-pane=c],#side[data-axis=c] .pane[data-pane=m]{display:none}
 .sb-label .note{margin-left:6px;font-size:12px}
-.sb-hint{margin:0 0 6px;padding:0 6px;font-size:12px;line-height:18px;color:var(--tx3)}
 details.dir .rng{margin-left:auto;margin-right:4px;font-size:12px;color:var(--tx3)}
 .item.ch{gap:8px}
 .kids .item.ch{padding-left:30px}
@@ -246,7 +246,7 @@ html[data-layout=v] .cmp{display:block;width:22px;height:auto;margin-right:8px;p
 .alw{margin:14px 0;overflow-x:auto}
 table.al{border-collapse:separate;border-spacing:0;table-layout:fixed;width:calc(52px + var(--n)*32px)}
 table.al th{position:sticky;left:0;z-index:1;width:52px;padding:0;background:var(--bg);text-align:left;font:400 13px/36px var(--sans);color:var(--tx3);white-space:nowrap}
-table.al td{position:relative;width:32px;height:36px;padding:0;text-align:center}
+table.al td{position:relative;isolation:isolate;width:32px;height:36px;padding:0;text-align:center}
 table.al tr+tr>*{border-top:.5px solid var(--bd)}
 table.al p{margin:0;font:18px/35px var(--serif);white-space:nowrap}
 table.al tr.sh>*{height:26px}
@@ -267,7 +267,7 @@ table.al td.f-bu p{font-style:italic;color:var(--tx3)}
 table.al sup.r{position:absolute;top:2px;right:2px;font:10px/10px var(--sans);color:var(--tx3)}
 table.al i.p{position:absolute;right:3px;bottom:3px;font:normal 11px/11px var(--serif);color:var(--tx3)}
 table.al td.nb:before{content:"";position:absolute;left:5px;right:5px;bottom:2px;border-bottom:1.5px dotted var(--ac)}
-table.al td.hl:after,table.al td.pin:after{content:"";position:absolute;inset:0;background:var(--hover);opacity:.7;pointer-events:none}
+table.al td.hl:after,table.al td.pin:after{content:"";position:absolute;inset:0;z-index:-1;background:var(--hover);opacity:.7;pointer-events:none}
 table.al td.pin:after{background:var(--sel);opacity:1}
 .where,.notes{margin-top:28px}
 .where h2,.notes h2{margin:0 0 8px;font:500 15px/24px var(--serif)}

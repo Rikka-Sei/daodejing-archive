@@ -130,7 +130,6 @@ function sideSearch(){
     while(t&&!t.classList.contains('tree'))t=t.nextElementSibling;
     var on=!s||!t||qsa('.item:not(summary)',t).some(shown);
     l.hidden=!on;
-    var h=l.nextElementSibling;if(h&&h.classList.contains('sb-hint'))h.hidden=!on;
   });
   var n=qsa('.item:not(summary)',pane).filter(shown).length;
   hits.textContent=s?(n?'找到 '+n+' 项':'没有找到'):'';

@@ -20,6 +20,7 @@ export const witnessUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}
 export const readerUrl = (c: { id: string }, w: { id: string }) => url(`${c.id}/${w.id}/read/`);
 export const chapterUrl = (c: { id: string }, n: number) => url(`${c.id}/chapters/${n}/`);
 export const studyUrl = (c: { id: string }, s: { id: string }) => url(`${c.id}/study/${s.id}/`);
+export const prefaceUrl = (c: { id: string }) => url(`${c.id}/preface/`);
 
 /**
  * 站点地址：http 升成 https。Pages 总是提供 https，但自定义域名前面有 CDN（如 Cloudflare）时，

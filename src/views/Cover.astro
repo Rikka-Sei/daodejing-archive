@@ -1,11 +1,10 @@
 ---
-// 封面：标题、按材料分类的文献卡片、论文与对照资料、凡例。
+// 封面：标题、按材料分类的文献卡片、论文与对照资料。凡例是单独一页。
 import DocCard from '../components/DocCard.astro';
 import Icon from '../components/Icon.astro';
 import Side from '../components/Side.astro';
 import Shell from '../layouts/Shell.astro';
 import type { Corpus } from '../lib/corpus';
-import { prefaceItems } from '../lib/preface';
 import { chapterUrl, REPO_URL, studyUrl, witnessUrl } from '../lib/url';
 
 interface Props {
@@ -80,9 +79,5 @@ const stats = [
       </section>
     )
   }
-  <section id="preface" class="sec">
-    <h2>凡例</h2>
-    <ol class="preface">{prefaceItems(c).map((t) => <li>{t}</li>)}</ol>
-  </section>
   <div class="foot"><a href={REPO_URL}>原始数据在 GitHub</a></div>
 </Shell>
