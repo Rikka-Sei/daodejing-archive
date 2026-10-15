@@ -18,8 +18,9 @@ from strokes import (
     shu_duan,
     shu_qie,
     shu_tail,
-    shu_wan_gou,
+    shu_wan_gou_r,
     shu_zhe,
+    ti,
 )
 
 Strokes = list[tuple[str, str]]  # (笔画名, SVG 路径)
@@ -46,33 +47,34 @@ def plain_shu(xl: float, y0: float, y1: float, w: float = W_V + 3) -> str:
 
 
 def mu(x0: float, x1: float, yt: float, yb: float) -> Strokes:
-    """木：x0..x1 横的起讫（含顿角），yt 竖头尖，yb 竖脚底。"""
-    h = yb - yt
-    yc = yt + 0.272 * h
-    cx = (x0 + x1) / 2 - 3
-    s = h / 917
+    """扁的木（在字底）：横长，撇捺从横下分出、向两边舒展。x0..x1 横的起讫（含顿角），yt 竖头尖，yb 竖脚底。
+    落点与曲线比例是对思源宋体 臬 的字底逐笔拟合的。"""
+    b = Box((52, 537, 950, 959), (x0, yt, x1, yb))
+    k = max(0.6, min(1.0, ((b.kx + b.ky) / 2) ** 0.5))
     return [
-        ('mu-heng', heng(x0, x1, yc)),
-        ('mu-shu', shu(cx - W_V / 2, yt, yb)),
+        ('mu-heng', heng(x0, x1, b.y(650))),
+        ('mu-shu', shu(b.x(466), yt, yb)),
         (
             'mu-pie',
-            pie(cx - 6, yc - 4, x0 + 7, yt + 811 * s, head=90, tip=21, plain=True,
-                right=(0.29, 0.22, 0.25, 0.50), left=(0.28, 0.17, 0.40, 0.41)),
+            pie(b.x(449.5), b.y(632), b.x(72), b.y(919.5), head=99.5 * k, tip=61 * k, plain=True, k=k,
+                right=(0.29, 0.225, 0.25, 0.50), left=(0.36, 0.25, 0.50, 0.41)),
         ),
-        ('mu-na', na(cx + 5, yc - 12, x1 + 12, yt + 729 * s, upper=(0.23, 0.38, 0.54, 0.80), lower=(0.32, 0.12, 0.77, 0.57))),
+        (
+            'mu-na',
+            na(b.x(525), b.y(628), b.x(974.5), b.y(868), upper=(0.145, 0.38, 0.40, 0.66), lower=(0.34, 0.11, 0.79, 0.53), foot=(-64, 59), k=k),
+        ),
     ]
 
 
 def wang(x0: float, x1: float, yt: float, yb: float) -> Strokes:
-    """王：三横一竖。yt 顶横的上缘，yb 底横的下缘；x0..x1 是底横起讫（含顿角）。"""
-    h = yb - yt
-    sx = (x1 - x0) / 906
-    cx = (x0 + x1) / 2 - 4
+    """左旁的王：两横一竖，末笔是向右上挑的提。x0..x1 是提的起讫，yt 顶横的上缘，yb 提的最低处。
+    比例是对思源宋体 珅 的左旁逐笔拟合的。"""
+    b = Box((29, 153, 396, 849), (x0, yt, x1, yb))
     return [
-        ('wang-heng1', heng(x0 + 44 * sx, x0 + 858 * sx, yt + 15)),
-        ('wang-heng2', heng(x0 + 87 * sx, x0 + 822 * sx, yt + 0.469 * h + 0.531 * 15)),
-        ('wang-shu', plain_shu(cx - 34, yt + 15, yb - 15)),
-        ('wang-heng3', heng(x0, x1, yb - 14)),
+        ('wang-heng1', heng(b.x(42), b.x(396), b.y(168))),
+        ('wang-heng2', heng(b.x(52), b.x(389), b.y(444))),
+        ('wang-shu', plain_shu(b.x(170), b.y(153), b.y(734), w=65)),
+        ('wang-ti', ti(b.x(29), b.y(767), b.x(381), b.y(657))),
     ]
 
 
@@ -93,48 +95,77 @@ def bai(x0: float, xr: float, yh: float, yb: float, *, inner: int = 1) -> Stroke
     """白：丿加一个框，框里有 inner 道内横（白 1 道，自 2 道）。x0 左竖左缘，xr 右竖右缘，yh 左竖切口顶，yb 竖脚底。"""
     s = (yb - yh) / 753
     w = xr - x0
+    k = max(0.6, min(1.0, s**0.5))  # 压扁的白，丿要比正文里的细小、短（臬 的字头）
     top, bottom = yh + 50, yb - 99 * min(1.0, 0.4 + 0.6 * s)
-    fr = [0.489] if inner == 1 else [i / (inner + 1) for i in range(1, inner + 1)]
+    fr = {1: [0.489], 2: [0.36, 0.64]}.get(inner) or [i / (inner + 1) for i in range(1, inner + 1)]
     bars = [top + (bottom - top) * f for f in fr] + [bottom]
     return [
         *kou_frame(x0, xr, yh, yb, bars),
         (
             'bai-pie',
-            pie(x0 + 0.416 * w, yh - 156 * s, x0 + 0.348 * w, yh + 47 * s, head=115, tip=6,
+            pie(x0 + 0.416 * w, yh - 156 * s**1.8, x0 + 0.348 * w, yh + 47 * s, head=115 * k, tip=6 * k, k=k,
+                right=(0.08, -0.04, 0.32, 0.64), left=(0.18, 0.24, 0.62, 0.50)),
+        ),
+    ]
+
+
+def dui(x0: float, xu: float, xl: float, yh: float, yb: float) -> Strokes:
+    """𠂤：丿下一道左竖，右边上下两个框（㠯），两个横折分开写，下框比上框宽。
+    x0 左竖左缘，xu、xl 上框、下框右竖的右缘，yh 左竖切口顶，yb 左竖脚底。
+    上下框的比例取自思源宋体 官 追 師 里的 㠯。"""
+    top = yh + 35
+    h = yb - top
+    ub, lt, bot = top + 0.34 * h, top + 0.575 * h, top + 0.875 * h
+    k = 0.85
+    return [
+        ('dui-left', shu_qie(x0, yh, yb)),
+        ('dui-up', shu_zhe(xu, top, top + 0.44 * h)),
+        ('dui-up-top', heng(x0 + 40, xu - 20, top + 15, dun=False)),
+        ('dui-up-bottom', heng(x0 + 40, xu - 40, ub, dun=False)),
+        ('dui-low', shu_zhe(xl, lt - 15, yb - 3)),
+        ('dui-low-top', heng(x0 + 40, xl - 20, lt, dun=False)),
+        ('dui-low-bottom', heng(x0 + 40, xl - 40, bot, dun=False)),
+        (
+            'dui-pie',
+            pie(x0 + 0.43 * (xu - x0), yh - 145, x0 + 0.36 * (xu - x0), yh + 40, head=112 * k, tip=6, k=k,
                 right=(0.08, -0.04, 0.32, 0.64), left=(0.18, 0.24, 0.62, 0.50)),
         ),
     ]
 
 
 def cong(x0: float, x1: float, yt: float, yb: float) -> Strokes:
-    """从：两个人并立，左人捺短，右人捺长。(x0, x1) 是笔画最左、最右的落点，yt 撇头顶，yb 撇尖底。"""
-    b = Box((36, 66, 976, 957), (x0, yt, x1, yb))
+    """扁的从（在字头或框里）：两个人并立，撇比正文里的从斜，左人的捺缩成一点，右人的捺短而有脚。
+    (x0, x1) 是笔画最左、最右的落点，yt 撇头顶，yb 撇尖底。
+    落点与曲线比例是对思源宋体 怂 的字头逐笔拟合的；缩小后笔画按缩小比例的平方根减轻，不随之细成线。"""
+    b = Box((36, 37, 954, 645), (x0, yt, x1, yb))
+    k = max(0.6, min(1.0, ((b.kx + b.ky) / 2) ** 0.5))
     return [
         (
             'cong-pie1',
-            pie(b.x(277), b.y(66), b.x(64), b.y(944.5), head=68 * b.kx * 0.8, tip=46 * b.kx * 0.6,
-                right=(0.02, 0.46, 0.10, 0.66), left=(0.50, 0.22, 0.70, 0.14)),
+            pie(b.x(271), b.y(37), b.x(47), b.y(645), head=85 * k, tip=20 * k, k=1.17 * k,
+                right=(0.10, 0.29, 0.10, 0.67), left=(0.38, 0.22, 0.68, 0.12)),
         ),
-        ('cong-na1', na_duan(b.x(309), b.y(443), b.x(475), b.y(731), upper=(0.43, 0.25, 0.81, 0.59), lower=(-0.32, -0.06, -0.34, -0.50))),
+        ('cong-na1', na_duan(b.x(327), b.y(244), b.x(457), b.y(448), upper=(0.43, 0.25, 0.82, 0.39), lower=(-0.08, 0.02, -0.66, -0.50), w=18, k=0.96 * k)),
         (
             'cong-pie2',
-            pie(b.x(635), b.y(75.5), b.x(400.5), b.y(939.5), head=84 * b.kx * 0.8, tip=9.5 * b.kx,
-                right=(0.04, 0.50, 0.10, 0.66), left=(0.36, 0.26, 0.70, 0.10)),
+            pie(b.x(639), b.y(40), b.x(358), b.y(622), head=94 * k, tip=21.5 * k, k=0.62 * k,
+                right=(0.04, 0.48, 0.08, 0.66), left=(0.33, 0.26, 0.90, 0.10)),
         ),
         (
             'cong-na2',
-            na(b.x(662), b.y(128), b.x(968), b.y(899), upper=(0.09, 0.64, 0.51, 0.80), lower=(0.54, 0.12, 1.08, 0.62), foot=(-63, 65)),
+            na(b.x(675), b.y(140), b.x(951), b.y(561), upper=(0.09, 0.64, 0.60, 0.81), lower=(0.42, 0.12, 1.03, 0.62), foot=(-76, 49), k=k),
         ),
     ]
 
 
 def tun(x0: float, x1: float, yt: float, yb: float) -> Strokes:
-    """屯：x0..x1 是横的起讫，yt 竖头尖，yb 竖弯钩的底。"""
-    b = Box((46, 43, 954, 936), (x0, yt, x1, yb))
+    """右旁的屯：横下两短竖夹一横，中竖下来圆转成平横，末端竖直出细钩。
+    x0..x1 是横的起点到钩脚最右处，yt 中竖头尖，yb 平横的下缘。比例是对思源宋体 纯 的右旁逐笔拟合的。"""
+    b = Box((384, 45, 969, 940), (x0, yt, x1, yb))
     return [
-        ('tun-heng', heng(b.x(46), b.x(942), b.y(247))),
-        ('tun-zuo', shu_tail(b.x(160), b.y(324), b.y(654))),
-        ('tun-bar', heng(b.x(192), b.x(791), b.y(639.5), dun=False)),
-        ('tun-you', shu_duan(b.x(759), b.y(329), b.y(717), w=65)),
-        ('tun-shu', shu_wan_gou(b.x(455), b.y(43), b.y(936), b.x(948), b.y(689))),
+        ('tun-heng', heng(b.x(384), b.x(969), b.y(238))),
+        ('tun-zuo', shu_tail(b.x(420), b.y(317), b.y(653))),
+        ('tun-bar', heng(b.x(462), b.x(855), b.y(638), dun=False)),
+        ('tun-you', shu_duan(b.x(824), b.y(317), b.y(706), w=62)),
+        ('tun-shu', shu_wan_gou_r(b.x(620), b.y(45), b.y(940), b.x(965), b.y(730))),
     ]

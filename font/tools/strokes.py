@@ -77,14 +77,16 @@ def shu_qie(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
     )
 
 
-def _gou_foot(xl: float, xr: float, y1: float, gou: float = 78) -> list[str]:
-    """竖钩的脚：竖到底，向左出钩，钩尖朝上。"""
+def _gou_foot(xl: float, xr: float, y1: float) -> list[str]:
+    """竖钩的脚（冊 的横折钩）：竖到底向左下圆转，钩向左平平地拖出一截，钩尖朝左上。y1 是钩底。"""
     return [
-        f'L{pt(xr, y1 - 24)}',
-        f'Q{pt(xr, y1 - 4)} {pt(xr - 24, y1 - 2)}',
-        f'Q{pt(xl - gou * 0.35, y1)} {pt(xl - gou * 0.62, y1 - 36)}',
-        f'L{pt(xl - gou * 0.46, y1 - 34)}',
-        f'Q{pt(xl - 4, y1 - 38)} {pt(xl, y1 - 56)}',
+        f'L{pt(xr, y1 - 94)}',
+        f'C{pt(xr, y1 - 50)} {pt(xr - 30, y1 - 4)} {pt(xr - 94, y1)}',
+        f'C{pt(xr - 95, y1 - 15)} {pt(xr - 103, y1 - 41)} {pt(xr - 110, y1 - 48)}',
+        f'C{pt(xr - 119, y1 - 57)} {pt(xr - 152, y1 - 68)} {pt(xr - 178, y1 - 72)}',
+        f'L{pt(xr - 178, y1 - 88)}',
+        f'L{pt(xr - 85, y1 - 81)}',
+        f'Q{pt(xl, y1 - 81)} {pt(xl, y1 - 102)}',
     ]
 
 
@@ -128,12 +130,14 @@ def pie(
     plain: bool = False,
     right: Ctl | None = None,
     left: Ctl | None = None,
+    k: float = 1.0,
 ) -> str:
     """撇：(xa, ya) 是头部左上角，(xe, ye) 是收笔尖的中心。头部带斜切的顶，向下渐细，收笔平切。
-    plain=True 是接在别的笔画里的撇（如木），起笔是平的，宽 head。right、left 是右、左两条边的曲线比例。"""
+    plain=True 是接在别的笔画里的撇（如木），起笔是平的，宽 head。right、left 是右、左两条边的曲线比例。
+    k 是笔画的轻重系数：小部件里的撇要比正文里的细，头部的斜切随之缩小。"""
     a = (xa, ya)
-    b = (xa + head, ya) if plain else (xa + head, ya + 26)
-    r0 = b if plain else (xa + head * 0.67, ya + 47)
+    b = (xa + head, ya) if plain else (xa + head, ya + 26 * k)
+    r0 = b if plain else (xa + head * 0.67, ya + 47 * k)
     tr = (xe + tip / 2, ye)
     tl = (xe - tip / 2, ye)
     rc1, rc2 = _ctl(r0, tr, right or PIE_R)
@@ -141,7 +145,7 @@ def pie(
     return path(
         f'M{pt(*a)}',
         f'L{pt(*b)}',
-        *([] if plain else [f'Q{pt(b[0] - 5, ya + 47)} {pt(*r0)}']),
+        *([] if plain else [f'Q{pt(b[0] - 5 * k, ya + 47 * k)} {pt(*r0)}']),
         f'C{pt(*rc1)} {pt(*rc2)} {pt(*tr)}',
         f'L{pt(*tl)}',
         f'C{pt(*lc1)} {pt(*lc2)} {pt(*a)}',
@@ -157,21 +161,22 @@ def na(
     upper: Ctl | None = None,
     lower: Ctl | None = None,
     foot: tuple[float, float] = (-70, 65),
+    k: float = 1.0,
 ) -> str:
-    """捺：从 (xa, ya) 细笔起，渐粗，到 (xe, ye) 出尖，再向左下收出脚（foot 是脚相对尖的位移）。"""
-    s1 = (xa + 16, ya)
-    s2 = (xa - 6, ya + 7)
+    """捺：从 (xa, ya) 细笔起，渐粗，到 (xe, ye) 出尖，再向左下收出脚（foot 是脚相对尖的位移）。k 是笔画的轻重系数。"""
+    s1 = (xa + 16 * k, ya)
+    s2 = (xa - 6 * k, ya + 7 * k)
     tip = (xe, ye)
-    tip2 = (xe - 3, ye + 10)
-    ft = (xe + foot[0], ye + foot[1])
+    tip2 = (xe - 3 * k, ye + 10 * k)
+    ft = (xe + foot[0] * k, ye + foot[1] * k)
     uc1, uc2 = _ctl(s1, tip, upper or NA_U)
     lc1, lc2 = _ctl(ft, s2, lower or NA_L)
     return path(
         f'M{pt(*s1)}',
         f'C{pt(*uc1)} {pt(*uc2)} {pt(*tip)}',
         f'L{pt(*tip2)}',
-        f'Q{pt(tip2[0] - 22, tip2[1] + 2)} {pt(ft[0] + 15, ft[1] - 30)}',
-        f'Q{pt(ft[0] + 4, ft[1] - 20)} {pt(*ft)}',
+        f'Q{pt(tip2[0] - 22 * k, tip2[1] + 2 * k)} {pt(ft[0] + 15 * k, ft[1] - 30 * k)}',
+        f'Q{pt(ft[0] + 4 * k, ft[1] - 20 * k)} {pt(*ft)}',
         f'C{pt(*lc1)} {pt(*lc2)} {pt(*s2)}',
     )
 
@@ -185,51 +190,22 @@ def na_duan(
     upper: Ctl = (0.35, 0.25, 0.75, 0.55),
     lower: Ctl = (0.0, -0.3, 0.1, -0.7),
     w: float = 14,
+    k: float = 1.0,
 ) -> str:
-    """短捺（从 的左人：捺画短，到底圆收）。(xs, ys) 细笔起，(xe, ye) 是圆头的中心。"""
+    """短捺（从 的左人：捺画短，到底圆收）。(xs, ys) 细笔起，(xe, ye) 是圆头的中心。k 是笔画的轻重系数。"""
     s1 = (xs, ys)
-    s2 = (xs - w, ys + 7)
-    u = (xe + 16, ye - 38)
-    b = (xe - 31, ye + 6)
-    l0 = (xe - 51, ye - 11)
+    s2 = (xs - w * k, ys + 7 * k)
+    u = (xe + 16 * k, ye - 38 * k)
+    b = (xe - 31 * k, ye + 6 * k)
+    l0 = (xe - 51 * k, ye - 11 * k)
     uc1, uc2 = _ctl(s1, u, upper)
     lc1, lc2 = _ctl(l0, s2, lower)
     return path(
         f'M{pt(*s1)}',
         f'C{pt(*uc1)} {pt(*uc2)} {pt(*u)}',
-        f'C{pt(u[0] - 1, u[1] + 22)} {pt(xe + 8, ye + 4)} {pt(*b)}',
-        f'C{pt(b[0] - 12, b[1])} {pt(l0[0] + 2, l0[1] + 12)} {pt(*l0)}',
+        f'C{pt(u[0] - 1 * k, u[1] + 22 * k)} {pt(xe + 8 * k, ye + 4 * k)} {pt(*b)}',
+        f'C{pt(b[0] - 12 * k, b[1])} {pt(l0[0] + 2 * k, l0[1] + 12 * k)} {pt(*l0)}',
         f'C{pt(*lc1)} {pt(*lc2)} {pt(*s2)}',
-    )
-
-
-def shu_wan_gou(xl: float, y0: float, ybot: float, xhook: float, ytop_hook: float) -> str:
-    """竖弯钩（屯、乚）：竖到底转成向右的横，末端向上出钩。
-    xl 竖的左缘，y0 竖头尖，ybot 弯底的下缘，xhook 钩的右缘，ytop_hook 钩尖的高度。
-    横段的长度随 xl 到 xhook 的距离伸缩（参考宽 493），钩和转弯的形状不变。"""
-    xr = xl + W_V
-    u = min(1.4, (xhook - xl) / 493)
-    return path(
-        f'M{pt(xl, y0 - 1)}',
-        f'L{pt(xl + 103, y0 + 10)}',
-        f'Q{pt(xl + 102, y0 + 20)} {pt(xl + 94.5, y0 + 27)}',
-        f'Q{pt(xl + 87, y0 + 34)} {pt(xr, y0 + 37)}',
-        f'L{pt(xr, ybot - 101)}',
-        f'Q{pt(xr, ybot - 78)} {pt(xr + 25, ybot - 58)}',
-        f'Q{pt(xr + 67 * u, ybot - 58)} {pt(xr + 130 * u, ybot - 58)}',
-        f'L{pt(xhook - 230 * u, ybot - 58)}',
-        f'Q{pt(xhook - 120, ybot - 58)} {pt(xhook - 90, ybot - 62)}',
-        f'Q{pt(xhook - 73, ybot - 64)} {pt(xhook - 66, ybot - 76)}',
-        f'Q{pt(xhook - 55, ybot - 120)} {pt(xhook - 45, ytop_hook + 60)}',
-        f'Q{pt(xhook - 40, ytop_hook + 30)} {pt(xhook - 36, ytop_hook)}',
-        f'L{pt(xhook - 22, ytop_hook)}',
-        f'L{pt(xhook - 19, ybot - 72)}',
-        f'Q{pt(xhook, ybot - 65)} {pt(xhook + 6, ybot - 52)}',
-        f'Q{pt(xhook + 6, ybot - 34)} {pt(xhook - 24, ybot - 16)}',
-        f'Q{pt(xhook - 126 * u, ybot)} {pt(xhook - 224 * u, ybot)}',
-        f'L{pt(xl + 127 * u, ybot)}',
-        f'Q{pt(xl + 73, ybot)} {pt(xl + 24, ybot - 16)}',
-        f'Q{pt(xl, ybot - 55)} {pt(xl, ybot - 89)}',
     )
 
 
@@ -263,4 +239,54 @@ def shu_duan(xl: float, y0: float, y1: float, *, w: float = W_V) -> str:
         f'Q{pt(xr, y1 - 18)} {pt(xr - 15, y1 - 7)}',
         f'Q{pt(xr - 40, y1)} {pt(xr - 53, y1)}',
         f'L{pt(xl, y1)}',
+    )
+
+
+def ti(xa: float, ya: float, xe: float, ye: float) -> str:
+    """提：(xa, ya) 是起笔顿头的左上角，向右上挑出，(xe, ye) 是笔尖的上缘。起笔粗、笔尖细，如 王 作偏旁时的末笔。"""
+    dx, dy = xe - xa, ye - ya
+    return path(
+        f'M{pt(xa, ya)}',
+        f'Q{pt(xa + 0.4 * dx, ya + 0.33 * dy)} {pt(xe, ye)}',
+        f'L{pt(xe + 3, ye + 14)}',
+        f'L{pt(xa + 57, ya + 57)}',
+        f'Q{pt(xa + 54, ya + 66)} {pt(xa + 35, ya + 82)}',
+    )
+
+
+def shu_wan_gou_r(xl: float, y0: float, ybot: float, xr: float, yhook: float) -> str:
+    """右旁的竖弯钩（沌 纯 的屯）：竖到底圆转成平的横，末端竖直向上出一个细钩。
+    xl 竖的左缘，y0 竖头尖，ybot 横的下缘，xr 钩脚最右处，yhook 钩尖的高度。"""
+    xs = xl + 65
+    return path(
+        f'M{pt(xl, y0)}',
+        f'L{pt(xl + 101, y0 + 12)}',
+        f'Q{pt(xl + 100, y0 + 22)} {pt(xl + 85, y0 + 30)}',
+        f'Q{pt(xl + 76, y0 + 37)} {pt(xs, y0 + 39)}',
+        f'L{pt(xs, ybot - 95)}',
+        f'Q{pt(xs, ybot - 61)} {pt(xs + 48, ybot - 61)}',
+        f'L{pt(xr - 184, ybot - 61)}',
+        f'Q{pt(xr - 99, ybot - 62)} {pt(xr - 85, ybot - 66)}',
+        f'Q{pt(xr - 73, ybot - 72)} {pt(xr - 64, ybot - 110)}',
+        f'Q{pt(xr - 55, ybot - 150)} {pt(xr - 47, yhook)}',
+        f'L{pt(xr - 34, yhook)}',
+        f'L{pt(xr - 31, ybot - 70)}',
+        f'Q{pt(xr, ybot - 58)} {pt(xr, ybot - 41)}',
+        f'Q{pt(xr, ybot - 10)} {pt(xr - 186, ybot)}',
+        f'L{pt(xl + 102, ybot)}',
+        f'Q{pt(xl, ybot)} {pt(xl, ybot - 78)}',
+    )
+
+
+def xie_shu(xt: float, yt: float, xb: float, yb: float, *, w: float = 70) -> str:
+    """斜竖（吾 的 五 里那一笔）：笔直、粗细不变地向左下斜，头上有竖的小钩，脚平收在横上。
+    (xt, yt) 是头的左上角，(xb, yb) 是脚的左下角，w 是水平方向的宽。"""
+    s = (xb - xt) / (yb - yt)  # 每向下一个单位，向左（负）挪多少
+    return path(
+        f'M{pt(xt, yt)}',
+        f'L{pt(xt + 102, yt + 12)}',
+        f'Q{pt(xt + 101, yt + 22)} {pt(xt + 93.5, yt + 29)}',
+        f'Q{pt(xt + 86, yt + 36)} {pt(xt + w + s * 39, yt + 39)}',
+        f'L{pt(xb + w, yb)}',
+        f'L{pt(xb, yb)}',
     )

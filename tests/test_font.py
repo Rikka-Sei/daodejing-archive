@@ -79,7 +79,9 @@ class StrokeTest(unittest.TestCase):
             strokes.pie(400, 100, 300, 500),
             strokes.na(500, 300, 900, 800),
             strokes.na_duan(300, 400, 480, 730),
-            strokes.shu_wan_gou(450, 50, 935, 950, 690),
+            strokes.shu_wan_gou_r(620, 45, 940, 965, 730),
+            strokes.ti(30, 770, 380, 660),
+            strokes.xie_shu(405, 50, 300, 490),
             strokes.shu_tail(160, 320, 650),
             strokes.shu_duan(750, 330, 720),
         ]
@@ -214,9 +216,9 @@ class RegisteredGlyphsTest(unittest.TestCase):
     def test_parts_scale_positions_but_not_stroke_weight(self):
         """部件压扁挤窄，笔画仍和正文一样粗：横笔画的纵向厚度不变"""
         for yt, yb in ((50, 900), (50, 400)):
-            g = glyphlib.to_glyph([d for _, d in parts.wang(50, 450, yt, yb) if _ == 'wang-heng3'])
+            g = glyphlib.to_glyph([d for _, d in parts.wang(50, 450, yt, yb) if _ == 'wang-heng1'])
             g.recalcBounds(None)
-            # 底横上缘到下缘：顿角之外的横身厚 30，顿角最高 65 + 13
+            # 顶横上缘到下缘：顿角之外的横身厚 30，顿角最高 65 + 13
             self.assertLess(g.yMax - g.yMin, 110)
 
     def test_license_names_the_derivative_and_the_original(self):

@@ -14,59 +14,57 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 
 from glyphlib import write_svg  # noqa: E402
-from parts import Strokes, bai, cong, kou_frame, mu, plain_shu, tun, wang  # noqa: E402
-from strokes import W_V, heng, pie, shu, shu_qie, shu_zhe  # noqa: E402
+from parts import Strokes, bai, cong, dui, kou_frame, mu, plain_shu, tun, wang  # noqa: E402
+from strokes import heng, shu, shu_qie, shu_zhe, xie_shu  # noqa: E402
 
 
 def zi_dui() -> Strokes:
-    """𠂤 U+200A4：丿加一个框，框里两道内横（自 的写法，丿更斜）。"""
-    return bai(195, 805, 205, 955, inner=2)
+    """𠂤 U+200A4：丿下 㠯（一道左竖，右边上下两个框，横折分开写），同 追 師 的右旁、官 的下部。"""
+    return dui(210, 778, 836, 178, 955)
 
 
 def ce() -> Strokes:
-    """𠕁 U+20541：冂里套卄。上横与框相接，四道竖，次横在顶横下；右外竖出钩。"""
-    top, mid, foot = 210, 372, 935
-    out: Strokes = [
-        ('ce-left', shu_qie(150, top - 50, foot)),
-        ('ce-right', shu_zhe(850, top - 15, foot, gou=True)),
-        ('ce-top', heng(180, 830, top, dun=False)),
-        ('ce-in1', shu(365, top - 15, foot, head=False)),
-        ('ce-in2', shu(570, top - 15, foot, head=False)),
-        ('ce-mid', heng(180, 830, mid, dun=False)),
+    """𠕁 U+20541：冂里套卄。上横与框相接，四道竖，中横收在框里；右外竖出钩。比例对照思源宋体的 冊。"""
+    return [
+        ('ce-left', shu_qie(149, 93, 958)),
+        ('ce-right', shu_zhe(857, 126, 956, w=65, gou=True)),
+        ('ce-top', heng(190, 826, 141, dun=False)),
+        ('ce-in1', shu(359, 141, 939, w=62, head=False)),
+        ('ce-in2', shu(575, 141, 939, w=62, head=False)),
+        ('ce-mid', heng(200, 800, 478, dun=False)),
     ]
-    return out
 
 
 def chi_shan() -> Strokes:
     """𠚕 U+20695：凵里叠两个从，中间一横；两边的竖比里面的横长出一截。"""
     return [
-        ('wall-left', shu(190, 275, 955)),
-        ('wall-right', shu(745, 275, 955)),
-        ('bar-mid', heng(220, 780, 445, dun=False)),
-        ('bar-bottom', heng(220, 780, 866, dun=False)),
-        *[(f'up-{k}', d) for k, d in cong(265, 735, 50, 395)],
-        *[(f'low-{k}', d) for k, d in cong(265, 735, 485, 835)],
+        ('wall-left', shu(135, 200, 955)),
+        ('wall-right', shu(799, 200, 955)),
+        ('bar-mid', heng(165, 835, 440, dun=False)),
+        ('bar-bottom', heng(165, 835, 866, dun=False)),
+        *[(f'up-{k}', d) for k, d in cong(232, 770, 48, 400)],
+        *[(f'low-{k}', d) for k, d in cong(232, 770, 474, 828)],
     ]
 
 
 def bai_mu() -> Strokes:
     """𣐩 U+23429：上白下木。"""
-    return [*bai(270, 730, 130, 450, inner=1), *mu(90, 910, 485, 958)]
+    return [*bai(220, 790, 111, 582, inner=1), *mu(52, 950, 537, 959)]
 
 
 def wang_tun() -> Strokes:
     """𤤀 U+24900：左王右屯。"""
-    return [*wang(45, 415, 140, 905), *tun(450, 955, 50, 935)]
+    return [*wang(29, 396, 153, 849), *tun(422, 969, 45, 940)]
 
 
 def wu_kou() -> Strokes:
-    """𭇁 U+2D1C1：上 𫝀（丿、一、竖折、一）下口。"""
+    """𭇁 U+2D1C1：上 𫝀（斜竖、一、横折、长横）下口，即 吾 去掉首横；斜竖从顶上起笔。比例对照思源宋体的 吾。"""
     return [
-        ('xi-pie', pie(400, 60, 333, 488, head=112, tip=14, right=(0.08, -0.04, 0.32, 0.64), left=(0.18, 0.24, 0.62, 0.50))),
-        ('xi-top', heng(187, 690, 266, dun=False)),
-        ('xi-shu', shu_zhe(706, 251, 490)),
-        ('xi-bottom', heng(110, 882, 490)),
-        *[(f'kou-{k}', d) for k, d in kou_frame(230, 770, 567, 940, [864])],
+        ('xi-shu', xie_shu(405, 50, 301, 488)),
+        ('xi-top', heng(156, 700, 287, dun=False)),
+        ('xi-zhe', shu_zhe(736, 272, 488)),
+        ('xi-bottom', heng(44, 965, 488)),
+        *[(f'kou-{k}', d) for k, d in kou_frame(206, 799, 577, 956, [875])],
     ]
 
 
