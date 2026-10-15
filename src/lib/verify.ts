@@ -156,10 +156,10 @@ export function uncovered(chars: Set<string>, manifest: FontManifest): [string, 
 
 /** 站点用字与固定字体的对照，返回要提示的几句话。 */
 export function fontNotes(outDir: string, manifest: FontManifest | null): string[] {
-  if (!manifest) return ['没有固定字体（public/fonts/），页面用系统字体；先运行 scripts/make_fonts.py'];
+  if (!manifest) return ['没有固定字体（public/fonts/），页面用系统字体；先运行 npm run fonts'];
   const [fresh, system] = uncovered(siteChars(outDir), manifest);
   const notes: string[] = [];
-  if (fresh) notes.push(`${[...fresh].length} 个字不在固定字体里，暂用系统字体显示：${fresh}；重新运行 scripts/make_fonts.py 可收进子集`);
+  if (fresh) notes.push(`${[...fresh].length} 个字不在固定字体里，暂用系统字体显示：${fresh}；重新运行 npm run fonts 可收进子集`);
   if (system) notes.push(`${[...system].length} 个字固定字体本身没有，由系统字体显示：${system}`);
   return notes;
 }

@@ -12,7 +12,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "fonts": "tsx scripts/make-fonts.ts"
   },
   "dependencies": {
     "astro": "^7.3.5",
@@ -22,7 +23,10 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/node": "^22.20.5",
+    "harfbuzzjs": "^1.6.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.4",
+    "wawoff2": "^2.0.1"
   }
 }

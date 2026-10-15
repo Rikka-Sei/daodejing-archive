@@ -2,7 +2,7 @@
  * 固定字体：站点随附子集字体，页面只用 @font-face 引用这几个文件，不依赖观看者机器上装了什么字体；
  * 子集里没有的字，浏览器逐字回退到系统字体。
  *
- * 字体文件在 public/fonts/，由 scripts/make_fonts.py 生成（思源黑体、思源宋体，SIL OFL 1.1，
+ * 字体文件在 public/fonts/，由 scripts/make-fonts.ts 生成（思源黑体、思源宋体，SIL OFL 1.1，
  * 来源与哈希记在 fonts.json）。
  */
 import manifest from '../../public/fonts/fonts.json';

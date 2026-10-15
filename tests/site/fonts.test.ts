@@ -51,7 +51,7 @@ describe('用字统计', () => {
   });
 
   it('没有固定字体时提示去运行脚本', () => {
-    expect(fontNotes('/nonexistent', null)[0]).toContain('make_fonts.py');
+    expect(fontNotes('/nonexistent', null)[0]).toContain('npm run fonts');
   });
 });
 

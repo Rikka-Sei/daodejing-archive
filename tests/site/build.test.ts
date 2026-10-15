@@ -7,9 +7,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { usedChars } from '../../scripts/make-fonts';
 import { allCorpora } from '../../src/lib/site';
 import { thumbJobs } from '../../src/lib/thumbs';
-import { checkLinks, siteChars } from '../../src/lib/verify';
+import { checkLinks } from '../../src/lib/verify';
 import { tempDir } from './fixtures';
 
 const ROOT = process.cwd();
@@ -31,24 +32,6 @@ function build(name: string, flags: string[]): string {
     timeout: 170_000,
   });
   return out;
-}
-
-/** scripts/make_fonts.py 统计出的页面用字，三档：全部、去掉释文正文、再去掉来源注释。没有 python3 时返回 null。 */
-function pythonChars(site: string): Record<'all' | 'text' | 'ui', string[]> | null {
-  const code = [
-    'import importlib.util, json, sys',
-    'from pathlib import Path',
-    'spec = importlib.util.spec_from_file_location("make_fonts", sys.argv[1])',
-    'm = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)',
-    'site = Path(sys.argv[2])',
-    'tiers = {"all": m.site_chars(site), "text": m.site_chars(site, units=False), "ui": m.site_chars(site, units=False, notes=False)}',
-    'print(json.dumps({k: sorted(v) for k, v in tiers.items()}, ensure_ascii=False))',
-  ].join('\n');
-  try {
-    return JSON.parse(execFileSync('python3', ['-I', '-c', code, join(ROOT, 'scripts/make_fonts.py'), site], { encoding: 'utf-8' }));
-  } catch {
-    return null;
-  }
 }
 
 const SITE = 'https://example.test';
@@ -129,13 +112,10 @@ describe.each(cases)('$name', ({ dir, base, flags }) => {
     expect(read('laozi/guodian-all.txt').startsWith('# 郭店楚简\n')).toBe(true);
   });
 
-  it('构建时的字体提示与 make_fonts.py 对“页面用了哪些字”的看法一致', () => {
-    const py = pythonChars(out);
-    if (!py) return; // 没有 python3 就不比
-    const byCodePoint = (a: string, b: string) => a.codePointAt(0)! - b.codePointAt(0)!;
-    const ts = { all: siteChars(out), text: siteChars(out, false), ui: siteChars(out, false, false) };
-    for (const tier of ['all', 'text', 'ui'] as const) expect([...ts[tier]].sort(byCodePoint), tier).toEqual(py[tier]);
-    expect(py.text.length).toBeLessThan(py.all.length); // 释文用字确实被单独分出来了
+  it('释文用字单独分档：黑体与 500 字重的子集因此小得多', () => {
+    const pools = usedChars(out);
+    expect(pools.text.size).toBeLessThan(pools.all.size);
+    expect(pools.ui.size).toBeLessThanOrEqual(pools.text.size);
   });
 
   it('llms.txt：配了 site 就是绝对链接，否则相对链接', () => {

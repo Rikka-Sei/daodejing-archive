@@ -136,7 +136,7 @@ describe('构建集成', () => {
     const lg = logger();
     expect(() => run('/', lg)).not.toThrow();
     expect(lg.info).toHaveBeenCalledWith('链接检查通过');
-    expect(lg.warn.mock.calls[0][0]).toContain('make_fonts.py');
+    expect(lg.warn.mock.calls[0][0]).toContain('npm run fonts');
   });
 
   it('有断链：逐条报错并让构建失败', () => {

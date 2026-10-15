@@ -1,6 +1,6 @@
 # 展示站
 
-用 [Astro](https://astro.build) 读取 `data/` 生成静态站：阅读版（封面、凡例、每个本一页）、数据版（所有版本一页、可跨版本检索）、每个本的 `.txt` 与 `.jsonl` 下载，以及 `llms.txt` / `llms-full.txt`。推送到 `main` 后由 `.github/workflows/astro.yml` 构建并发布到 GitHub Pages，地址是 `https://<用户名>.github.io/<仓库名>/`。
+用 [Astro](https://astro.build) 读取 `data/` 生成静态站：阅读版（封面、凡例、每个本一页）、数据版（所有版本一页、可跨版本检索）、每个本的 `.txt` 与 `.jsonl` 下载，以及 `llms.txt` / `llms-full.txt`。推送到 `main` 后由 `.github/workflows/astro.yml` 构建并发布到 GitHub Pages，地址是 `https://<用户名>.github.io/<仓库名>/`，仓库配了自定义域名时是那个域名。
 
 站点不另存数据：释文、影像登记、来源与授权都直接来自 `data/`，下载的 `.jsonl` 与仓库里的文件逐字相同。
 
@@ -15,6 +15,7 @@ npm run build        # 构建到 dist/（要带 Pages 的地址时加 --site htt
 npm run preview      # 预览 dist/
 npm run check        # 类型检查
 npm test             # 测试（含两遍完整构建，约半分钟）
+npm run fonts        # 重新生成固定字体（先 npm run build，见下文“固定字体”）
 ```
 
 ## 目录
@@ -31,6 +32,7 @@ src/
   scripts/app.js         页面脚本（检索、排版、主题、菜单），原样输出，不打包
   styles/site.css        样式
 public/fonts/            固定字体子集与授权文本
+scripts/make-fonts.ts    生成固定字体子集（npm run fonts）
 tests/site/              测试
 ```
 
@@ -61,11 +63,10 @@ tests/site/              测试
 页面不依赖观看者机器上的字体：随站点发布思源黑体、思源宋体的子集（SIL OFL 1.1，约 610 KB），子集里没有的字由浏览器逐字回退到系统字体。构建结束时会列出页面用到、但子集里没有的字。
 
 ```bash
-pip install fonttools brotli
-npm run build && scripts/make_fonts.py    # 统计 dist/ 里的用字，重新裁出子集到 public/fonts/
+npm run build && npm run fonts    # 统计 dist/ 里的用字，重新裁出子集到 public/fonts/
 ```
 
-来源字体按 URL 和 SHA-256 固定，下载后先校验。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
+来源字体按 URL 和 SHA-256 固定：首次运行会下载（两个字体共约 43 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：取定字重，保留竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
 
 ## 构建后检查
 
@@ -76,7 +77,7 @@ npm run build && scripts/make_fonts.py    # 统计 dist/ 里的用字，重新�
 
 ## 测试
 
-`tests/site/` 用占位典籍测数据读取、文本处理、下载内容、缩略图、固定字体、各页面的结构和检查本身，用 `astro build` 跑两遍真实数据（带 `--site`、`--base` 与不带）检查输出，并核对真实数据的结构约定。`tests/test_make_fonts.py` 测字体脚本的用字统计，构建测试里还会核对它与构建时的字体提示对“页面用了哪些字”的统计一致。
+`tests/site/` 用占位典籍测数据读取、文本处理、下载内容、缩略图、固定字体、各页面的结构和检查本身，用 `astro build` 跑两遍真实数据（带 `--site`、`--base` 与不带）检查输出，并核对真实数据的结构约定。字体脚本的用字统计、来源校验和子集裁剪也在这里测，不联网：裁剪用 `tests/site/assets/mini-vf.ttf`，那是从固定来源的思源黑体里只裁出六个字、保留字重轴的小字体。
 
 ## 部署
 

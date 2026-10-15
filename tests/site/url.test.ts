@@ -34,6 +34,18 @@ describe('llms.txt 里的站点地址', () => {
     expect((await load({ BASE_URL: '/', SITE: 'https://example.test' })).absoluteBase()).toBe('https://example.test');
   });
 
+  it('GitHub 把挂在 CDN 后面的自定义域名报成 http：升成 https', async () => {
+    expect((await load({ BASE_URL: '/', SITE: 'http://archive.example.test' })).absoluteBase()).toBe('https://archive.example.test');
+    expect((await load({ BASE_URL: '/x/', SITE: 'http://archive.example.test/' })).absoluteBase()).toBe('https://archive.example.test/x');
+  });
+
+  it.each(['http://localhost:4321', 'http://localhost', 'http://127.0.0.1:4321', 'http://192.168.1.2', 'http://[::1]:4321', 'http://box.local', 'http://example.test:8080'])(
+    '本机、内网地址与带端口的地址保持 http：%s',
+    async (site) => {
+      expect((await load({ BASE_URL: '/', SITE: site })).absoluteBase()).toBe(site);
+    },
+  );
+
   it('没配 site 或环境里的 SITE 不是网址（如字符串 "undefined"）：留空，写相对链接', async () => {
     expect((await load({ BASE_URL: '/', SITE: 'undefined' })).absoluteBase()).toBe('');
     expect((await load({ BASE_URL: '/', SITE: '' })).absoluteBase()).toBe('');
