@@ -288,6 +288,7 @@ body.rdr main{display:flex;flex-direction:column;min-height:0}
 body.rdr .content.reader{display:flex;flex:1;flex-direction:column;min-height:0;max-width:none;padding:0}
 .rd-bar{display:flex;align-items:center;gap:12px;min-height:34px;padding:0 24px;font-size:13px;line-height:18px;color:var(--tx3)}
 .rd-bar .grow{flex:1}
+.rd-bar .meta+.meta::before{content:"·";margin-right:12px;color:var(--tx3)}
 .rd{--rf:22px;display:flex;flex:1;flex-direction:column;min-height:240px;padding:8px 24px 16px;overflow-x:auto;overflow-y:hidden;writing-mode:vertical-rl;outline:0;scrollbar-width:thin}
 html[data-rsize=s] .rd{--rf:18px}
 html[data-rsize=l] .rd{--rf:27px}

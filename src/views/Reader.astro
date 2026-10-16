@@ -41,17 +41,17 @@ const plateOf = (no: string) => {
     }<span class="sep">›</span><b>阅读器</b>
   </Fragment>
   <div class="rd-bar">
-    <span>共 {lines.length} {unit}，自右向左读。点一个字或拖选几个字，看其他本在同一处写的什么。</span>
+    <span class="meta">共 {lines.length} {unit}</span>
+    <span class="meta src">释文 tt24h《四种原文表》（CC0）</span>
     <span class="grow"></span>
     <a class="ver" href={witnessUrl(c, w)}>版本信息与下载 ›</a>
-    <span class="src">释文与定位取自 tt24h《四种原文表》（CC0）</span>
   </div>
   <div
     id="rd"
     class="rd"
     tabindex="0"
     role="document"
-    aria-label={`${w.meta.name}，竖排`}
+    aria-label={`${w.meta.name}，竖排，自右向左读；点一个字或拖选几个字，看其他本在同一处写的什么`}
     data-chapters={url(`${c.id}/chapters/`)}
     data-meta={url(`${c.id}/alignment.json`)}
     data-w={w.id}
