@@ -1,7 +1,7 @@
 """字库 font/：笔画库、SVG 读取、合并进字体、改名、拟合工具，以及登记的 6 个手绘字。
 
 构建用一个很小的合成字体当“上游”，不下载思源宋体；真正的上游字体由 npm run fonts 生成时核对哈希。
-运行：python3 -m unittest tests.test_font（需要 fonttools、skia-pathops、pyyaml）
+运行：python3 -m unittest tests.test_font（需要 fonttools、skia-pathops、pyyaml、afdko）
 """
 
 from __future__ import annotations
@@ -22,27 +22,40 @@ import glyphlib  # noqa: E402
 import parts  # noqa: E402
 import strokes  # noqa: E402
 from fontTools.fontBuilder import FontBuilder  # noqa: E402
-from fontTools.pens.ttGlyphPen import TTGlyphPen  # noqa: E402
+from fontTools.pens.areaPen import AreaPen  # noqa: E402
+from fontTools.pens.boundsPen import BoundsPen  # noqa: E402
+from fontTools.pens.t2CharStringPen import T2CharStringPen  # noqa: E402
 from fontTools.ttLib import TTFont  # noqa: E402
 
 
 def square(x0, y0, x1, y1):
-    pen = TTGlyphPen(None)
+    pen = T2CharStringPen(1000, None)
     pen.moveTo((x0, y0))
-    pen.lineTo((x0, y1))
-    pen.lineTo((x1, y1))
     pen.lineTo((x1, y0))
+    pen.lineTo((x1, y1))
+    pen.lineTo((x0, y1))
     pen.closePath()
-    return pen.glyph()
+    return pen.getCharString()
+
+
+def bounds(font, name):
+    bp = BoundsPen(font.getGlyphSet())
+    font.getGlyphSet()[name].draw(bp)
+    return bp.bounds
 
 
 def fake_upstream(path: Path) -> Path:
-    """合成的“上游”：.notdef、国、A；有 vmtx（竖排度量），带 Noto 风格的名字。"""
-    fb = FontBuilder(1000, isTTF=True)
+    """合成的“上游”（CFF 轮廓）：.notdef、国、A；有 vmtx（竖排度量），带 Noto 风格的名字。"""
+    fb = FontBuilder(1000, isTTF=False)
     order = ['.notdef', 'uni56FD', 'A']
     fb.setupGlyphOrder(order)
     fb.setupCharacterMap({0x56FD: 'uni56FD', 0x41: 'A'})
-    fb.setupGlyf({'.notdef': square(50, 0, 450, 700), 'uni56FD': square(99, -78, 944, 821), 'A': square(40, 0, 560, 700)})
+    fb.setupCFF(
+        'NotoSerifSC-Regular',
+        {'FullName': 'Noto Serif SC Regular', 'FamilyName': 'Noto Serif SC', 'Notice': '(c) Adobe. Noto is a trademark of Google Inc.'},
+        {'.notdef': square(50, 0, 450, 700), 'uni56FD': square(99, -78, 944, 821), 'A': square(40, 0, 560, 700)},
+        {'BlueValues': [-120, -120, 880, 880], 'StdHW': 30, 'StdVW': 66},  # otfautohint 要有对齐区
+    )
     fb.setupHorizontalMetrics({g: (1000, 50) for g in order})
     fb.setupHorizontalHeader(ascent=880, descent=-120)
     fb.setupVerticalMetrics({g: (1000, 59) for g in order})
@@ -89,16 +102,14 @@ class StrokeTest(unittest.TestCase):
         ]
         for d in samples:
             self.assertTrue(d.startswith('M') and d.endswith('Z'), d)
-            g = glyphlib.to_glyph([d])
-            self.assertGreater(g.numberOfContours, 0, d)
+            self.assertGreater(len(list(glyphlib.outline([d]).contours)), 0, d)
 
     def test_stroke_weight_matches_regular(self):
         """横 30、竖 66：量自思源宋体 Regular，别随手改"""
         self.assertEqual((strokes.T_H, strokes.W_V), (30, 66))
 
     def test_union_merges_overlapping_strokes_into_one_contour(self):
-        g = glyphlib.to_glyph(rects((100, 100, 500, 130), (280, 100, 320, 600)))
-        self.assertEqual(g.numberOfContours, 1)
+        self.assertEqual(len(list(glyphlib.outline(rects((100, 100, 500, 130), (280, 100, 320, 600))).contours)), 1)
 
     def test_svg_round_trip(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -107,9 +118,13 @@ class StrokeTest(unittest.TestCase):
             self.assertEqual([i for i, _ in glyphlib.read_strokes(f)], ['a', 'b'])
 
     def test_y_axis_is_flipped_around_the_baseline(self):
-        g = glyphlib.to_glyph(rects((0, 0, 100, 100)))  # SVG 里在字身框顶部
-        g.recalcBounds(None)
-        self.assertEqual((g.yMin, g.yMax), (780, 880))
+        _, y0, _, y1 = glyphlib.outline(rects((0, 0, 100, 100))).bounds  # SVG 里在字身框顶部
+        self.assertEqual((y0, y1), (780, 880))
+
+    def test_outer_contours_run_counterclockwise_as_cff_expects(self):
+        pen = AreaPen()
+        glyphlib.outline(rects((0, 0, 100, 100), (300, 0, 400, 100))).draw(pen)
+        self.assertEqual(pen.value, 20000)  # 面积为正即逆时针，与思源宋体的字一致
 
 
 class FitTest(unittest.TestCase):
@@ -121,7 +136,7 @@ class FitTest(unittest.TestCase):
 
     def test_reference_contours_are_flipped_like_the_svgs(self):
         with tempfile.TemporaryDirectory() as tmp:
-            font = fit.reference_font(fake_upstream(Path(tmp) / 'up.ttf'))
+            font = fit.reference_font(fake_upstream(Path(tmp) / 'up.otf'))
             (c,) = fit.contours(font, '国')
         self.assertEqual(tuple(round(v) for v in c.bounds), (99, 880 - 821, 944, 880 + 78))
 
@@ -142,7 +157,7 @@ class BuildTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.dir = Path(self.tmp.name)
-        self.upstream = fake_upstream(self.dir / 'up.ttf')
+        self.upstream = fake_upstream(self.dir / 'up.otf')
         (self.dir / 'g').mkdir()
         glyphlib.write_svg(self.dir / 'g/u20000.svg', [(f's{i}', d) for i, d in enumerate(rects((100, 100, 900, 130), (480, 100, 520, 900)))], title='甲')
         self.cfg = {
@@ -160,28 +175,37 @@ class BuildTest(unittest.TestCase):
 
     def build(self, **over):
         cfg = {**self.cfg, **over}
-        return fontbuild.build(self.upstream, self.dir / 'out.ttf', cfg, root=self.dir)
+        return fontbuild.build(self.upstream, self.dir / 'out.otf', cfg, root=self.dir)
 
     def test_glyph_is_added_with_cmap_and_metrics(self):
-        f = TTFont(self.dir / 'out.ttf') if self.build() else None
+        f = TTFont(self.dir / 'out.otf') if self.build() else None
         g = f.getBestCmap()[0x20000]
         self.assertEqual(g, 'u20000')
         self.assertEqual(f['hmtx'][g][0], 1000)
-        glyph = f['glyf'][g]
-        glyph.recalcBounds(f['glyf'])
-        self.assertEqual(f['hmtx'][g][1], glyph.xMin)
+        x_min, _, _, y_max = bounds(f, g)
+        self.assertEqual(f['hmtx'][g][1], x_min)
         # 竖排：与“国”共用同一个字符原点（国 tsb 59 + yMax 821 = 880）
-        self.assertEqual(f['vmtx'][g], (1000, 880 - glyph.yMax))
+        self.assertEqual(f['vmtx'][g], (1000, 880 - y_max))
+
+    def test_added_glyph_is_hinted_and_the_others_are_not_touched(self):
+        self.build()
+        cs = TTFont(self.dir / 'out.otf')['CFF '].cff.topDictIndex[0].CharStrings
+        new, old = cs['u20000'], cs['uni56FD']
+        new.decompile()
+        old.decompile()
+        self.assertTrue(any(op in ('hstem', 'hstemhm', 'vstem', 'vstemhm') for op in new.program))
+        self.assertFalse(any(op in ('hstem', 'hstemhm', 'vstem', 'vstemhm') for op in old.program))
 
     def test_original_glyphs_are_untouched(self):
         self.build()
-        f = TTFont(self.dir / 'out.ttf')
+        f = TTFont(self.dir / 'out.otf')
         self.assertEqual(f.getBestCmap()[0x56FD], 'uni56FD')
         self.assertEqual(f['maxp'].numGlyphs, 4)
 
     def test_renamed_and_license_kept(self):
         self.build()
-        n = TTFont(self.dir / 'out.ttf')['name']
+        f = TTFont(self.dir / 'out.otf')
+        n = f['name']
         self.assertEqual(n.getDebugName(1), 'TestSong')
         self.assertEqual(n.getDebugName(4), 'TestSong Regular')
         self.assertEqual(n.getDebugName(6), 'TestSong-Regular')
@@ -190,12 +214,16 @@ class BuildTest(unittest.TestCase):
         self.assertIsNone(n.getDebugName(7))  # 上游的商标声明不沿用
         self.assertIn('SIL Open Font License', n.getDebugName(13))
         self.assertIn('Adobe', n.getDebugName(0))
+        cff = f['CFF '].cff
+        self.assertEqual(cff.fontNames, ['TestSong-Regular'])
+        self.assertEqual((cff.topDictIndex[0].FamilyName, cff.topDictIndex[0].FullName), ('TestSong', 'TestSong Regular'))
+        self.assertNotIn('Noto', cff.topDictIndex[0].Notice)
 
     def test_same_input_gives_same_bytes(self):
         self.build()
-        a = (self.dir / 'out.ttf').read_bytes()
+        a = (self.dir / 'out.otf').read_bytes()
         self.build()
-        self.assertEqual(a, (self.dir / 'out.ttf').read_bytes())
+        self.assertEqual(a, (self.dir / 'out.otf').read_bytes())
 
     def test_refuses_a_codepoint_the_upstream_already_has(self):
         with self.assertRaises(SystemExit) as cm:
@@ -234,21 +262,19 @@ class RegisteredGlyphsTest(unittest.TestCase):
 
     def test_outlines_sit_inside_the_em_box_with_room_to_spare(self):
         for g in self.cfg['glyphs']:
-            glyph = glyphlib.to_glyph([d for _, d in glyphlib.read_strokes(ROOT / 'font' / g['svg'])])
-            glyph.recalcBounds(None)
-            self.assertGreaterEqual(glyph.xMin, 20, g['char'])
-            self.assertLessEqual(glyph.xMax, 980, g['char'])
-            self.assertGreaterEqual(glyph.yMin, -100, g['char'])
-            self.assertLessEqual(glyph.yMax, 860, g['char'])
-            self.assertGreater(glyph.yMax - glyph.yMin, 700, g['char'])  # 与正文的字一样高
+            x0, y0, x1, y1 = glyphlib.outline([d for _, d in glyphlib.read_strokes(ROOT / 'font' / g['svg'])]).bounds
+            self.assertGreaterEqual(x0, 20, g['char'])
+            self.assertLessEqual(x1, 980, g['char'])
+            self.assertGreaterEqual(y0, -100, g['char'])
+            self.assertLessEqual(y1, 860, g['char'])
+            self.assertGreater(y1 - y0, 700, g['char'])  # 与正文的字一样高
 
     def test_parts_scale_positions_but_not_stroke_weight(self):
         """部件压扁挤窄，笔画仍和正文一样粗：横笔画的纵向厚度不变"""
         for yt, yb in ((50, 900), (50, 400)):
-            g = glyphlib.to_glyph([d for _, d in parts.wang_left(50, 450, yt, yb) if _ == 'wang-heng1'])
-            g.recalcBounds(None)
+            _, y0, _, y1 = glyphlib.outline([d for _, d in parts.wang_left(50, 450, yt, yb) if _ == 'wang-heng1']).bounds
             # 顶横上缘到下缘：顿角之外的横身厚 30，顿角最高 65 + 13
-            self.assertLess(g.yMax - g.yMin, 110)
+            self.assertLess(y1 - y0, 110)
 
     def test_license_names_the_derivative_and_the_original(self):
         text = (ROOT / 'font/OFL.txt').read_text(encoding='utf-8')

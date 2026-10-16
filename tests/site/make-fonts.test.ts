@@ -1,7 +1,7 @@
 /**
  * 固定字体脚本（scripts/make-fonts.ts）：页面用字统计、来源字体的下载校验、按字重裁出子集。
- * 全部离线：子集用 assets/mini-vf.ttf 测，那是从固定来源的思源黑体变体字体（NotoSansSC[wght].ttf，SIL OFL 1.1）
- * 里只裁出“甲乙丙「」A”六个字、保留字重轴得到的小字体：hbSubset(font, '甲乙丙「」A')。
+ * 全部离线：子集用 assets/mini-sans.otf 测，那是从固定来源的思源黑体 Regular（NotoSansSC-Regular.otf，SIL OFL 1.1）
+ * 里只裁出“甲乙丙「」A”六个字的小字体（pyftsubset，保留 hinting 与全部排版特征）。
  */
 import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -14,6 +14,66 @@ import { hbSubset } from '../../scripts/hb-subset';
 import wawoff2 from 'wawoff2';
 import { codePoints, DERIVED, derivedConfig, EXT, EXTRA, fetchPinned, main, makeExt, makeSubset, SOURCES, usedChars } from '../../scripts/make-fonts';
 import { tempDir } from './fixtures';
+
+/**
+ * 数 CFF 字形里声明的笔画提示（hstem、vstem 及其 hm 形式，hintmask 前隐含的 vstem）：只读每个字形开头、第一个 moveto 之前的部分。
+ * 这里只为测试 hinting 是否保留，够用即可：不展开子程序（思源的提示都直接写在字形里）。
+ */
+function cffStems(font: Uint8Array): number[] {
+  const dir = [...Array((font[4] << 8) | font[5]).keys()].map((i) => 12 + i * 16);
+  const rec = dir.find((r) => String.fromCharCode(...font.subarray(r, r + 4)) === 'CFF ')!;
+  const at32 = (o: number) => ((font[o] << 24) | (font[o + 1] << 16) | (font[o + 2] << 8) | font[o + 3]) >>> 0;
+  const t = font.subarray(at32(rec + 8), at32(rec + 8) + at32(rec + 12));
+  const u8 = (o: number) => t[o];
+  const off = (o: number, size: number) => [...Array(size).keys()].reduce((a, i) => a * 256 + t[o + i], 0);
+  /** 读一个 INDEX，返回各项的 [起, 止) 与 INDEX 之后的位置 */
+  const index = (o: number): [[number, number][], number] => {
+    const count = off(o, 2);
+    if (!count) return [[], o + 2];
+    const size = u8(o + 2);
+    const at = (i: number) => off(o + 3 + i * size, size);
+    const base = o + 2 + (count + 1) * size;
+    return [[...Array(count).keys()].map((i) => [base + at(i), base + at(i + 1)]), base + at(count)];
+  };
+  const [, afterName] = index(t[2]);
+  const [[top]] = index(afterName);
+  // Top DICT 里找 CharStrings（操作符 17）的偏移
+  let charStrings = 0;
+  const stack: number[] = [];
+  for (let i = top[0]; i < top[1]; ) {
+    const b = t[i];
+    if (b <= 21) {
+      if (b === 17) charStrings = stack[stack.length - 1];
+      i += b === 12 ? 2 : 1;
+      stack.length = 0;
+    } else if (b === 28) (stack.push((t[i + 1] << 24 >> 16) | t[i + 2]), (i += 3));
+    else if (b === 29) (stack.push(off(i + 1, 4) | 0), (i += 5));
+    else if (b === 30) {
+      i++;
+      while ((t[i] & 0x0f) !== 0x0f && (t[i] >> 4) !== 0x0f) i++;
+      i++;
+      stack.push(0);
+    } else if (b <= 246) (stack.push(b - 139), (i += 1));
+    else if (b <= 250) (stack.push((b - 247) * 256 + t[i + 1] + 108), (i += 2));
+    else (stack.push(-(b - 251) * 256 - t[i + 1] - 108), (i += 2));
+  }
+  const [glyphs] = index(charStrings);
+  return glyphs.map(([a, z]) => {
+    let stems = 0;
+    let args = 0;
+    for (let i = a; i < z; ) {
+      const b = t[i];
+      if (b === 28) (args++, (i += 3));
+      else if (b === 255) (args++, (i += 5));
+      else if (b >= 32) (args++, (i += b <= 246 ? 1 : 2));
+      else if ([1, 3, 18, 23].includes(b)) ((stems += args >> 1), (args = 0), i++);
+      else if (b === 19 || b === 20) ((stems += args >> 1), (args = 0), (i += 1 + Math.ceil(stems / 8)));
+      else break; // moveto、callsubr、endchar 等：提示部分到此为止
+    }
+    return stems;
+  });
+}
+const stemTotal = (font: Uint8Array) => cffStems(font).reduce((a, b) => a + b, 0);
 
 let tmp: ReturnType<typeof tempDir>;
 beforeEach(() => {
@@ -87,65 +147,63 @@ describe('下载来源字体并校验', () => {
     await expect(fetchPinned('https://x.test/f.ttf', hash, join(tmp.dir, 'cache'), reply('', 404))).rejects.toThrow('HTTP 404');
   });
 
-  it('来源按地址与哈希固定，两种字体各带授权文本', () => {
+  it('来源按地址与哈希固定：每个字重一个 Adobe 发布的静态 OTF（固定在一个标签上），两种字体各带授权文本', () => {
     for (const s of Object.values(SOURCES)) {
-      expect(s.url).toMatch(/^https:\/\/raw\.githubusercontent\.com\/google\/fonts\/[^/]+\/ofl\//);
-      expect([s.sha256, s.licenseSha256].every((h) => /^[0-9a-f]{64}$/.test(h))).toBe(true);
+      expect(Object.keys(s.files)).toEqual(['400', '500']);
+      for (const f of Object.values(s.files)) {
+        expect(f.url).toMatch(/^https:\/\/raw\.githubusercontent\.com\/notofonts\/noto-cjk\/(Sans|Serif)[\d.]+\/.+\.otf$/);
+        expect(f.sha256).toMatch(/^[0-9a-f]{64}$/);
+      }
+      expect(s.licenseSha256).toMatch(/^[0-9a-f]{64}$/);
     }
   });
 });
 
 describe('裁出子集', () => {
-  const vf = readFileSync(new URL('./assets/mini-vf.ttf', import.meta.url));
+  const otf = readFileSync(new URL('./assets/mini-sans.otf', import.meta.url));
   const face = (font: Uint8Array) => new Face(new FontBlob(font));
   const unicodes = (font: Uint8Array) => [...codePoints(font)].sort((a, b) => a - b);
-  const path = (font: Uint8Array, char: string) => {
-    const f = new Font(face(font));
-    return f.glyphToPath(f.nominalGlyph(char.codePointAt(0)!)!);
-  };
 
-  it('小字体是变体字体，收着六个字', () => {
-    expect(Object.keys(face(vf).getAxisInfos())).toEqual(['wght']);
-    expect(unicodes(vf)).toEqual([...'「」丙乙甲A'].map((c) => c.codePointAt(0)!).sort((a, b) => a - b));
+  it('小字体是 CFF 轮廓的静态字体，收着六个字', () => {
+    expect(face(otf).getAxisInfos()).toEqual({});
+    expect(cffStems(otf).length).toBe(11); // .notdef、六个字，加竖排与全角半角的替换字形
+    expect(unicodes(otf)).toEqual([...'「」丙乙甲A'].map((c) => c.codePointAt(0)!).sort((a, b) => a - b));
   });
 
   it('只留要的字', async () => {
-    expect(unicodes(await makeSubset(vf, 400, '甲乙', 'truetype'))).toEqual([0x4e59, 0x7532]);
+    expect(unicodes(await makeSubset(otf, '甲乙', 'sfnt'))).toEqual([0x4e59, 0x7532]);
   });
 
-  it('取定字重得到静态字体：没有字重轴，不同字重的字形不同', async () => {
-    const light = await makeSubset(vf, 400, '甲乙丙', 'truetype');
-    const bold = await makeSubset(vf, 700, '甲乙丙', 'truetype');
-    expect(face(light).getAxisInfos()).toEqual({});
-    expect(face(bold).getAxisInfos()).toEqual({});
-    expect(path(light, '甲')).not.toBe(path(bold, '甲'));
-    expect(path(light, '甲')).not.toBe(path(vf, '甲')); // 也不是变体字体的默认字重
+  it('hinting 保留：没有它，小字号下横画时而对齐像素、时而摊成两列浅灰，一行字看着有粗有细', async () => {
+    const before = stemTotal(otf);
+    expect(before).toBe(36); // 与 fontTools 解出的数目一致
+    expect(stemTotal(await makeSubset(otf, '甲乙丙「」A', 'sfnt'))).toBe(before);
   });
 
   it('排版特征全部保留，包括竖排用的 vert、vrt2 和 HarfBuzz 默认会去掉的全角、半角形（fwid、hwid）', async () => {
-    const font = face(await makeSubset(vf, 400, '甲「A', 'truetype'));
+    const font = face(await makeSubset(otf, '甲「A', 'sfnt'));
     expect(font.getTableFeatureTags('GSUB')).toEqual(expect.arrayContaining(['vert', 'vrt2', 'fwid', 'hwid']));
     expect(font.getTableFeatureTags('GPOS')).toEqual(expect.arrayContaining(['vhal', 'vpal']));
   });
 
   it('版权与授权信息原样保留', async () => {
-    const font = face(await makeSubset(vf, 400, '甲', 'truetype'));
+    const font = face(await makeSubset(otf, '甲', 'sfnt'));
     expect(font.getName(0, 'en')).toContain('Adobe');
     expect(font.getName(13, 'en')).toContain('SIL Open Font License');
   });
 
   it('缺字时浏览器画的 .notdef 方框保留（去掉轮廓，缺字处就成了空白，读者看不出缺了字）', async () => {
-    const font = new Font(face(await makeSubset(vf, 400, '甲', 'truetype')));
+    const font = new Font(face(await makeSubset(otf, '甲', 'sfnt')));
     expect(font.glyphToPath(0)).not.toBe('');
   });
 
   it('默认存成 WOFF2', async () => {
-    const out = await makeSubset(vf, 400, '甲');
+    const out = await makeSubset(otf, '甲');
     expect(Buffer.from(out.subarray(0, 4)).toString('latin1')).toBe('wOF2');
   });
 
   it('同样的输入得到逐字节相同的结果', async () => {
-    expect(await makeSubset(vf, 500, '甲乙丙')).toEqual(await makeSubset(vf, 500, '甲乙丙'));
+    expect(await makeSubset(otf, '甲乙丙')).toEqual(await makeSubset(otf, '甲乙丙'));
   });
 });
 
@@ -206,13 +264,6 @@ describe('补充字体（tt24h 的 DaoDeJingExt）', () => {
   });
 });
 
-describe('取定不存在的轴', () => {
-  it('报错，说明是哪根轴', async () => {
-    const vf = readFileSync(new URL('./assets/mini-vf.ttf', import.meta.url));
-    await expect(hbSubset(vf, '甲', { wdth: 100 })).rejects.toThrow('wdth');
-  });
-});
-
 describe('命令', () => {
   it('没构建过站点：提示先构建', async () => {
     await expect(main(['--site', tmp.dir])).rejects.toThrow('npm run build');
@@ -253,13 +304,15 @@ describe('派生字体 DaoSong（宋体 400）', () => {
 
   it('字体清单的来源里登记了派生关系与上游哈希', () => {
     const own = manifest.sources.find((x) => x.license_file === DERIVED.licenseFile) as unknown as Record<string, string>;
-    expect(own.upstream_sha256).toBe(SOURCES.serif.sha256);
+    expect(own.upstream_sha256).toBe(SOURCES.serif.files[400].sha256);
     expect(own.weights).toBe('400');
     expect(manifest.sources.find((x) => x.license_file === SOURCES.serif.licenseFile)?.weights).toBe('500');
   });
 
-  it('静态字体的子集不再取定字重（weight 为 null）', async () => {
-    const out = await makeSubset(await ttf(), null, '甲', 'truetype');
-    expect(codePoints(out).has('甲'.codePointAt(0)!)).toBe(true);
+  it('补绘的字也带 hinting，和思源宋体原有的字一样', async () => {
+    const font = await ttf();
+    const stems = cffStems(font);
+    const ids = new Font(new Face(new FontBlob(font)));
+    for (const g of [...cfg.glyphs, { cp: '道'.codePointAt(0)!, char: '道' }]) expect(stems[ids.nominalGlyph(g.cp)!], g.char).toBeGreaterThan(0);
   });
 });

@@ -30,20 +30,29 @@ interface Source {
   name: string;
   slug: string;
   licenseFile: string;
-  url: string;
-  sha256: string;
+  /** 每个字重一个静态字体文件 */
+  files: Record<number, { url: string; sha256: string }>;
   licenseUrl: string;
   licenseSha256: string;
 }
 
+/**
+ * 来源是 Adobe 发布的静态 OpenType（CFF）版，不用 Google Fonts 的可变 TrueType 版：两者字形相同，
+ * 但只有 CFF 版带 hinting（让笔画在小字号时对齐像素）。没有 hinting 的字体在 Windows、Linux 的普通分辨率屏上，
+ * 横画时而落在一列像素上、时而摊成两列浅灰，同一行字看着有粗有细。
+ */
+const CJK = 'https://raw.githubusercontent.com/notofonts/noto-cjk/Serif2.003';
 const GF = 'https://raw.githubusercontent.com/google/fonts/main/ofl';
 export const SOURCES: Record<Family, Source> = {
   sans: {
     name: 'Noto Sans SC',
     slug: 'noto-sans-sc',
     licenseFile: 'OFL-NotoSansSC.txt',
-    url: `${GF}/notosanssc/NotoSansSC%5Bwght%5D.ttf`,
-    sha256: 'a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da',
+    files: {
+      400: { url: `${CJK}/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf`, sha256: 'faa6c9df652116dde789d351359f3d7e5d2285a2b2a1f04a2d7244df706d5ea9' },
+      500: { url: `${CJK}/Sans/SubsetOTF/SC/NotoSansSC-Medium.otf`, sha256: '7633f5a016d4dd95e685a69633d818aabc4644c4b08e26bd35b1b30c45ed5dda' },
+    },
+    // 授权文本取 Google Fonts 的那份：同一套字体，它写明了版权与保留名 Source
     licenseUrl: `${GF}/notosanssc/OFL.txt`,
     licenseSha256: '1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9',
   },
@@ -51,14 +60,17 @@ export const SOURCES: Record<Family, Source> = {
     name: 'Noto Serif SC',
     slug: 'noto-serif-sc',
     licenseFile: 'OFL-NotoSerifSC.txt',
-    url: `${GF}/notoserifsc/NotoSerifSC%5Bwght%5D.ttf`,
-    sha256: '050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9',
+    files: {
+      400: { url: `${CJK}/Serif/SubsetOTF/SC/NotoSerifSC-Regular.otf`, sha256: 'e8f396decc1f0963a016a989c3d8852e863d1350996f573860a80767c83a1cd3' },
+      500: { url: `${CJK}/Serif/SubsetOTF/SC/NotoSerifSC-Medium.otf`, sha256: 'e4e9beb5aaeb951e101aa8f122e2a6801ea9e48ac9f9b6bdfeef2436b55bc8ee' },
+    },
     licenseUrl: `${GF}/notoserifsc/OFL.txt`,
     licenseSha256: '5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6',
   },
 };
 
 const WEIGHTS = [400, 500];
+const WEIGHT_NAME: Record<number, string> = { 400: 'Regular', 500: 'Medium' };
 
 /**
  * 宋体 400 用本项目的派生字体 DaoSong：思源宋体 Regular 加上 font/glyphs/ 里手绘的生僻字（见 font/README.md）。
@@ -84,11 +96,11 @@ export function derivedConfig(repo: string = REPO): DerivedConfig {
   return parseYaml(readFileSync(join(repo, DERIVED.dir, 'font.yaml'), 'utf-8')) as DerivedConfig;
 }
 
-/** 调 Python 生成 DaoSong（TTF）；upstream 是固定版本的思源宋体变体字体的路径。 */
+/** 调 Python 生成 DaoSong（OTF）；upstream 是固定版本的思源宋体 Regular（静态 OTF）的路径。 */
 export function buildDerived(upstream: string, out: string, repo: string = REPO): Buffer {
   const run = spawnSync('python3', [join(repo, DERIVED.dir, 'build.py'), '--upstream', upstream, '--out', out], { encoding: 'utf-8' });
   if (run.status !== 0) {
-    throw new Error(`生成 ${DERIVED.name} 失败（需要 python3 与 fonttools、skia-pathops、pyyaml，见 font/README.md）：\n${run.stderr || run.stdout || run.error}`);
+    throw new Error(`生成 ${DERIVED.name} 失败（需要 python3 与 fonttools、skia-pathops、pyyaml、afdko，见 font/README.md）：\n${run.stderr || run.stdout || run.error}`);
   }
   return readFileSync(out);
 }
@@ -164,12 +176,12 @@ export function codePoints(font: Uint8Array): Set<number> {
 }
 
 /**
- * 在变体字体上取定字重（得到静态字体；weight 为 null 表示字体本来就是静态的），只留 chars 里的字，存成 WOFF2。
- * 竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时画的 .notdef 方框都保留。
+ * 只留 chars 里的字，存成 WOFF2（format 为 'sfnt' 时不压缩，测试用）。
+ * hinting、竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时画的 .notdef 方框都保留。
  */
-export async function makeSubset(font: Uint8Array, weight: number | null, chars: string, format: 'woff2' | 'truetype' = 'woff2'): Promise<Uint8Array> {
-  const ttf = await hbSubset(font, chars, weight === null ? {} : { wght: weight });
-  return format === 'woff2' ? wawoff2.compress(ttf) : ttf;
+export async function makeSubset(font: Uint8Array, chars: string, format: 'woff2' | 'sfnt' = 'woff2'): Promise<Uint8Array> {
+  const sfnt = await hbSubset(font, chars);
+  return format === 'woff2' ? wawoff2.compress(sfnt) : sfnt;
 }
 
 /**
@@ -207,15 +219,19 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
   const sources: Record<string, string>[] = [];
   let serifHas = new Set<string>(); // 宋体收了哪些页面用字（含派生字体补的字）
   for (const [family, s] of Object.entries(SOURCES) as [Family, Source][]) {
-    const font = await fetchPinned(s.url, s.sha256, cache);
     writeFileSync(join(FONT_DIR, s.licenseFile), await fetchPinned(s.licenseUrl, s.licenseSha256, cache));
-    // 宋体 400 用派生字体 DaoSong（在固定版本的思源宋体上补字），其余字重与黑体直接用上游字体
+    const fonts: Record<number, Buffer> = {};
+    for (const weight of WEIGHTS) fonts[weight] = await fetchPinned(s.files[weight].url, s.files[weight].sha256, cache);
+    // 宋体 400 用派生字体 DaoSong（在固定版本的思源宋体 Regular 上补字），其余字重与黑体直接用上游字体
     let derived: Buffer | undefined;
     if (family === 'serif') {
-      const upstream = join(cache, `${s.sha256.slice(0, 12)}-${decodeURIComponent(basename(s.url))}`);
-      derived = buildDerived(upstream, join(cache, 'DaoSong-Regular.ttf'));
+      const up = s.files[DERIVED.weight];
+      const upstream = join(cache, `${up.sha256.slice(0, 12)}-${decodeURIComponent(basename(up.url))}`);
+      derived = buildDerived(upstream, join(cache, 'DaoSong-Regular.otf'));
+      fonts[DERIVED.weight] = derived;
     }
-    const cmap = codePoints(derived ?? font);
+    // 各字重收的字相同（派生字体多出补绘的字），以 400 为准
+    const cmap = codePoints(fonts[400]);
     const have = new Set([...wanted].filter((c) => cmap.has(c.codePointAt(0)!)));
     if (family === 'serif') serifHas = have;
     for (const weight of WEIGHTS) {
@@ -223,20 +239,21 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
       const pool = [...have].filter((c) => pools[tier].has(c)).sort(byCodePoint);
       const own = derived !== undefined && weight === DERIVED.weight;
       const file = `${own ? DERIVED.slug : s.slug}-${weight}.woff2`;
-      const data = own ? await makeSubset(derived!, null, pool.join('')) : await makeSubset(font, weight, pool.join(''));
+      const data = await makeSubset(fonts[weight], pool.join(''));
       writeFileSync(join(FONT_DIR, file), data);
       files.push({ file, family, weight, scope, chars: pool.length, bytes: data.length, sha256: sha256(data) });
+      if (own) continue;
+      sources.push({
+        family,
+        name: `${s.name} ${WEIGHT_NAME[weight]}`,
+        url: s.files[weight].url,
+        sha256: s.files[weight].sha256,
+        license: 'SIL OFL 1.1',
+        license_file: s.licenseFile,
+        reserved_font_name: 'Source',
+        weights: String(weight),
+      });
     }
-    sources.push({
-      family,
-      name: s.name,
-      url: s.url.replace('%5B', '[').replace('%5D', ']'),
-      sha256: s.sha256,
-      license: 'SIL OFL 1.1',
-      license_file: s.licenseFile,
-      reserved_font_name: 'Source',
-      weights: derived ? String(WEIGHTS.filter((w) => w !== DERIVED.weight)) : String(WEIGHTS),
-    });
     if (derived) {
       const cfg = derivedConfig();
       writeFileSync(join(FONT_DIR, DERIVED.licenseFile), readFileSync(join(REPO, DERIVED.dir, 'OFL.txt')));
@@ -244,12 +261,12 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
         family,
         name: `${DERIVED.name} ${cfg.version}（${s.name} Regular 的派生字体，补绘 ${cfg.glyphs.length} 字：${cfg.glyphs.map((g) => g.char).join('')}）`,
         url: DERIVED.url,
-        upstream_sha256: s.sha256,
+        upstream_sha256: s.files[DERIVED.weight].sha256,
         license: 'SIL OFL 1.1',
         license_file: DERIVED.licenseFile,
         reserved_font_name: '',
         weights: String(DERIVED.weight),
-        derived_from: s.name,
+        derived_from: `${s.name} ${WEIGHT_NAME[DERIVED.weight]}`,
       });
     }
   }

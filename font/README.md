@@ -19,8 +19,8 @@ DaoSong 是思源宋体（Noto Serif SC）Regular 的**派生字体**。上游�
 font/
   font.yaml          登记：字体名、版本、上游字体（URL 与 SHA-256）、手绘的字（码位、结构、参考字）
   glyphs/uXXXXX.svg  字形，每笔一条 <path>（1000×1000 字身框，基线在 y=880 的红线上）；由 tools/draw.py 生成，构建只读它们
-  build.py           生成字体：上游字体取定字重 400，加入 SVG 里的字形，改名，存成 TTF
-  glyphlib.py        SVG 读写、笔画合并、转成 TrueType 曲线
+  build.py           生成字体：在上游的思源宋体 Regular（CFF，带 hinting）里加入 SVG 里的字形，给新字补 hinting，改名，存成 OTF
+  glyphlib.py        SVG 读写、笔画合并、转成 CFF 曲线
   tools/strokes.py   笔画：横、竖、撇、捺、提、斜竖、横折钩、竖弯钩……尺寸常量在文件开头
   tools/parts.py     部件，按部位命名：wang_left（左旁王）、tun_right（右旁屯）、mu_bottom（字底木）、
                      bai_top（字头白）、cong_top（字头从）、yi（㠯）、kou_frame（口框）
@@ -36,8 +36,8 @@ font/
 - **拟合**：`tools/fit.py` 把每一笔对应到参考字的一个或几个轮廓，用笔画函数画出这一笔，求两者的重合度（交集面积 ÷ 并集面积），逐个参数爬坡到不再升高；`parts.py` 里的坐标就是它的输出。头宽、尖宽、轻重这类参数单凭重合度会被拟到失形，所以按目测取定、只拟合落点与曲线。重新核对：
 
   ```bash
-  python3 font/tools/fit.py --upstream "NotoSerifSC[wght].ttf" fit        # 打印各部件每一笔的参数与重合度
-  python3 font/tools/fit.py --upstream "NotoSerifSC[wght].ttf" measure 冊  # 列出参考字各轮廓的范围
+  python3 font/tools/fit.py --upstream NotoSerifSC-Regular.otf fit        # 打印各部件每一笔的参数与重合度
+  python3 font/tools/fit.py --upstream NotoSerifSC-Regular.otf measure 冊  # 列出参考字各轮廓的范围
   ```
 
 - **不是拼贴**：部件只按字框移动笔画的落点，横竖的粗细和收笔不随字框缩放；撇捺在缩小的部件里按缩小比例的平方根减轻，和思源宋体里小部件的笔画轻重一致，不会像把整个字缩放后那样细成线。
@@ -48,17 +48,19 @@ font/
 制作字体要用 Python（只在重新生成字体时需要，站点构建与浏览不需要）：
 
 ```bash
-python3 -m pip install fonttools skia-pathops pyyaml brotli
+python3 -m pip install fonttools skia-pathops pyyaml brotli afdko
 npm run build && npm run fonts   # 会调用 font/build.py，得到站点用的 dao-song-400.woff2
 ```
 
-也可以单独生成完整的 TTF（约 14 MB，含思源宋体的全部字形）：
+也可以单独生成完整的 OTF（约 11 MB，含思源宋体的全部字形）：
 
 ```bash
-python3 font/build.py --upstream "NotoSerifSC[wght].ttf" --out DaoSong-Regular.ttf
+python3 font/build.py --upstream NotoSerifSC-Regular.otf --out DaoSong-Regular.otf
 ```
 
 上游字体是 `font.yaml` 里固定的版本，`build.py` 会核对它的 SHA-256。同样的输入得到逐字节相同的字体。
+
+**为什么用 OTF 而不是 Google Fonts 的可变字体**：两者字形相同，但只有 Adobe 发布的 CFF 版带 hinting（让笔画在小字号时对齐像素的指令）。没有 hinting，Windows、Linux 的普通分辨率屏上，横画时而落在一列像素上、时而摊成两列浅灰，同一行字看着有粗有细。上游的字原样保留 Adobe 的 hinting；补绘的字由 AFDKO 的 `otfautohint` 按同一组对齐区与标准笔宽补上。
 
 ## 授权
 

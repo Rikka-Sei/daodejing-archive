@@ -1,4 +1,4 @@
-"""SVG 手绘字形 → 字体轮廓：读 SVG 里的各条笔画，合并成一个轮廓，转成 TrueType 的二次曲线。"""
+"""SVG 手绘字形 → 字体轮廓：读 SVG 里的各条笔画，合并成一个轮廓，转成 CFF（PostScript）的三次曲线。"""
 
 from __future__ import annotations
 
@@ -6,13 +6,15 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import pathops
-from fontTools.pens.cu2quPen import Cu2QuPen
+from fontTools.misc.psCharStrings import T2CharString
+from fontTools.pens.reverseContourPen import ReverseContourPen
+from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.transformPen import TransformPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.svgLib.path import parse_path
 
 SVG_NS = '{http://www.w3.org/2000/svg}'
 ASCENT = 880  # 字身框：基线以上 880，以下 120（与思源宋体一致）
+EM = 1000
 
 
 def read_strokes(svg: str | Path) -> list[tuple[str, str]]:
@@ -28,13 +30,21 @@ def _union(parts: list[pathops.Path]) -> pathops.Path:
     return acc
 
 
-def to_glyph(strokes: list[str], *, max_err: float = 1.0):
-    """SVG 路径（y 向下）→ TrueType 字形（y 向上，基线在 880 处）。"""
+
+def outline(strokes: list[str]) -> pathops.Path:
+    """SVG 路径（y 向下）合并成一个轮廓，翻成字体坐标（y 向上，基线在 880 处）。
+    上下一翻，轮廓方向也跟着反了，所以再反过来：外框逆时针、内框顺时针，是 CFF（PostScript）要的方向。"""
     merged = _union([_path(d) for d in strokes])
-    pen = TTGlyphPen(None)
-    flip = TransformPen(pen, (1, 0, 0, -1, 0, ASCENT))
-    merged.draw(Cu2QuPen(flip, max_err, reverse_direction=True))
-    return pen.glyph()
+    out = pathops.Path()
+    merged.draw(TransformPen(ReverseContourPen(out.getPen()), (1, 0, 0, -1, 0, ASCENT)))
+    return out
+
+
+def to_charstring(strokes: list[str], private=None, global_subrs=None) -> T2CharString:
+    """手绘笔画 → CFF 字形（字宽 1000，不带 hinting；hinting 由 build.py 统一加）。"""
+    pen = T2CharStringPen(EM, None)
+    outline(strokes).draw(pen)
+    return pen.getCharString(private=private, globalSubrs=global_subrs)
 
 
 def _path(d: str) -> pathops.Path:

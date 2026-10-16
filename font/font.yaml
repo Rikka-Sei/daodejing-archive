@@ -11,8 +11,9 @@ license: SIL OFL 1.1
 
 upstream:
   name: Noto Serif SC
-  url: https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf
-  sha256: 050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9
+  # Adobe 发布的静态 OTF（CFF 轮廓，带 hinting）；字形与 Google Fonts 的可变字体相同，但那一版不带 hinting
+  url: https://raw.githubusercontent.com/notofonts/noto-cjk/Serif2.003/Serif/SubsetOTF/SC/NotoSerifSC-Regular.otf
+  sha256: e8f396decc1f0963a016a989c3d8852e863d1350996f573860a80767c83a1cd3
   weight: 400
 
 # 手绘的字：码位、字、结构（IDS，仅作说明）、SVG 文件（由 tools/draw.py 生成）、参考字（对照比例的思源宋体字，见 tools/fit.py）。字形依据 Unicode 字表（The Unicode Standard 18.0，

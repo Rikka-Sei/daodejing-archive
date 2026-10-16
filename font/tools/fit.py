@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """拟合：在思源宋体的参考字上量出部件的落点。parts.py 里各部件的坐标就是这样量出来再取整的。
 
-做法：从上游字体（取定字重 400）里取参考字的轮廓，每一笔对应其中一个或几个轮廓；
+做法：从上游字体（思源宋体 Regular）里取参考字的轮廓，每一笔对应其中一个或几个轮廓；
 用 strokes.py 的笔画函数按一组参数画出这一笔，与参考轮廓求重合度（交集面积 / 并集面积），
 逐个参数加减步长、步长逐级减半地爬坡，直到重合度不再升高。只量落点与曲线比例，不取用参考字的轮廓本身。
 
 用法（上游字体与 npm run fonts 用的是同一个文件，见 font.yaml 的 upstream）：
-  python3 font/tools/fit.py --upstream NotoSerifSC[wght].ttf measure 臬 吾   # 列出参考字各轮廓的范围（y 向下）
-  python3 font/tools/fit.py --upstream NotoSerifSC[wght].ttf fit cong_top     # 逐笔拟合，打印参数与重合度
-  python3 font/tools/fit.py --upstream NotoSerifSC[wght].ttf fit              # 拟合全部登记的部件
+  python3 font/tools/fit.py --upstream NotoSerifSC-Regular.otf measure 臬 吾   # 列出参考字各轮廓的范围（y 向下）
+  python3 font/tools/fit.py --upstream NotoSerifSC-Regular.otf fit cong_top     # 逐笔拟合，打印参数与重合度
+  python3 font/tools/fit.py --upstream NotoSerifSC-Regular.otf fit              # 拟合全部登记的部件
 轮廓的序号随上游字体而定；font.yaml 按 SHA-256 固定了上游版本，换版本要重新核对 SPECS 里的序号。
 """
 
@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 
-from build import load_config, static_instance  # noqa: E402
+from build import load_config  # noqa: E402
 from glyphlib import ASCENT, _path  # noqa: E402
 from parts import kou_frame  # noqa: E402
 from strokes import heng, na, na_duan, pie, plain_shu, shu, shu_duan, shu_tail, shu_wan_gou, shu_zhe, ti  # noqa: E402
@@ -41,15 +41,14 @@ Model = Callable[[Sequence[float]], 'str | list[str]']
 # ---- 参考字的轮廓与重合度 ----
 
 
-def reference_font(upstream: Path, weight: int = 400) -> TTFont:
-    return static_instance(TTFont(upstream), weight)
+def reference_font(upstream: Path) -> TTFont:
+    return TTFont(upstream)
 
 
 def contours(font: TTFont, ch: str) -> list[pathops.Path]:
     """参考字的各个轮廓，换到 y 向下、基线在 ASCENT 的坐标（与 SVG 一致）。"""
-    glyf = font['glyf']
     rec = RecordingPen()
-    glyf[font.getBestCmap()[ord(ch)]].draw(rec, glyf)  # 直接取 glyf 里的坐标（复合字形会展开）
+    font.getGlyphSet()[font.getBestCmap()[ord(ch)]].draw(rec)
     out, cur = [], pathops.Path()
     pen = TransformPen(cur.getPen(), (1, 0, 0, -1, 0, ASCENT))
     for op, args in rec.value:
@@ -201,7 +200,7 @@ def fit(font: TTFont, names: Sequence[str]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('--upstream', required=True, type=Path, help='固定版本的 NotoSerifSC[wght].ttf')
+    ap.add_argument('--upstream', required=True, type=Path, help='固定版本的 NotoSerifSC-Regular.otf')
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('measure', help='列出参考字各轮廓的范围').add_argument('chars')
     sub.add_parser('fit', help='逐笔拟合登记的部件').add_argument('parts', nargs='*', choices=list(SPECS))

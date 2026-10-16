@@ -74,13 +74,13 @@ tests/site/              测试
 
 ## 固定字体
 
-页面不依赖观看者机器上的字体：随站点发布思源黑体、宋体的子集（SIL OFL 1.1，共约 1 MB），子集里没有的字由浏览器逐字回退到系统字体。构建结束时会列出页面用到、但子集里没有的字。宋体 400（释文正文）用的是 DaoSong：思源宋体 Regular 的派生字体，Noto 与补充字体都没有的 6 个生僻字（𠂤𠕁𠚕𣐩𤤀𭇁）在 `font/` 里逐笔手绘补进去，其余字形原样沿用；见 [font/README.md](../font/README.md)。黑体缺的字（界面与注释里偶尔出现的这几个字）回退到宋体，所以样式里 `--sans` 的字体列表带着 DG Serif。
+页面不依赖观看者机器上的字体：随站点发布思源黑体、宋体的子集（SIL OFL 1.1，共约 1.4 MB），子集里没有的字由浏览器逐字回退到系统字体。构建结束时会列出页面用到、但子集里没有的字。宋体 400（释文正文）用的是 DaoSong：思源宋体 Regular 的派生字体，Noto 与补充字体都没有的 6 个生僻字（𠂤𠕁𠚕𣐩𤤀𭇁）在 `font/` 里逐笔手绘补进去，其余字形原样沿用；见 [font/README.md](../font/README.md)。黑体缺的字（界面与注释里偶尔出现的这几个字）回退到宋体，所以样式里 `--sans` 的字体列表带着 DG Serif。
 
 ```bash
 npm run build && npm run fonts    # 统计 dist/ 里的用字，重新裁出子集到 public/fonts/
 ```
 
-来源字体按 URL 和 SHA-256 固定：首次运行会下载（两个字体共约 43 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。宋体 400 先用 `font/build.py`（Python，需要 fonttools、skia-pathops、pyyaml）从固定版本的思源宋体生成 DaoSong，再裁子集；字体清单 `fonts.json` 的 `sources` 里登记派生关系与上游哈希。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：取定字重，保留竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
+来源字体是 Adobe 发布的思源黑体、宋体静态 OpenType（Regular 与 Medium 各一个文件，CFF 轮廓，带 hinting），按 URL 和 SHA-256 固定：首次运行会下载（四个文件共约 40 MB，缓存在 `~/.cache/daodejing-archive/fonts`），校验通过才用。不用 Google Fonts 的可变字体，是因为它不带 hinting：小字号在普通分辨率屏上横画时而清楚时而发虚，一行字看着有粗有细。宋体 400 先用 `font/build.py`（Python，需要 fonttools、skia-pathops、pyyaml、afdko）从固定版本的思源宋体 Regular 生成 DaoSong，再裁子集；字体清单 `fonts.json` 的 `sources` 里登记派生关系与上游哈希。子集由 HarfBuzz 的 hb-subset（WebAssembly 版，随 npm 依赖安装）裁出：保留 hinting、竖排用的 vert/vrt2 等排版特征、版权与授权信息、缺字时显示的方框，再压成 WOFF2。同样的输入得到逐字节相同的文件，不需要装别的工具。释文只用宋体 400，所以其余字重只装界面与标题用字；这靠一个约定区分：**不带属性的 `<p>` 只用于释文正文**，其他段落都要带 class。
 
 对读表和实录里有 Unicode 没有收的造字（用私用区码位）和扩展 B 区到扩展 H 区的生僻字，用 tt24h 随源码发布的补充字体 DaoDeJingExt（`dg-ext-400.woff2`，约 144 KB，SIL OFL 1.1）显示。它整个收录、不裁剪；页面用 `unicode-range: U+E000-F8FF, U+20000-3FFFF` 声明它，页面上出现这些字才下载，也不预加载。字体文件和授权文本随源码存在 `data/raw/tt24h-daodejing/`，已登记在 `data/sources/tt24h-daodejing.yaml`；`npm run fonts` 从那里读入，并按脚本里固定的 SHA-256 校验，通过才转成 WOFF2。
 
@@ -93,7 +93,7 @@ npm run build && npm run fonts    # 统计 dist/ 里的用字，重新裁出子�
 
 ## 测试
 
-`tests/site/` 用占位典籍测数据读取、文本处理、对读表、下载内容、缩略图、固定字体、各页面的结构和检查本身，用 `astro build` 跑两遍真实数据（带 `--site`、`--base` 与不带）检查输出，并核对真实数据的结构约定。字体脚本的用字统计、来源校验和子集裁剪也在这里测，不联网：裁剪用 `tests/site/assets/mini-vf.ttf`，那是从固定来源的思源黑体里只裁出六个字、保留字重轴的小字体。
+`tests/site/` 用占位典籍测数据读取、文本处理、对读表、下载内容、缩略图、固定字体、各页面的结构和检查本身，用 `astro build` 跑两遍真实数据（带 `--site`、`--base` 与不带）检查输出，并核对真实数据的结构约定。字体脚本的用字统计、来源校验和子集裁剪也在这里测，不联网：裁剪用 `tests/site/assets/mini-sans.otf`，那是从固定来源的思源黑体 Regular 里只裁出六个字、保留 hinting 的小字体。
 
 页面脚本 `reader.js`、`align.js` 在 `client-scripts.test.ts` 里放进 `node:vm` 的假页面运行，不引入 DOM 库：点字、拖选、读各章、专注模式、键盘，以及对读表页的高亮与钉住。阅读器里重抄了一份比较与共用通行字的规则（同 `src/lib/alignment.ts`，两处要一起改），这个测试把两边对每一列的结果逐一核对，用占位数据和整套真实数据各跑一遍。`app.js`（侧栏检索、两条轴、菜单）没有自动测试，改动后要在浏览器里看一遍。
 
