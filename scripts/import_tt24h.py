@@ -5,6 +5,8 @@
 只读取 data/raw/tt24h-daodejing/ 下已登记哈希的文件，不联网。
 
 实录每行末尾的〚L…〛是简号（"2背"、"2正"这类原样保留在 unit_no），按它切分；
+实录把写在简背的篇题（"2背""124背"）排在该简正面之前，这里按简牍本身的顺序改排到正面之后
+（简1、简2正、简2背、简3……），locator 仍指实录原行；
 text 去掉简号标记和换行，其余照抄，只做一处机械处理：
   - 残字〚F字〛去掉外层记号，只留该字，残字范围记入 damage（uncertain）。
 造字用的〚⿰…〛序列原样保留，一个〚…〛代表一个字。
@@ -13,6 +15,10 @@ import json
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import alignment as al  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = {"source": "tt24h-daodejing", "raw": "data/raw/tt24h-daodejing/v0.1.3/实录-北大汉简.txt"}
@@ -51,7 +57,7 @@ def beida() -> list[dict]:
             sys.exit(f"第 {ln} 行没有以简号结尾：{line}")
         text, marks, damage = parse_slip(m.group(1))
         u = {
-            "id": f"beida.{len(units) + 1:03d}",
+            "id": "",
             "witness": "beida",
             "unit_type": "slip",
             "unit_no": m.group(2),
@@ -64,6 +70,12 @@ def beida() -> list[dict]:
         if damage:
             u["damage"] = damage
         units.append(u)
+    try:
+        units = al.slip_order(units, "unit_no")
+    except ValueError as e:
+        sys.exit(str(e))
+    for i, u in enumerate(units, 1):
+        u["id"] = f"beida.{i:03d}"
     nos = [u["unit_no"] for u in units]
     expect = [str(n) for n in range(1, 222)]
     got = [re.sub(r"正$", "", n) for n in nos if not n.endswith("背")]

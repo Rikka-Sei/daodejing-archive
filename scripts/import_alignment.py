@@ -130,7 +130,7 @@ def build(root: Path) -> dict[str, str]:
             for n, l in enumerate(body, 1):
                 l["no"] = str(n)
         for v in group:
-            mine = [l for l in body if "line_prefix" not in v or (l["no"] or "").startswith(v["line_prefix"])]
+            mine = al.slip_order([l for l in body if "line_prefix" not in v or (l["no"] or "").startswith(v["line_prefix"])], "no")
             lines_out[v["id"]] = mine
             meta_of[v["id"]].update({en: info[zh] for zh, en in (("底本", "base"), ("参照书", "reference"), ("与参照书差异", "differences")) if zh in info})
             meta_of[v["id"]]["unit"] = v.get("unit", "chapter")

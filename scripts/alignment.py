@@ -224,6 +224,26 @@ def read_records(path: Path) -> list[tuple[str, str, list[str]]]:
     return out
 
 
+def slip_order(items: list[dict], key: str) -> list[dict]:
+    """实录把写在简背的篇题（"2背"）排在该简正面之前；按简牍本身的顺序改排到同一枚简的正面（"2正"）之后。
+
+    key 是简号所在的字段。简背找不到对应正面时报 ValueError。
+    """
+    def no(x):
+        return x.get(key) or ""
+    backs = {no(x)[:-1]: x for x in items if no(x).endswith("背")}
+    out = []
+    for x in items:
+        if no(x).endswith("背"):
+            continue
+        out.append(x)
+        if no(x).endswith("正") and no(x)[:-1] in backs:
+            out.append(backs.pop(no(x)[:-1]))
+    if backs:
+        raise ValueError(f"简背找不到对应的正面：{sorted(backs)}")
+    return out
+
+
 def physical_order(cells: list[tuple[int, dict]]) -> list[tuple[int, dict]]:
     """把 ▩…▦ 里的句子按 🅰🅱🅲 标出的底本顺序排回去，返回底本顺序的 (列, 格)。"""
     out, i = [], 0
