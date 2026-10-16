@@ -3,6 +3,7 @@
 // 材料轴：封面、凡例、透视（有简牍的典籍），再按分类列文献（一手的出土文献、拓本、传世本与校订本、论文与对照资料）。
 // 章节轴：依王弼本分章的八十一章，每章后面的圆点表示各出土本有没有这一章（悬停看各本）。
 import { chapterTitle, showText } from '../lib/alignment';
+import { COMMIT, commitUrl } from '../lib/commit';
 import type { Corpus } from '../lib/corpus';
 import { chapterUrl, coverUrl, lensUrl, openUrl, prefaceUrl, REPO_URL, studyUrl, url } from '../lib/url';
 import CorpusLinks from './CorpusLinks.astro';
@@ -133,4 +134,5 @@ const parts = (c.chapterParts.length ? c.chapterParts : [{ title: '', to: chapte
 <div class="sb-foot">
   <a href={REPO_URL} target="_blank" rel="noopener">数据仓库</a>
   <a href={url('llms.txt')}>llms.txt</a>
+  {COMMIT && <a class="sha" href={commitUrl(COMMIT)} target="_blank" rel="noopener" title={`构建自提交 ${COMMIT}`}>{COMMIT.slice(0, 7)}</a>}
 </div>
