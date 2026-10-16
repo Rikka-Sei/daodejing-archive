@@ -24,6 +24,11 @@ describe('缩略图文件名', () => {
     expect(thumbName(rel, COVER_WIDTH)).toBe('commons__d9a29621c2@720.jpg');
   });
 
+  it('从整页图上裁出的块：带上 ~左-上-宽-高', () => {
+    expect(thumbName('data/images/a/b.jpg', WIDTH, [1, 2, 3, 4])).toBe('a__b~1-2-3-4.jpg');
+    expect(thumbName('data/images/a/b.jpg', COVER_WIDTH, [1, 2, 3, 4])).toBe('a__b~1-2-3-4@720.jpg');
+  });
+
   it('站内路径与原图地址', () => {
     expect(thumbPath('laozi', 'data/images/a/b.jpg')).toBe('laozi/thumbs/a__b.jpg');
     expect(fullUrl('data/images/a/郭 店.jpg')).toBe(
@@ -69,6 +74,11 @@ describe('生成缩略图', () => {
 
   it('不放大', async () => {
     expect(await dims(await makeThumb(await make('small.jpg', 100, 80), 360))).toEqual(['jpeg', 100, 80]);
+  });
+
+  it('带裁块时先裁再缩', async () => {
+    expect(await dims(await makeThumb(await make('page.jpg', 1000, 2000), 360, [10, 20, 100, 300]))).toEqual(['jpeg', 100, 300]);
+    expect(await dims(await makeThumb(await make('page2.jpg', 1000, 2000), 50, [10, 20, 100, 300]))).toEqual(['jpeg', 50, 150]);
   });
 
   it('按 EXIF 方向摆正', async () => {

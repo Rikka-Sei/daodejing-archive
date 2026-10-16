@@ -188,7 +188,7 @@ def main() -> int:
             except (ValueError, KeyError, TypeError):
                 pass  # 上面已报告
     plates = 0
-    seen_files: set[str] = set()
+    seen_files: set[object] = set()
     for p in sorted((data / "plates").glob("*.jsonl")):
         wid = p.stem
         if wid not in witnesses:
@@ -209,9 +209,22 @@ def main() -> int:
             plates += 1
             if rec["witness"] != wid:
                 problems.append(f"{where}: witness 字段 {rec['witness']} 与文件名不一致")
-            if rec["file"] in seen_files:
+            # 同一张图只登记一次；整页图上逐简裁出的块（带 crop）按“图 + 块”算，块要在图内、同一块不重复
+            key = (rec["file"], tuple(rec["crop"])) if "crop" in rec else rec["file"]
+            if key in seen_files:
                 problems.append(f"{where}: 图片重复登记 {rec['file']}")
-            seen_files.add(rec["file"])
+            seen_files.add(key)
+            if "crop" in rec:
+                if rec["kind"] != "slip-plate":
+                    problems.append(f"{where}: 只有单简图版（slip-plate）可以带 crop")
+                left, top, w, h = rec["crop"]
+                img = root / rec["file"]
+                if img.exists():
+                    from PIL import Image  # 只在有裁块时用到
+
+                    with Image.open(img) as im:
+                        if w <= 0 or h <= 0 or left + w > im.width or top + h > im.height:
+                            problems.append(f"{where}: crop {rec['crop']} 超出图片范围 {im.width}×{im.height}")
             src = sources.get(rec["source"])
             if src is None:
                 problems.append(f"{where}: 来源 {rec['source']} 未登记")

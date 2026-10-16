@@ -10,4 +10,4 @@ export const getStaticPaths = (() =>
   )) satisfies GetStaticPaths;
 
 export const GET: APIRoute<{ job: ThumbJob }> = async ({ props: { job } }) =>
-  new Response(await makeThumb(job.rel, job.width), { headers: { 'Content-Type': 'image/jpeg' } });
+  new Response(await makeThumb(job.rel, job.width, job.crop), { headers: { 'Content-Type': 'image/jpeg' } });

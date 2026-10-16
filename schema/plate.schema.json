@@ -20,6 +20,13 @@
       "items": { "type": "string" },
       "description": "图中出现的文本单位 id；尚未对应时为空"
     },
+    "crop": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0 },
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "只取图中的一块（左、上、宽、高，原图像素）：整页图版上的一枚简。缩略图按这块裁出，点开仍是整页原图"
+    },
     "note": { "type": ["string", "null"] }
   }
 }

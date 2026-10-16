@@ -35,7 +35,11 @@ export interface Plate {
   units: string[];
   witness?: string;
   source?: string;
+  /** 只取图中的一块：左、上、宽、高（原图像素） */
+  crop?: Crop;
 }
+
+export type Crop = [number, number, number, number];
 
 /** 版本登记表（witnesses.yaml）或来源登记（sources/*.yaml）里的一条，字段随来源而异。 */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

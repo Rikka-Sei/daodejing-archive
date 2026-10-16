@@ -30,7 +30,7 @@ const chapter = compare && u.unit_type === 'chapter' && /^\d+$/.test(String(u.un
   {
     plates.map((p) => (
       <a class="plate" href={fullUrl(p.file)} target="_blank" rel="noopener">
-        <img loading="lazy" src={thumbUrl(corpusId, p.file)} alt={`${label}图版`} />
+        <img loading="lazy" src={thumbUrl(corpusId, p.file, undefined, p.crop)} alt={`${label}图版`} />
       </a>
     ))
   }

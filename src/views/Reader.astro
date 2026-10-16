@@ -63,7 +63,7 @@ const plateOf = (no: string) => {
           <p set:html={lineHtml(l, al.glyphs, (n) => chapterUrl(c, n))} />
           {plateOf(l.no).map((p) => (
             <a class="plate" href={fullUrl(p.file)} target="_blank" rel="noopener">
-              <img loading="lazy" src={thumbUrl(c.id, p.file, READER_WIDTH)} alt={`${unit} ${l.no}图版`} />
+              <img loading="lazy" src={thumbUrl(c.id, p.file, READER_WIDTH, p.crop)} alt={`${unit} ${l.no}图版`} />
             </a>
           ))}
         </div>
